@@ -223,7 +223,7 @@ applyANSISGRToAttribute sgr attribute = case sgr of
     SetColor Background Dull color  -> applyBackgroundANSIColorToAttribute color (attribute .&. (complement bACKGROUND_INTENSITY))
     SetColor Background Vivid color -> applyBackgroundANSIColorToAttribute color (attribute .|. bACKGROUND_INTENSITY)
   where
-    iNTENSITY = fOREGROUND_INTENSITY .|. bACKGROUND_INTENSITY
+    iNTENSITY = fOREGROUND_INTENSITY
 
 hSetSGR h sgr = emulatorFallback (Unix.hSetSGR h sgr) $ withHandle h $ \handle -> do
     screen_buffer_info <- getConsoleScreenBufferInfo handle
