@@ -228,7 +228,9 @@ applyANSISGRToAttribute sgr attribute = case sgr of
 hSetSGR h sgr = emulatorFallback (Unix.hSetSGR h sgr) $ withHandle h $ \handle -> do
     screen_buffer_info <- getConsoleScreenBufferInfo handle
     let attribute = csbi_attributes screen_buffer_info
-        attribute' = foldl' (flip applyANSISGRToAttribute) attribute sgr
+        attribute' = foldl' (flip applyANSISGRToAttribute) attribute
+          -- make [] equivalent to [Reset], as documented
+          (if null sgr then [Reset] else sgr)
     setConsoleTextAttribute handle attribute'
 
 setSGRCode _ = ""
