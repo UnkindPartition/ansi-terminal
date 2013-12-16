@@ -7,7 +7,6 @@ Description:         ANSI terminal support for Haskell: allows cursor movement, 
                      changing the title. Compatible with Windows and those Unixes with ANSI terminals, but only GHC is supported as a compiler.
 License:             BSD3
 License-File:        LICENSE
-Extra-Source-Files:  README.textile
 Author:              Max Bolingbroke
 Maintainer:          Roman Cheplyaka <roma@ro-che.info>
 Homepage:            https://github.com/feuerbach/ansi-terminal
@@ -16,6 +15,7 @@ Build-Type:          Simple
 Extra-Source-Files:     includes/Common-Include.hs
                         includes/Exports-Include.hs
                         CHANGELOG.md
+                        README.md
 
 
 Source-repository head
