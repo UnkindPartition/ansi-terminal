@@ -47,22 +47,24 @@ A full example is
 [available](http://github.com/feuerbach/ansi-terminal/tree/master/System/Console/ANSI/Example.hs),
 but for a taste of how the library works try the following code:
 
-    import System.Console.ANSI
+``` haskell
+import System.Console.ANSI
 
-    main = do
-        setCursorPosition 5 0
-        setTitle "ANSI Terminal Short Example"
+main = do
+    setCursorPosition 5 0
+    setTitle "ANSI Terminal Short Example"
 
-        setSGR [ SetConsoleIntensity BoldIntensity
-               , SetColor Foreground Vivid Red
-               ]
-        putStr "Hello"
-        
-        setSGR [ SetConsoleIntensity NormalIntensity
-               , SetColor Foreground Vivid White
-               , SetColor Background Dull Blue
-               ]
-        putStrLn "World!"
+    setSGR [ SetConsoleIntensity BoldIntensity
+           , SetColor Foreground Vivid Red
+           ]
+    putStr "Hello"
+
+    setSGR [ SetConsoleIntensity NormalIntensity
+           , SetColor Foreground Vivid White
+           , SetColor Background Dull Blue
+           ]
+    putStrLn "World!"
+```
 
 ![](images/example.png)
 
