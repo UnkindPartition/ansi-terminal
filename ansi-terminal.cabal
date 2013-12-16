@@ -1,6 +1,6 @@
 Name:                ansi-terminal
 Version:             0.6
-Cabal-Version:       >= 1.2
+Cabal-Version:       >= 1.6
 Category:            User Interfaces
 Synopsis:            Simple ANSI terminal support, with Windows compatibility
 Description:         ANSI terminal support for Haskell: allows cursor movement, screen clearing, color output showing or hiding the cursor, and
