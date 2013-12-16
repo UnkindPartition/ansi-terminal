@@ -15,6 +15,7 @@ Build-Type:          Simple
 
 Extra-Source-Files:     includes/Common-Include.hs
                         includes/Exports-Include.hs
+                        CHANGELOG.md
 
 
 Source-repository head
