@@ -9,12 +9,17 @@ License:             BSD3
 License-File:        LICENSE
 Extra-Source-Files:  README.textile
 Author:              Max Bolingbroke
-Maintainer:          batterseapower@hotmail.com
-Homepage:            http://batterseapower.github.com/ansi-terminal
+Maintainer:          Roman Cheplyaka <roma@ro-che.info>
+Homepage:            https://github.com/feuerbach/ansi-terminal
 Build-Type:          Simple
 
 Extra-Source-Files:     includes/Common-Include.hs
                         includes/Exports-Include.hs
+
+
+Source-repository head
+  type:     git
+  location: git://github.com/feuerbach/ansi-terminal.git
 
 Flag SplitBase
         Description:    Choose the new smaller, split-up base package
