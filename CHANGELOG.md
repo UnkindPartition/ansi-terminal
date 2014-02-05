@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 0.6.1.1
+---------------
+
+Fix to build with GHC 7.8 on Windows
+
 Version 0.6.1
 -------------
 
