@@ -45,12 +45,13 @@ import Control.Exception (bracket)
 
 import Foreign.StablePtr
 
-import GHC.IOBase (Handle(..), Handle__(..))
-import qualified GHC.IOBase as IOBase (FD) -- Just an Int32
-
 #if __GLASGOW_HASKELL__ >= 612
+import GHC.IO.Handle.Types (Handle(..), Handle__(..))
 import GHC.IO.FD (FD(..)) -- A wrapper around an Int32
 import Data.Typeable
+#else
+import GHC.IOBase (Handle(..), Handle__(..))
+import qualified GHC.IOBase as IOBase (FD) -- Just an Int32
 #endif
 
 
@@ -287,7 +288,11 @@ scrollConsoleScreenBuffer handle scroll_rectangle mb_clip_rectangle destination_
 
 
 -- This essential function comes from the C runtime system. It is certainly provided by msvcrt, and also seems to be provided by the mingw C library - hurrah!
+#if __GLASGOW_HASKELL__ >= 612
+foreign import ccall unsafe "_get_osfhandle" cget_osfhandle :: CInt -> IO HANDLE
+#else
 foreign import ccall unsafe "_get_osfhandle" cget_osfhandle :: IOBase.FD -> IO HANDLE
+#endif
 
 -- | This bit is all highly dubious.  The problem is that we want to output ANSI to arbitrary Handles rather than forcing
 -- people to use stdout.  However, the Windows ANSI emulator needs a Windows HANDLE to work it's magic, so we need to be able
