@@ -66,7 +66,7 @@ main = do
     putStrLn "World!"
 ```
 
-![](images/example.png)
+![](https://raw.githubusercontent.com/feuerbach/ansi-terminal/master/example.png)
 
 Documentation
 -------------
