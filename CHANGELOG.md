@@ -1,6 +1,12 @@
 Changes
 =======
 
+Version 0.6.2
+---------------
+
+* Add `hSupportsANSI`
+* Drop support for `base < 4`
+
 Version 0.6.1.1
 ---------------
 
