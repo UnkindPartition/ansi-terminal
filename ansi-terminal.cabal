@@ -22,10 +22,6 @@ Source-repository head
   type:     git
   location: git://github.com/feuerbach/ansi-terminal.git
 
-Flag SplitBase
-        Description:    Choose the new smaller, split-up base package
-        Default:        True
-
 Flag Example
         Description:    Build the example application
         Default:        False
@@ -37,6 +33,7 @@ Library
         
         Include-Dirs:           includes
         
+        Build-Depends:          base >= 4 && < 5
         if os(windows)
                 Build-Depends:          Win32 >= 2.0
                 Cpp-Options:            -DWINDOWS
@@ -52,11 +49,6 @@ Library
                 Cpp-Options:            -DUNIX
                 Other-Modules:          System.Console.ANSI.Unix
         
-        if flag(splitBase)
-                Build-Depends:          base >= 3 && < 5
-        else
-                Build-Depends:          base < 3
-        
         Extensions:             CPP
                                 ForeignFunctionInterface
         
@@ -65,7 +57,7 @@ Library
 Executable ansi-terminal-example
         Main-Is:                System/Console/ANSI/Example.hs
         
-        Cpp-Options:            -Iincludes
+        Include-Dirs:           includes
         
         if os(windows)
                 Build-Depends:          Win32 >= 2.0
@@ -80,11 +72,8 @@ Executable ansi-terminal-example
                 Cpp-Options:            -DUNIX
                 Other-Modules:          System.Console.ANSI.Unix
         
-        if flag(splitBase)
-                Build-Depends:          base >= 3 && < 5
-        else
-                Build-Depends:          base < 3
         
+        Build-Depends:          base >= 4 && < 5
         Extensions:             CPP
                                 ForeignFunctionInterface
         
