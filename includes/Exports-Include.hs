@@ -47,4 +47,7 @@ hideCursorCode, showCursorCode,
 -- * Changing the title
 setTitle,
 hSetTitle,
-setTitleCode
+setTitleCode,
+
+-- * Checking if handle supports ANSI
+hSupportsANSI
