@@ -1,8 +1,13 @@
 Changes
 =======
 
-Version 0.6.2
+Version 0.6.2.1
 ---------------
+
+Restore compatibility with GHC 7.4 and older
+
+Version 0.6.2
+-------------
 
 * Add `hSupportsANSI`
 * Drop support for `base < 4`
