@@ -140,4 +140,5 @@ hSupportsANSI :: Handle -> IO Bool
 -- (https://github.com/hspec/hspec/commit/d932f03317e0e2bd08c85b23903fb8616ae642bd)
 hSupportsANSI h = (&&) <$> hIsTerminalDevice h <*> (not <$> isDumb)
   where
-    isDumb = maybe False (== "dumb") <$> lookupEnv "TERM"
+    -- cannot use lookupEnv since it only appeared in GHC 7.6
+    isDumb = maybe False (== "dumb") . lookup "TERM" <$> getEnvironment
