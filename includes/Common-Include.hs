@@ -1,5 +1,7 @@
 import System.Environment
+#if !MIN_VERSION_base(4,8,0)
 import Control.Applicative
+#endif
 
 hCursorUp, hCursorDown, hCursorForward, hCursorBackward :: Handle
                                                         -> Int -- ^ Number of lines or characters to move
