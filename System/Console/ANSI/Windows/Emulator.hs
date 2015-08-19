@@ -95,11 +95,11 @@ clearAttribute = 0
 hClearScreenFraction :: HANDLE -> (SMALL_RECT -> COORD -> (DWORD, COORD)) -> IO ()
 hClearScreenFraction handle fraction_finder = do
     screen_buffer_info <- getConsoleScreenBufferInfo handle
-    
+
     let window = csbi_window screen_buffer_info
         cursor_pos = csbi_cursor_position screen_buffer_info
         (fill_length, fill_cursor_pos) = fraction_finder window cursor_pos
-    
+
     fillConsoleOutputCharacter handle clearChar fill_length fill_cursor_pos
     fillConsoleOutputAttribute handle clearAttribute fill_length fill_cursor_pos
     return ()
