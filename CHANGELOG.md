@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 0.6.2.2
+---------------
+
+Fix a GHC 7.10 warning
+
 Version 0.6.2.1
 ---------------
 
