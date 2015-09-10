@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 0.6.2.3
+---------------
+
+Add an example to the haddocks
+
 Version 0.6.2.2
 ---------------
 
