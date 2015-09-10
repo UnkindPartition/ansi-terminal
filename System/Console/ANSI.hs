@@ -26,6 +26,20 @@
 --    Windows ANSI terminal support will only work on Unix.  On Windows these codes will always be the empty string,
 --    so it is possible to use them portably for e.g. coloring console output on the understanding that you will only
 --    see colors if you are running on a Unix-like operating system.
+--
+-- Example:
+--
+-- > -- Set colors and write some text in those colors.
+-- > sgrExample :: IO ()
+-- > sgrExample = do
+-- >     setSGR [SetColor Foreground Vivid Red]
+-- >     setSGR [SetColor Background Vivid Blue]
+-- >     putStr "Red-On-Blue"
+-- >     setSGR [Reset]
+-- >     putStr "White-On-Black"
+--
+-- For many more examples, see the project's extensive
+-- <https://raw.githubusercontent.com/feuerbach/ansi-terminal/master/System/Console/ANSI/Example.hs Example.hs> file.
 #if defined(WINDOWS)
 module System.Console.ANSI (
         module System.Console.ANSI.Windows
