@@ -135,7 +135,7 @@ setTitle = hSetTitle stdout
 -- package will work with a given handle.
 --
 -- The current implementation checks that the handle is a terminal, and
--- that the @TERM@ environment variable doesn't say @dumb@ (whcih is what
+-- that the @TERM@ environment variable doesn't say @dumb@ (which is what
 -- Emacs sets for its own terminal).
 hSupportsANSI :: Handle -> IO Bool
 -- Borrowed from an HSpec patch by Simon Hengel
