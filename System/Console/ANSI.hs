@@ -19,7 +19,7 @@
 --    and Unix.
 --
 --  * Chocolate: has an @IO ()@ type but takes a @Handle@.  This outputs the ANSI command on the terminal corresponding
---    to the supplied handle.  Commands issued like this should also work as your expect on both Windows and Unix.
+--    to the supplied handle.  Commands issued like this should also work as you expect on both Windows and Unix.
 --
 --  * Strawberry: has a @String@ type and just consists of an escape code which can be added to any other bit of text
 --    before being output.  This version of the API is often convenient to use, but due to fundamental limitations in
