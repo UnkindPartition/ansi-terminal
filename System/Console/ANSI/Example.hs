@@ -24,8 +24,14 @@ examples = [ cursorMovementExample
 main :: IO ()
 main = mapM_ (\example -> resetScreen >> example) examples
 
+-- Annex D to Standard ECMA-48 (5th Ed, 1991) identifies that the representation
+-- of an erased state is implementation-dependent. There may or may not be a
+-- distinction between a character position in the erased state and one imaging
+-- SPACE. Consequently, to reset the screen, the default graphic rendition must
+-- be selected (setSGR [Reset]) before all character positions are put into the
+-- erased state (clearScreen).
 resetScreen :: IO ()
-resetScreen = clearScreen >> setSGR [Reset] >> setCursorPosition 0 0
+resetScreen = setSGR [Reset] >> clearScreen >> setCursorPosition 0 0
 
 pause :: IO ()
 pause = do
