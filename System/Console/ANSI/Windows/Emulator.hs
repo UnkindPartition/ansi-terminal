@@ -2,9 +2,10 @@ module System.Console.ANSI.Windows.Emulator (
 #include "Exports-Include.hs"
     ) where
 
-import System.Console.ANSI.Common
+import System.Console.ANSI.Types
 import qualified System.Console.ANSI.Unix as Unix
 import System.Console.ANSI.Windows.Foreign
+import System.Console.ANSI.Windows.Emulator.Codes
 
 import System.IO
 
@@ -54,31 +55,15 @@ hCursorDown h n     = emulatorFallback (Unix.hCursorDown h n)     $ withHandle h
 hCursorForward h n  = emulatorFallback (Unix.hCursorForward h n)  $ withHandle h $ \handle -> adjustCursorPosition handle (\_ x -> x + fromIntegral n) (\_ y -> y)
 hCursorBackward h n = emulatorFallback (Unix.hCursorBackward h n) $ withHandle h $ \handle -> adjustCursorPosition handle (\_ x -> x - fromIntegral n) (\_ y -> y)
 
-cursorUpCode _       = ""
-cursorDownCode _     = ""
-cursorForwardCode _  = ""
-cursorBackwardCode _ = ""
-
-
 adjustLine :: HANDLE -> (SHORT -> SHORT -> SHORT) -> IO ()
 adjustLine handle change_y = adjustCursorPosition handle (\window_left _ -> window_left) change_y
 
 hCursorDownLine h n = emulatorFallback (Unix.hCursorDownLine h n) $ withHandle h $ \handle -> adjustLine handle (\_ y -> y + fromIntegral n)
 hCursorUpLine h n   = emulatorFallback (Unix.hCursorUpLine h n)   $ withHandle h $ \handle -> adjustLine handle (\_ y -> y - fromIntegral n)
 
-cursorDownLineCode _   = ""
-cursorUpLineCode _ = ""
-
-
 hSetCursorColumn h x = emulatorFallback (Unix.hSetCursorColumn h x) $ withHandle h $ \handle -> adjustCursorPosition handle (\window_left _ -> window_left + fromIntegral x) (\_ y -> y)
 
-setCursorColumnCode _ = ""
-
-
 hSetCursorPosition h y x = emulatorFallback (Unix.hSetCursorPosition h y x) $ withHandle h $ \handle -> adjustCursorPosition handle (\window_left _ -> window_left + fromIntegral x) (\window_top _ -> window_top + fromIntegral y)
-
-setCursorPositionCode _ _ = ""
-
 
 clearChar :: WCHAR
 clearChar = charToWCHAR ' '
@@ -136,14 +121,6 @@ hClearLine h = emulatorFallback (Unix.hClearLine h) $ withHandle h $ \handle -> 
   where
     go window cursor_pos = (fromIntegral (rect_width window), cursor_pos { coord_x = rect_left window })
 
-clearFromCursorToScreenEndCode       = ""
-clearFromCursorToScreenBeginningCode = ""
-clearScreenCode                      = ""
-clearFromCursorToLineEndCode         = ""
-clearFromCursorToLineBeginningCode   = ""
-clearLineCode                        = ""
-
-
 hScrollPage :: HANDLE -> Int -> IO ()
 hScrollPage handle new_origin_y = do
     screen_buffer_info <- getConsoleScreenBufferInfo handle
@@ -154,10 +131,6 @@ hScrollPage handle new_origin_y = do
 
 hScrollPageUp   h n = emulatorFallback (Unix.hScrollPageUp   h n) $ withHandle h $ \handle -> hScrollPage handle (negate n)
 hScrollPageDown h n = emulatorFallback (Unix.hScrollPageDown h n) $ withHandle h $ \handle -> hScrollPage handle n
-
-scrollPageUpCode _   = ""
-scrollPageDownCode _ = ""
-
 
 {-# INLINE applyANSIColorToAttribute #-}
 applyANSIColorToAttribute :: WORD -> WORD -> WORD -> Color -> WORD -> WORD
@@ -227,9 +200,6 @@ hSetSGR h sgr = emulatorFallback (Unix.hSetSGR h sgr) $ withHandle h $ \handle -
           (if null sgr then [Reset] else sgr)
     setConsoleTextAttribute handle attribute'
 
-setSGRCode _ = ""
-
-
 hChangeCursorVisibility :: HANDLE -> Bool -> IO ()
 hChangeCursorVisibility handle cursor_visible = do
     cursor_info <- getConsoleCursorInfo handle
@@ -238,13 +208,7 @@ hChangeCursorVisibility handle cursor_visible = do
 hHideCursor h = emulatorFallback (Unix.hHideCursor h) $ withHandle h $ \handle -> hChangeCursorVisibility handle False
 hShowCursor h = emulatorFallback (Unix.hShowCursor h) $ withHandle h $ \handle -> hChangeCursorVisibility handle True
 
-hideCursorCode = ""
-showCursorCode = ""
-
-
 -- Windows only supports setting the terminal title on a process-wide basis, so for now we will
 -- assume that that is what the user intended. This will fail if they are sending the command
 -- over e.g. a network link... but that's not really what I'm designing for.
 hSetTitle h title = emulatorFallback (Unix.hSetTitle h title) $ withTString title $ setConsoleTitle
-
-setTitleCode _ = ""

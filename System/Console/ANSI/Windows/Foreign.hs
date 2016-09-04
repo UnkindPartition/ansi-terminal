@@ -1,3 +1,5 @@
+{-# OPTIONS_HADDOCK hide #-}
+
 -- | "System.Win32.Console" is really very impoverished, so I have had to do all the FFI myself.
 module System.Console.ANSI.Windows.Foreign (
         -- Re-exports from Win32.Types

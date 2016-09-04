@@ -1,4 +1,14 @@
-module System.Console.ANSI.Common where
+-- | Types used to represent SELECT GRAPHIC RENDITION (SGR) aspects.
+module System.Console.ANSI.Types
+    (
+      SGR (..)
+    , ConsoleLayer (..)
+    , Color (..)
+    , ColorIntensity (..)
+    , ConsoleIntensity (..)
+    , Underlining (..)
+    , BlinkSpeed (..)
+    ) where
 
 import Data.Ix
 

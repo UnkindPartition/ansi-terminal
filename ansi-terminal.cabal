@@ -17,7 +17,6 @@ Extra-Source-Files:     includes/Common-Include.hs
                         CHANGELOG.md
                         README.md
 
-
 Source-repository head
   type:     git
   location: git://github.com/feuerbach/ansi-terminal.git
@@ -28,8 +27,8 @@ Flag Example
 
 Library
         Exposed-Modules:        System.Console.ANSI
-        
-        Other-Modules:          System.Console.ANSI.Common
+                                System.Console.ANSI.Types
+                                System.Console.ANSI.Codes
         
         Include-Dirs:           includes
         
@@ -40,6 +39,7 @@ Library
                 Other-Modules:          System.Console.ANSI.Windows
                                         System.Console.ANSI.Windows.Foreign
                                         System.Console.ANSI.Windows.Emulator
+                                        System.Console.ANSI.Windows.Emulator.Codes
                                         -- NB: used for fallback by the emulator
                                         System.Console.ANSI.Unix
         else
@@ -57,25 +57,29 @@ Executable ansi-terminal-example
         Main-Is:                System/Console/ANSI/Example.hs
         
         Include-Dirs:           includes
-        
+
+        Other-Modules:          System.Console.ANSI
+                                System.Console.ANSI.Codes
+                                System.Console.ANSI.Types
+                                System.Console.ANSI.Unix
+
         if os(windows)
                 Build-Depends:          Win32 >= 2.0
                 Cpp-Options:            -DWINDOWS
                 Other-Modules:          System.Console.ANSI.Windows
                                         System.Console.ANSI.Windows.Foreign
                                         System.Console.ANSI.Windows.Emulator
+                                        System.Console.ANSI.Windows.Emulator.Codes
         else
                 -- We assume any non-Windows platform is Unix
                 Build-Depends:          unix >= 2.3.0.0
                 Cpp-Options:            -DUNIX
-                Other-Modules:          System.Console.ANSI.Unix
-        
-        
+
         Build-Depends:          base >= 4 && < 5
         Extensions:             CPP
                                 ForeignFunctionInterface
-        
+
         Ghc-Options:            -Wall
-        
+
         if !flag(example)
                 Buildable:              False

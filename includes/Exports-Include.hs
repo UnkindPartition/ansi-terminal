@@ -1,5 +1,5 @@
 -- * Basic data types
-module System.Console.ANSI.Common,
+module System.Console.ANSI.Types,
 
 -- * Cursor movement by character
 cursorUp, cursorDown, cursorForward, cursorBackward,
