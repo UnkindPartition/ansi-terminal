@@ -7,6 +7,13 @@ hCursorUp, hCursorDown, hCursorForward, hCursorBackward,
 cursorUpCode, cursorDownCode, cursorForwardCode, cursorBackwardCode,
 
 -- * Cursor movement by line
+-- | The difference between movements \"by character\" and \"by line\" is
+-- that @*Line@ functions additionally move the cursor to the start of the
+-- line, while functions like @cursorUp@ and @cursorDown@ keep the column
+-- the same.
+--
+-- Also keep in mind that @*Line@ functions are not as portable. See
+-- <https://github.com/feuerbach/ansi-terminal/issues/10> for the details.
 cursorUpLine, cursorDownLine,
 hCursorUpLine, hCursorDownLine,
 cursorUpLineCode, cursorDownLineCode,
