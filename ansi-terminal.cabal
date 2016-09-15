@@ -37,7 +37,6 @@ Library
         if os(windows)
                 Build-Depends:          Win32 >= 2.0
                 Cpp-Options:            -DWINDOWS
-                Extra-Libraries:        "kernel32"
                 Other-Modules:          System.Console.ANSI.Windows
                                         System.Console.ANSI.Windows.Foreign
                                         System.Console.ANSI.Windows.Emulator
@@ -62,7 +61,6 @@ Executable ansi-terminal-example
         if os(windows)
                 Build-Depends:          Win32 >= 2.0
                 Cpp-Options:            -DWINDOWS
-                Extra-Libraries:        "kernel32"
                 Other-Modules:          System.Console.ANSI.Windows
                                         System.Console.ANSI.Windows.Foreign
                                         System.Console.ANSI.Windows.Emulator
