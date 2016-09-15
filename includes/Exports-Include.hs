@@ -28,6 +28,8 @@ hSetCursorPosition,
 setCursorPositionCode,
 
 -- * Clearing parts of the screen
+-- | Note that these functions only clear parts of the screen. They do not move the
+-- cursor.
 clearFromCursorToScreenEnd, clearFromCursorToScreenBeginning, clearScreen,
 hClearFromCursorToScreenEnd, hClearFromCursorToScreenBeginning, hClearScreen,
 clearFromCursorToScreenEndCode, clearFromCursorToScreenBeginningCode, clearScreenCode,
