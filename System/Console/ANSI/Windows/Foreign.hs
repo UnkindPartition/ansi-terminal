@@ -250,9 +250,8 @@ data ConsoleException = ConsoleException !ErrCode deriving (Show, Eq, Typeable)
 
 instance Exception ConsoleException
 
--- Maybe someone can think of a better name for this function
-withErrorCode :: IO Bool -> IO ()
-withErrorCode action = do
+throwIfFalse :: IO Bool -> IO ()
+throwIfFalse action = do
   succeeded <- action
   if not succeeded
     then getLastError >>= throw . ConsoleException -- TODO: Check if last error is zero for some instructable reason (?)
@@ -261,38 +260,38 @@ withErrorCode action = do
 
 getConsoleScreenBufferInfo :: HANDLE -> IO CONSOLE_SCREEN_BUFFER_INFO
 getConsoleScreenBufferInfo handle = alloca $ \ptr_console_screen_buffer_info -> do
-    withErrorCode $ cGetConsoleScreenBufferInfo handle ptr_console_screen_buffer_info
+    throwIfFalse $ cGetConsoleScreenBufferInfo handle ptr_console_screen_buffer_info
     peek ptr_console_screen_buffer_info
 
 
 getConsoleCursorInfo :: HANDLE -> IO CONSOLE_CURSOR_INFO
 getConsoleCursorInfo handle = alloca $ \ptr_console_cursor_info -> do
-    withErrorCode $ cGetConsoleCursorInfo handle ptr_console_cursor_info
+    throwIfFalse $ cGetConsoleCursorInfo handle ptr_console_cursor_info
     peek ptr_console_cursor_info
 
 
 setConsoleTextAttribute :: HANDLE -> WORD -> IO ()
-setConsoleTextAttribute handle attributes = withErrorCode $ cSetConsoleTextAttribute handle attributes
+setConsoleTextAttribute handle attributes = throwIfFalse $ cSetConsoleTextAttribute handle attributes
 
 setConsoleCursorPosition :: HANDLE -> COORD -> IO ()
-setConsoleCursorPosition handle cursor_position = withErrorCode $ cSetConsoleCursorPosition handle (unpackCOORD cursor_position)
+setConsoleCursorPosition handle cursor_position = throwIfFalse $ cSetConsoleCursorPosition handle (unpackCOORD cursor_position)
 
 setConsoleCursorInfo :: HANDLE -> CONSOLE_CURSOR_INFO -> IO ()
 setConsoleCursorInfo handle console_cursor_info = with console_cursor_info $ \ptr_console_cursor_info -> do
-    withErrorCode $ cSetConsoleCursorInfo handle ptr_console_cursor_info
+    throwIfFalse $ cSetConsoleCursorInfo handle ptr_console_cursor_info
 
 setConsoleTitle :: LPCTSTR -> IO ()
-setConsoleTitle title = withErrorCode $ cSetConsoleTitle title
+setConsoleTitle title = throwIfFalse $ cSetConsoleTitle title
 
 
 fillConsoleOutputAttribute :: HANDLE -> WORD -> DWORD -> COORD -> IO DWORD
 fillConsoleOutputAttribute handle attribute fill_length write_origin = alloca $ \ptr_chars_written -> do
-    withErrorCode $ cFillConsoleOutputAttribute handle attribute fill_length (unpackCOORD write_origin) ptr_chars_written
+    throwIfFalse $ cFillConsoleOutputAttribute handle attribute fill_length (unpackCOORD write_origin) ptr_chars_written
     peek ptr_chars_written
 
 fillConsoleOutputCharacter :: HANDLE -> TCHAR -> DWORD -> COORD -> IO DWORD
 fillConsoleOutputCharacter handle char fill_length write_origin = alloca $ \ptr_chars_written -> do
-    withErrorCode $ cFillConsoleOutputCharacter handle char fill_length (unpackCOORD write_origin) ptr_chars_written
+    throwIfFalse $ cFillConsoleOutputCharacter handle char fill_length (unpackCOORD write_origin) ptr_chars_written
     peek ptr_chars_written
 
 scrollConsoleScreenBuffer :: HANDLE -> SMALL_RECT -> Maybe SMALL_RECT -> COORD -> CHAR_INFO -> IO ()
@@ -300,7 +299,7 @@ scrollConsoleScreenBuffer handle scroll_rectangle mb_clip_rectangle destination_
   = with scroll_rectangle $ \ptr_scroll_rectangle ->
     maybeWith with mb_clip_rectangle $ \ptr_clip_rectangle ->
     with fill $ \ptr_fill ->
-    withErrorCode $ cScrollConsoleScreenBuffer handle ptr_scroll_rectangle ptr_clip_rectangle (unpackCOORD destination_origin) ptr_fill
+    throwIfFalse $ cScrollConsoleScreenBuffer handle ptr_scroll_rectangle ptr_clip_rectangle (unpackCOORD destination_origin) ptr_fill
 
 
 -- This essential function comes from the C runtime system. It is certainly provided by msvcrt, and also seems to be provided by the mingw C library - hurrah!

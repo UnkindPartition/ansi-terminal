@@ -8,7 +8,7 @@ import System.Console.ANSI.Windows.Foreign
 
 import System.IO
 
-import Control.Exception (SomeException(..), catchJust, catch, throw)
+import Control.Exception (catch, throw)
 import Control.Monad (guard)
 import Data.Typeable
 import Data.Bits
@@ -38,8 +38,10 @@ withHandle handle action = do
 -- handle is there so that the terminal supports ANSI escape codes. So 99% of the time, the correct thing to do is
 -- just to fall back on the Unix module to output the ANSI codes and hope for the best.
 emulatorFallback :: IO a -> IO a -> IO a
-emulatorFallback fallback first_try = catch first_try (\e -> let _ = (e :: ConsoleException) in fallback)
--- emulatorFallback fallback first_try = catchJust (\e -> guard (isHandleIsInvalidException e) >> return ()) first_try (\() -> fallback)
+emulatorFallback fallback first_try = catch first_try catchInvalidHandle
+  where
+    catchInvalidHandle (ConsoleException 6) = fallback -- 6 is the Windows error code for invalid handles
+    catchInvalidHandle (e)                  = throw e
 
 
 adjustCursorPosition :: HANDLE -> (SHORT -> SHORT -> SHORT) -> (SHORT -> SHORT -> SHORT) -> IO ()
