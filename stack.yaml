@@ -1,0 +1,7 @@
+extra-deps: []
+resolver: lts-6.14
+flags:
+  ansi-terminal:
+    example: false
+packages:
+- '.'
