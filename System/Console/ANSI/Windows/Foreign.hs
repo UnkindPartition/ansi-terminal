@@ -3,7 +3,8 @@
 -- | "System.Win32.Console" is really very impoverished, so I have had to do all the FFI myself.
 module System.Console.ANSI.Windows.Foreign (
         -- Re-exports from Win32.Types
-        BOOL, WORD, DWORD, WCHAR, HANDLE, SHORT,
+        BOOL, WORD, DWORD, WCHAR, HANDLE, iNVALID_HANDLE_VALUE, nullHANDLE,
+        SHORT,
         
         charToWCHAR,
         
@@ -12,6 +13,9 @@ module System.Console.ANSI.Windows.Foreign (
         
         sTD_INPUT_HANDLE, sTD_OUTPUT_HANDLE, sTD_ERROR_HANDLE,
         
+        eNABLE_VIRTUAL_TERMINAL_INPUT,
+        eNABLE_VIRTUAL_TERMINAL_PROCESSING,
+
         fOREGROUND_BLUE, fOREGROUND_GREEN, fOREGROUND_RED, fOREGROUND_INTENSITY, fOREGROUND_WHITE, fOREGROUND_INTENSE_WHITE,
         bACKGROUND_BLUE, bACKGROUND_GREEN, bACKGROUND_RED, bACKGROUND_INTENSITY, bACKGROUND_WHITE, bACKGROUND_INTENSE_WHITE,
         cOMMON_LVB_REVERSE_VIDEO, cOMMON_LVB_UNDERSCORE,
@@ -19,11 +23,13 @@ module System.Console.ANSI.Windows.Foreign (
         getStdHandle,
         getConsoleScreenBufferInfo,
         getConsoleCursorInfo,
+        getConsoleMode,
         
         setConsoleTextAttribute,
         setConsoleCursorPosition,
         setConsoleCursorInfo,
         setConsoleTitle,
+        setConsoleMode,
         
         fillConsoleOutputAttribute,
         fillConsoleOutputCharacter,
@@ -44,6 +50,7 @@ import Data.Bits
 import Data.Char
 
 import System.Win32.Types
+
 
 import Control.Concurrent.MVar
 import Control.Exception (Exception, bracket, throw)
@@ -209,7 +216,10 @@ instance Storable CHAR_INFO where
         poke ptr' attributes
 
 
+eNABLE_VIRTUAL_TERMINAL_INPUT, eNABLE_VIRTUAL_TERMINAL_PROCESSING :: DWORD
 sTD_INPUT_HANDLE, sTD_OUTPUT_HANDLE, sTD_ERROR_HANDLE :: DWORD
+eNABLE_VIRTUAL_TERMINAL_INPUT = 512
+eNABLE_VIRTUAL_TERMINAL_PROCESSING = 4
 sTD_INPUT_HANDLE = -10
 sTD_OUTPUT_HANDLE = -11
 sTD_ERROR_HANDLE = -12
@@ -238,11 +248,13 @@ bACKGROUND_INTENSE_WHITE = bACKGROUND_WHITE .|. bACKGROUND_INTENSITY
 foreign import stdcall unsafe "windows.h GetStdHandle" getStdHandle :: DWORD -> IO HANDLE
 foreign import stdcall unsafe "windows.h GetConsoleScreenBufferInfo" cGetConsoleScreenBufferInfo :: HANDLE -> Ptr CONSOLE_SCREEN_BUFFER_INFO -> IO BOOL
 foreign import stdcall unsafe "windows.h GetConsoleCursorInfo" cGetConsoleCursorInfo :: HANDLE -> Ptr CONSOLE_CURSOR_INFO -> IO BOOL
+foreign import stdcall unsafe "windows.h GetConsoleMode" cGetConsoleMode :: HANDLE -> Ptr DWORD -> IO BOOL
 
 foreign import stdcall unsafe "windows.h SetConsoleTextAttribute" cSetConsoleTextAttribute :: HANDLE -> WORD -> IO BOOL
 foreign import stdcall unsafe "windows.h SetConsoleCursorPosition" cSetConsoleCursorPosition :: HANDLE -> UNPACKED_COORD -> IO BOOL
 foreign import stdcall unsafe "windows.h SetConsoleCursorInfo" cSetConsoleCursorInfo :: HANDLE -> Ptr CONSOLE_CURSOR_INFO -> IO BOOL
 foreign import stdcall unsafe "windows.h SetConsoleTitleW" cSetConsoleTitle :: LPCTSTR -> IO BOOL
+foreign import stdcall unsafe "windows.h SetConsoleMode" cSetConsoleMode :: HANDLE -> DWORD -> IO BOOL
 
 foreign import stdcall unsafe "windows.h FillConsoleOutputAttribute" cFillConsoleOutputAttribute :: HANDLE -> WORD -> DWORD -> UNPACKED_COORD -> Ptr DWORD -> IO BOOL
 foreign import stdcall unsafe "windows.h FillConsoleOutputCharacterW" cFillConsoleOutputCharacter :: HANDLE -> TCHAR -> DWORD -> UNPACKED_COORD -> Ptr DWORD -> IO BOOL
@@ -259,7 +271,6 @@ throwIfFalse action = do
     then getLastError >>= throw . ConsoleException -- TODO: Check if last error is zero for some instructable reason (?)
     else return ()
 
-
 getConsoleScreenBufferInfo :: HANDLE -> IO CONSOLE_SCREEN_BUFFER_INFO
 getConsoleScreenBufferInfo handle = alloca $ \ptr_console_screen_buffer_info -> do
     throwIfFalse $ cGetConsoleScreenBufferInfo handle ptr_console_screen_buffer_info
@@ -271,6 +282,10 @@ getConsoleCursorInfo handle = alloca $ \ptr_console_cursor_info -> do
     throwIfFalse $ cGetConsoleCursorInfo handle ptr_console_cursor_info
     peek ptr_console_cursor_info
 
+getConsoleMode :: HANDLE -> IO DWORD
+getConsoleMode handle = alloca $ \ptr_mode -> do
+    throwIfFalse $ cGetConsoleMode handle ptr_mode
+    peek ptr_mode
 
 setConsoleTextAttribute :: HANDLE -> WORD -> IO ()
 setConsoleTextAttribute handle attributes = throwIfFalse $ cSetConsoleTextAttribute handle attributes
@@ -284,6 +299,9 @@ setConsoleCursorInfo handle console_cursor_info = with console_cursor_info $ \pt
 
 setConsoleTitle :: LPCTSTR -> IO ()
 setConsoleTitle title = throwIfFalse $ cSetConsoleTitle title
+
+setConsoleMode :: HANDLE -> DWORD -> IO ()
+setConsoleMode handle attributes = throwIfFalse $ cSetConsoleMode handle attributes
 
 
 fillConsoleOutputAttribute :: HANDLE -> WORD -> DWORD -> COORD -> IO DWORD

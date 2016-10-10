@@ -34,12 +34,15 @@ Library
         
         Build-Depends:          base >= 4 && < 5
         if os(windows)
-                Build-Depends:          Win32 >= 2.0
+                Build-Depends:          base-compat >= 0.9.1
+                                      , Win32 >= 2.0
+                                      , process
                 Cpp-Options:            -DWINDOWS
                 Other-Modules:          System.Console.ANSI.Windows
-                                        System.Console.ANSI.Windows.Foreign
+                                        System.Console.ANSI.Windows.Detect        
                                         System.Console.ANSI.Windows.Emulator
                                         System.Console.ANSI.Windows.Emulator.Codes
+                                        System.Console.ANSI.Windows.Foreign
                                         -- NB: used for fallback by the emulator
                                         System.Console.ANSI.Unix
         else
@@ -64,12 +67,14 @@ Executable ansi-terminal-example
                                 System.Console.ANSI.Unix
 
         if os(windows)
-                Build-Depends:          Win32 >= 2.0
+                Build-Depends:          base-compat >= 0.9.1
+                                      , Win32 >= 2.0
                 Cpp-Options:            -DWINDOWS
                 Other-Modules:          System.Console.ANSI.Windows
-                                        System.Console.ANSI.Windows.Foreign
+                                        System.Console.ANSI.Windows.Detect
                                         System.Console.ANSI.Windows.Emulator
                                         System.Console.ANSI.Windows.Emulator.Codes
+                                        System.Console.ANSI.Windows.Foreign
         else
                 -- We assume any non-Windows platform is Unix
                 Build-Depends:          unix >= 2.3.0.0
