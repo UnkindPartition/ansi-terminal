@@ -47,7 +47,6 @@ Library
                                         System.Console.ANSI.Unix
         else
                 -- We assume any non-Windows platform is Unix
-                Build-Depends:          unix >= 2.3.0.0
                 Cpp-Options:            -DUNIX
                 Other-Modules:          System.Console.ANSI.Unix
         
@@ -77,7 +76,6 @@ Executable ansi-terminal-example
                                         System.Console.ANSI.Windows.Foreign
         else
                 -- We assume any non-Windows platform is Unix
-                Build-Depends:          unix >= 2.3.0.0
                 Cpp-Options:            -DUNIX
 
         Build-Depends:          base >= 4 && < 5
