@@ -51,12 +51,16 @@ import Data.Char
 
 import System.Win32.Types
 
+import Control.Exception (Exception, throw)
 
+#if __GLASGOW_HASKELL__ >= 612
+import Data.Typeable
+#endif
+
+#if !MIN_VERSION_Win32(2,5,1)
 import Control.Concurrent.MVar
-import Control.Exception (Exception, bracket, throw)
-
 import Foreign.StablePtr
-
+import Control.Exception (bracket)
 #if __GLASGOW_HASKELL__ >= 612
 import GHC.IO.Handle.Types (Handle(..), Handle__(..))
 import GHC.IO.FD (FD(..)) -- A wrapper around an Int32
@@ -65,10 +69,21 @@ import Data.Typeable
 import GHC.IOBase (Handle(..), Handle__(..))
 import qualified GHC.IOBase as IOBase (FD) -- Just an Int32
 #endif
+#endif
 
+#if defined(i386_HOST_ARCH)
+# define WINDOWS_CCONV stdcall
+#elif defined(x86_64_HOST_ARCH)
+# define WINDOWS_CCONV ccall
+#else
+# error Unknown mingw32 arch
+#endif
 
--- Some Windows types missing from System.Win32
+--import System.Console.ANSI.Windows.Foreign.Compat
+#if !MIN_VERSION_Win32(2,5,0)
+-- Some Windows types missing from System.Win32 prior version 2.5.0.0
 type SHORT = CShort
+#endif
 type WCHAR = CWchar
 
 charToWCHAR :: Char -> WCHAR
@@ -244,21 +259,20 @@ bACKGROUND_WHITE = bACKGROUND_RED .|. bACKGROUND_GREEN .|. bACKGROUND_BLUE
 fOREGROUND_INTENSE_WHITE = fOREGROUND_WHITE .|. fOREGROUND_INTENSITY
 bACKGROUND_INTENSE_WHITE = bACKGROUND_WHITE .|. bACKGROUND_INTENSITY
 
+foreign import WINDOWS_CCONV unsafe "windows.h GetStdHandle" getStdHandle :: DWORD -> IO HANDLE
+foreign import WINDOWS_CCONV unsafe "windows.h GetConsoleScreenBufferInfo" cGetConsoleScreenBufferInfo :: HANDLE -> Ptr CONSOLE_SCREEN_BUFFER_INFO -> IO BOOL
+foreign import WINDOWS_CCONV unsafe "windows.h GetConsoleCursorInfo" cGetConsoleCursorInfo :: HANDLE -> Ptr CONSOLE_CURSOR_INFO -> IO BOOL
+foreign import WINDOWS_CCONV unsafe "windows.h GetConsoleMode" cGetConsoleMode :: HANDLE -> Ptr DWORD -> IO BOOL
 
-foreign import stdcall unsafe "windows.h GetStdHandle" getStdHandle :: DWORD -> IO HANDLE
-foreign import stdcall unsafe "windows.h GetConsoleScreenBufferInfo" cGetConsoleScreenBufferInfo :: HANDLE -> Ptr CONSOLE_SCREEN_BUFFER_INFO -> IO BOOL
-foreign import stdcall unsafe "windows.h GetConsoleCursorInfo" cGetConsoleCursorInfo :: HANDLE -> Ptr CONSOLE_CURSOR_INFO -> IO BOOL
-foreign import stdcall unsafe "windows.h GetConsoleMode" cGetConsoleMode :: HANDLE -> Ptr DWORD -> IO BOOL
+foreign import WINDOWS_CCONV unsafe "windows.h SetConsoleTextAttribute" cSetConsoleTextAttribute :: HANDLE -> WORD -> IO BOOL
+foreign import WINDOWS_CCONV unsafe "windows.h SetConsoleCursorPosition" cSetConsoleCursorPosition :: HANDLE -> UNPACKED_COORD -> IO BOOL
+foreign import WINDOWS_CCONV unsafe "windows.h SetConsoleCursorInfo" cSetConsoleCursorInfo :: HANDLE -> Ptr CONSOLE_CURSOR_INFO -> IO BOOL
+foreign import WINDOWS_CCONV unsafe "windows.h SetConsoleTitleW" cSetConsoleTitle :: LPCTSTR -> IO BOOL
+foreign import WINDOWS_CCONV unsafe "windows.h SetConsoleMode" cSetConsoleMode :: HANDLE -> DWORD -> IO BOOL
 
-foreign import stdcall unsafe "windows.h SetConsoleTextAttribute" cSetConsoleTextAttribute :: HANDLE -> WORD -> IO BOOL
-foreign import stdcall unsafe "windows.h SetConsoleCursorPosition" cSetConsoleCursorPosition :: HANDLE -> UNPACKED_COORD -> IO BOOL
-foreign import stdcall unsafe "windows.h SetConsoleCursorInfo" cSetConsoleCursorInfo :: HANDLE -> Ptr CONSOLE_CURSOR_INFO -> IO BOOL
-foreign import stdcall unsafe "windows.h SetConsoleTitleW" cSetConsoleTitle :: LPCTSTR -> IO BOOL
-foreign import stdcall unsafe "windows.h SetConsoleMode" cSetConsoleMode :: HANDLE -> DWORD -> IO BOOL
-
-foreign import stdcall unsafe "windows.h FillConsoleOutputAttribute" cFillConsoleOutputAttribute :: HANDLE -> WORD -> DWORD -> UNPACKED_COORD -> Ptr DWORD -> IO BOOL
-foreign import stdcall unsafe "windows.h FillConsoleOutputCharacterW" cFillConsoleOutputCharacter :: HANDLE -> TCHAR -> DWORD -> UNPACKED_COORD -> Ptr DWORD -> IO BOOL
-foreign import stdcall unsafe "windows.h ScrollConsoleScreenBufferW" cScrollConsoleScreenBuffer :: HANDLE -> Ptr SMALL_RECT -> Ptr SMALL_RECT -> UNPACKED_COORD -> Ptr CHAR_INFO -> IO BOOL
+foreign import WINDOWS_CCONV unsafe "windows.h FillConsoleOutputAttribute" cFillConsoleOutputAttribute :: HANDLE -> WORD -> DWORD -> UNPACKED_COORD -> Ptr DWORD -> IO BOOL
+foreign import WINDOWS_CCONV unsafe "windows.h FillConsoleOutputCharacterW" cFillConsoleOutputCharacter :: HANDLE -> TCHAR -> DWORD -> UNPACKED_COORD -> Ptr DWORD -> IO BOOL
+foreign import WINDOWS_CCONV unsafe "windows.h ScrollConsoleScreenBufferW" cScrollConsoleScreenBuffer :: HANDLE -> Ptr SMALL_RECT -> Ptr SMALL_RECT -> UNPACKED_COORD -> Ptr CHAR_INFO -> IO BOOL
 
 data ConsoleException = ConsoleException !ErrCode deriving (Show, Eq, Typeable)
 
@@ -322,18 +336,13 @@ scrollConsoleScreenBuffer handle scroll_rectangle mb_clip_rectangle destination_
     throwIfFalse $ cScrollConsoleScreenBuffer handle ptr_scroll_rectangle ptr_clip_rectangle (unpackCOORD destination_origin) ptr_fill
 
 
--- This essential function comes from the C runtime system. It is certainly provided by msvcrt, and also seems to be provided by the mingw C library - hurrah!
-#if __GLASGOW_HASKELL__ >= 612
-foreign import ccall unsafe "_get_osfhandle" cget_osfhandle :: CInt -> IO HANDLE
-#else
-foreign import ccall unsafe "_get_osfhandle" cget_osfhandle :: IOBase.FD -> IO HANDLE
-#endif
-
+#if !MIN_VERSION_Win32(2,5,1)
 -- | This bit is all highly dubious.  The problem is that we want to output ANSI to arbitrary Handles rather than forcing
 -- people to use stdout.  However, the Windows ANSI emulator needs a Windows HANDLE to work it's magic, so we need to be able
 -- to extract one of those from the Haskell Handle.
 --
 -- This code accomplishes this, albeit at the cost of only being compatible with GHC.
+-- withHandleToHANDLE was added in Win32-2.5.1.0
 withHandleToHANDLE :: Handle -> (HANDLE -> IO a) -> IO a
 withHandleToHANDLE haskell_handle action =
     -- Create a stable pointer to the Handle. This prevents the garbage collector
@@ -359,5 +368,14 @@ withHandleToHANDLE haskell_handle action =
         -- Do what the user originally wanted
         action windows_handle
 
+-- This essential function comes from the C runtime system. It is certainly provided by msvcrt, and also seems to be provided by the mingw C library - hurrah!
+#if __GLASGOW_HASKELL__ >= 612
+foreign import WINDOWS_CCONV unsafe "_get_osfhandle" cget_osfhandle :: CInt -> IO HANDLE
+#else
+foreign import WINDOWS_CCONV unsafe "_get_osfhandle" cget_osfhandle :: IOBase.FD -> IO HANDLE
+#endif
+
+-- withStablePtr was added in Win32-2.5.1.0
 withStablePtr :: a -> (StablePtr a -> IO b) -> IO b
 withStablePtr value = bracket (newStablePtr value) freeStablePtr
+#endif
