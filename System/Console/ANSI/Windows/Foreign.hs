@@ -5,36 +5,36 @@ module System.Console.ANSI.Windows.Foreign (
         -- Re-exports from Win32.Types
         BOOL, WORD, DWORD, WCHAR, HANDLE, iNVALID_HANDLE_VALUE, nullHANDLE,
         SHORT,
-        
+
         charToWCHAR,
-        
+
         COORD(..), SMALL_RECT(..), rect_top, rect_bottom, rect_left, rect_right, rect_width, rect_height,
         CONSOLE_CURSOR_INFO(..), CONSOLE_SCREEN_BUFFER_INFO(..), CHAR_INFO(..),
-        
+
         sTD_INPUT_HANDLE, sTD_OUTPUT_HANDLE, sTD_ERROR_HANDLE,
-        
+
         eNABLE_VIRTUAL_TERMINAL_INPUT,
         eNABLE_VIRTUAL_TERMINAL_PROCESSING,
 
         fOREGROUND_BLUE, fOREGROUND_GREEN, fOREGROUND_RED, fOREGROUND_INTENSITY, fOREGROUND_WHITE, fOREGROUND_INTENSE_WHITE,
         bACKGROUND_BLUE, bACKGROUND_GREEN, bACKGROUND_RED, bACKGROUND_INTENSITY, bACKGROUND_WHITE, bACKGROUND_INTENSE_WHITE,
         cOMMON_LVB_REVERSE_VIDEO, cOMMON_LVB_UNDERSCORE,
-        
+
         getStdHandle,
         getConsoleScreenBufferInfo,
         getConsoleCursorInfo,
         getConsoleMode,
-        
+
         setConsoleTextAttribute,
         setConsoleCursorPosition,
         setConsoleCursorInfo,
         setConsoleTitle,
         setConsoleMode,
-        
+
         fillConsoleOutputAttribute,
         fillConsoleOutputCharacter,
         scrollConsoleScreenBuffer,
-        
+
         withTString, withHandleToHANDLE,
 
         --
@@ -315,7 +315,7 @@ fillConsoleOutputCharacter handle char fill_length write_origin = alloca $ \ptr_
     peek ptr_chars_written
 
 scrollConsoleScreenBuffer :: HANDLE -> SMALL_RECT -> Maybe SMALL_RECT -> COORD -> CHAR_INFO -> IO ()
-scrollConsoleScreenBuffer handle scroll_rectangle mb_clip_rectangle destination_origin fill 
+scrollConsoleScreenBuffer handle scroll_rectangle mb_clip_rectangle destination_origin fill
   = with scroll_rectangle $ \ptr_scroll_rectangle ->
     maybeWith with mb_clip_rectangle $ \ptr_clip_rectangle ->
     with fill $ \ptr_fill ->
@@ -335,7 +335,7 @@ foreign import ccall unsafe "_get_osfhandle" cget_osfhandle :: IOBase.FD -> IO H
 --
 -- This code accomplishes this, albeit at the cost of only being compatible with GHC.
 withHandleToHANDLE :: Handle -> (HANDLE -> IO a) -> IO a
-withHandleToHANDLE haskell_handle action = 
+withHandleToHANDLE haskell_handle action =
     -- Create a stable pointer to the Handle. This prevents the garbage collector
     -- getting to it while we are doing horrible manipulations with it, and hence
     -- stops it being finalized (and closed).
@@ -344,7 +344,7 @@ withHandleToHANDLE haskell_handle action =
         let write_handle_mvar = case haskell_handle of
                 FileHandle _ handle_mvar     -> handle_mvar
                 DuplexHandle _ _ handle_mvar -> handle_mvar -- This is "write" MVar, we could also take the "read" one
-        
+
         -- Get the FD from the algebraic data type
 #if __GLASGOW_HASKELL__ < 612
         fd <- fmap haFD $ readMVar write_handle_mvar
@@ -355,7 +355,7 @@ withHandleToHANDLE haskell_handle action =
 
         -- Finally, turn that (C-land) FD into a HANDLE using msvcrt
         windows_handle <- cget_osfhandle fd
-        
+
         -- Do what the user originally wanted
         action windows_handle
 
