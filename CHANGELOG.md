@@ -1,6 +1,12 @@
 Changes
 =======
 
+Version 0.6.3
+-------------
+
+* Add ANSI support for Windows
+* Add compatibility with Win32-2.5.0.0 and above
+
 Version 0.6.2.3
 ---------------
 
