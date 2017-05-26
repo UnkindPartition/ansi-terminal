@@ -1,0 +1,7 @@
+extra-deps: []
+resolver: lts-8.13
+flags:
+  ansi-terminal:
+    example: false
+packages:
+- '.'
