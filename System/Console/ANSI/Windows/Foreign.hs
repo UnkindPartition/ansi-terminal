@@ -1,4 +1,5 @@
 {-# OPTIONS_HADDOCK hide #-}
+{-# LANGUAGE DeriveDataTypeable #-}
 
 -- | "System.Win32.Console" is really very impoverished, so I have had to do all the FFI myself.
 module System.Console.ANSI.Windows.Foreign (
