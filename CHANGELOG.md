@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 0.6.3.1
+---------------
+
+Fix Windows + ghc 7.8 compatibility,
+
 Version 0.6.3
 -------------
 
