@@ -52,6 +52,7 @@ module System.Console.ANSI.Codes
     , colorToCode, csi, sgrToCode
     ) where
 
+import Data.Colour.SRGB (toSRGB24, RGB (..))
 import Data.List (intersperse)
 import System.Console.ANSI.Types
 
@@ -81,31 +82,36 @@ colorToCode color = case color of
 -- | 'sgrToCode' @sgr@ returns the parameter of the SELECT GRAPHIC RENDITION
 -- (SGR) aspect identified by @sgr@.
 sgrToCode :: SGR -- ^ The SGR aspect
-          -> Int
+          -> [Int]
 sgrToCode sgr = case sgr of
-    Reset -> 0
+    Reset -> [0]
     SetConsoleIntensity intensity -> case intensity of
-        BoldIntensity   -> 1
-        FaintIntensity  -> 2
-        NormalIntensity -> 22
-    SetItalicized True  -> 3
-    SetItalicized False -> 23
+        BoldIntensity   -> [1]
+        FaintIntensity  -> [2]
+        NormalIntensity -> [22]
+    SetItalicized True  -> [3]
+    SetItalicized False -> [23]
     SetUnderlining underlining -> case underlining of
-        SingleUnderline -> 4
-        DoubleUnderline -> 21
-        NoUnderline     -> 24
+        SingleUnderline -> [4]
+        DoubleUnderline -> [21]
+        NoUnderline     -> [24]
     SetBlinkSpeed blink_speed -> case blink_speed of
-        SlowBlink   -> 5
-        RapidBlink  -> 6
-        NoBlink     -> 25
-    SetVisible False -> 8
-    SetVisible True  -> 28
-    SetSwapForegroundBackground True  -> 7
-    SetSwapForegroundBackground False -> 27
-    SetColor Foreground Dull color  -> 30 + colorToCode color
-    SetColor Foreground Vivid color -> 90 + colorToCode color
-    SetColor Background Dull color  -> 40 + colorToCode color
-    SetColor Background Vivid color -> 100 + colorToCode color
+        SlowBlink   -> [5]
+        RapidBlink  -> [6]
+        NoBlink     -> [25]
+    SetVisible False -> [8]
+    SetVisible True  -> [28]
+    SetSwapForegroundBackground True  -> [7]
+    SetSwapForegroundBackground False -> [27]
+    SetColor Foreground Dull color  -> [30 + colorToCode color]
+    SetColor Foreground Vivid color -> [90 + colorToCode color]
+    SetColor Background Dull color  -> [40 + colorToCode color]
+    SetColor Background Vivid color -> [100 + colorToCode color]
+    SetRGBColor Foreground color -> [38, 2] ++ toRGB color
+    SetRGBColor Background color -> [48, 2] ++ toRGB color
+  where
+    toRGB color = let RGB r g b = toSRGB24 color
+                  in  map fromIntegral [r, g, b]
 
 cursorUpCode, cursorDownCode, cursorForwardCode, cursorBackwardCode :: Int -- ^ Number of lines or characters to move
                                                                     -> String
@@ -148,7 +154,7 @@ setSGRCode :: [SGR] -- ^ Commands: these will typically be applied on top of the
                     -- equivalent to the list @[Reset]@. Commands are applied
                     -- left to right.
            -> String
-setSGRCode sgrs = csi (map sgrToCode sgrs) "m"
+setSGRCode sgrs = csi (concatMap sgrToCode sgrs) "m"
 
 hideCursorCode, showCursorCode :: String
 hideCursorCode = csi [] "?25l"

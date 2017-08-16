@@ -10,6 +10,7 @@ module System.Console.ANSI.Types
     , BlinkSpeed (..)
     ) where
 
+import Data.Colour (Colour)
 import Data.Ix
 
 -- | ANSI colors: come in various intensities, which are controlled by 'ColorIntensity'
@@ -60,4 +61,5 @@ data SGR = Reset
          | SetVisible Bool -- ^ Not widely supported
          | SetSwapForegroundBackground Bool
          | SetColor ConsoleLayer ColorIntensity Color
-         deriving (Eq, Ord, Show, Read)
+         | SetRGBColor ConsoleLayer (Colour Float) -- ^ Supported from Windows 10 Creators Update
+         deriving (Eq, Show, Read)

@@ -10,6 +10,10 @@ import System.Console.ANSI.Windows.Emulator.Codes
 import System.IO
 
 import Control.Exception (catchJust)
+import Data.Colour (Colour)
+import Data.Colour.Names (black, blue, cyan, green, grey, lime, magenta, maroon,
+    navy, olive, purple, red, silver, teal, white, yellow)
+import Data.Colour.SRGB (RGB (..), toSRGB)
 import Data.Bits
 import Data.List
 
@@ -189,6 +193,16 @@ applyANSISGRToAttribute sgr attribute = case sgr of
     SetColor Foreground Vivid color -> applyForegroundANSIColorToAttribute color (attribute .|. fOREGROUND_INTENSITY)
     SetColor Background Dull color  -> applyBackgroundANSIColorToAttribute color (attribute .&. (complement bACKGROUND_INTENSITY))
     SetColor Background Vivid color -> applyBackgroundANSIColorToAttribute color (attribute .|. bACKGROUND_INTENSITY)
+    SetRGBColor Foreground color -> let (colorIntensity, aNSIColor) = toANSIColor color
+                                        attribute' = case colorIntensity of
+                                            Dull  -> attribute .&. complement fOREGROUND_INTENSITY
+                                            Vivid -> attribute .|. fOREGROUND_INTENSITY
+                                    in applyForegroundANSIColorToAttribute aNSIColor attribute'
+    SetRGBColor Background color -> let (colorIntensity, aNSIColor) = toANSIColor color
+                                        attribute' = case colorIntensity of
+                                            Dull  -> attribute .&. complement bACKGROUND_INTENSITY
+                                            Vivid -> attribute .|. bACKGROUND_INTENSITY
+                                    in applyBackgroundANSIColorToAttribute aNSIColor attribute'
   where
     iNTENSITY = fOREGROUND_INTENSITY
 
@@ -212,3 +226,32 @@ hShowCursor h = emulatorFallback (Unix.hShowCursor h) $ withHandle h $ \handle -
 -- assume that that is what the user intended. This will fail if they are sending the command
 -- over e.g. a network link... but that's not really what I'm designing for.
 hSetTitle h title = emulatorFallback (Unix.hSetTitle h title) $ withTString title $ setConsoleTitle
+
+aNSIColors :: [((ColorIntensity, Color), Colour Float)]
+aNSIColors = [ ((Dull,  Black),   black)
+             , ((Dull,  Blue),    navy)
+             , ((Dull,  Green),   green)
+             , ((Dull,  Cyan),    teal)
+             , ((Dull,  Red),     maroon)
+             , ((Dull,  Magenta), purple)
+             , ((Dull,  Yellow),  olive)
+             , ((Dull,  White),   silver)
+             , ((Vivid, Black),   grey)
+             , ((Vivid, Blue),    blue)
+             , ((Vivid, Green),   lime)
+             , ((Vivid, Cyan),    cyan)
+             , ((Vivid, Red),     red)
+             , ((Vivid, Magenta), magenta)
+             , ((Vivid, Yellow),  yellow)
+             , ((Vivid, White),   white) ]
+
+toANSIColor :: Colour Float -> (ColorIntensity, Color)
+toANSIColor color = fst $ minimumBy order aNSIColors
+  where
+    RGB r g b = toSRGB color
+    order (_, c1) (_, c2) = compare (dist c1) (dist c2)
+    dist c = let RGB r' g' b' = toSRGB c
+                 dr = r' - r
+                 dg = g' - g
+                 db = b' - b
+             in  dr * dr + dg * dg + db * db
