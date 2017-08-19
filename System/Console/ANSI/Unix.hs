@@ -8,6 +8,7 @@ import System.Console.ANSI.Types
 import System.IO (Handle, hIsTerminalDevice, hPutStr, stdout)
 
 #include "Common-Include.hs"
+#include "Common-Include-Enabled.hs"
 
 hCursorUp h n = hPutStr h $ cursorUpCode n
 hCursorDown h n = hPutStr h $ cursorDownCode n

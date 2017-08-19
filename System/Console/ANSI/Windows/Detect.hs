@@ -2,23 +2,56 @@
 
 module System.Console.ANSI.Windows.Detect
 (
-    isANSIEnabled
+  ANSIEnabledStatus (..)
+, ConsoleDefaultState (..)
+, isANSIEnabled
 ) where
 
 import Control.Exception (SomeException(..), throwIO, try)
-import Data.Bits ((.|.))
-import System.Console.ANSI.Windows.Foreign (ConsoleException(..), DWORD,
-    eNABLE_VIRTUAL_TERMINAL_PROCESSING, getConsoleMode, getStdHandle, HANDLE,
-    iNVALID_HANDLE_VALUE, nullHANDLE, setConsoleMode, sTD_OUTPUT_HANDLE)
+import Data.Bits ((.&.), (.|.))
+import System.Console.ANSI.Windows.Foreign (bACKGROUND_INTENSE_WHITE,
+    ConsoleException(..), CONSOLE_SCREEN_BUFFER_INFO (..), DWORD,
+    eNABLE_VIRTUAL_TERMINAL_PROCESSING, fOREGROUND_INTENSE_WHITE,
+    getConsoleMode, getConsoleScreenBufferInfo, getStdHandle, HANDLE,
+    iNVALID_HANDLE_VALUE, nullHANDLE, setConsoleMode, sTD_OUTPUT_HANDLE, WORD)
 -- 'lookupEnv' is not available until base-4.6.0.0 (GHC 7.6.1)
 import System.Environment.Compat (lookupEnv)
 import System.IO.Unsafe (unsafePerformIO)
 
--- This function assumes that once it is first established whether or not the
--- Windows console is ANSI-enabled, that will not change.
+-- | The default state of the console
+data ConsoleDefaultState = ConsoleDefaultState
+    { defaultForegroundAttributes :: WORD -- ^ Foreground attributes
+    , defaultBackgroundAttributes :: WORD -- ^ Background attributes
+    } deriving (Eq, Show)
+
+-- | The status of the console as regards it being ANSI-enabled or not
+-- ANSI-enabled.
+data ANSIEnabledStatus
+    = ANSIEnabled -- ^ ANSI-enabled
+    | NotANSIEnabled ConsoleDefaultState -- ^ Not ANSI-enabled (including the
+                                         -- state of the console when that
+                                         -- status was determined)
+    deriving (Eq, Show)
+
+-- | This function assumes that once it is first established whether or not the
+-- Windows console is ANSI-enabled, that will not change. If the console is not
+-- ANSI-enabled, the state of the console is considered to be its default state.
 {-# NOINLINE isANSIEnabled #-}
-isANSIEnabled :: Bool
-isANSIEnabled = unsafePerformIO safeIsANSIEnabled
+isANSIEnabled :: ANSIEnabledStatus
+isANSIEnabled = unsafePerformIO $ do
+    e <- safeIsANSIEnabled
+    if e
+        then return ANSIEnabled
+        else do
+            hOut <- getValidStdHandle sTD_OUTPUT_HANDLE
+            info <- getConsoleScreenBufferInfo hOut
+            let attributes = csbi_attributes info
+                fgAttributes = attributes .&. fOREGROUND_INTENSE_WHITE
+                bgAttributes = attributes .&. bACKGROUND_INTENSE_WHITE
+                consoleDefaultState = ConsoleDefaultState
+                    { defaultForegroundAttributes = fgAttributes
+                    , defaultBackgroundAttributes = bgAttributes }
+            return $ NotANSIEnabled consoleDefaultState
 
 -- This function takes the following approach. If the environment variable TERM
 -- exists and is not set to 'dumb' or 'msys' (see below), it assumes the console

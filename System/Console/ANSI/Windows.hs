@@ -5,132 +5,114 @@ module System.Console.ANSI.Windows (
 
 import System.Console.ANSI.Types
 import qualified System.Console.ANSI.Unix as U
-import System.Console.ANSI.Windows.Detect (isANSIEnabled)
+import System.Console.ANSI.Windows.Detect (ANSIEnabledStatus (..),
+    ConsoleDefaultState (..), isANSIEnabled)
 import qualified System.Console.ANSI.Windows.Emulator as E
 import System.IO (Handle, hIsTerminalDevice, stdout)
 
 #include "Common-Include.hs"
+#include "Common-Include-Enabled.hs"
+
+-- | A helper function which returns the native or emulated version, depending
+-- on `isANSIEnabled`.
+nativeOrEmulated :: a -> a -> a
+nativeOrEmulated native emulated = case isANSIEnabled of
+    ANSIEnabled      -> native
+    NotANSIEnabled _ -> emulated
+
+-- | A helper function which returns the native or emulated version, depending
+-- on `isANSIEnabled`, where the emulator uses the default console state.
+nativeOrEmulatedWithDefault :: a -> (ConsoleDefaultState -> a) -> a
+nativeOrEmulatedWithDefault native emulated = case isANSIEnabled of
+    ANSIEnabled        -> native
+    NotANSIEnabled def -> emulated def
+
 
 -- * Cursor movement by character
-hCursorUp = if isANSIEnabled then U.hCursorUp else E.hCursorUp
-
-hCursorDown = if isANSIEnabled then U.hCursorDown else E.hCursorDown
-
-hCursorForward = if isANSIEnabled then U.hCursorForward else E.hCursorForward
-
-hCursorBackward = if isANSIEnabled then U.hCursorBackward else E.hCursorBackward
+hCursorUp       = nativeOrEmulated U.hCursorUp       E.hCursorUp
+hCursorDown     = nativeOrEmulated U.hCursorDown     E.hCursorDown
+hCursorForward  = nativeOrEmulated U.hCursorForward  E.hCursorForward
+hCursorBackward = nativeOrEmulated U.hCursorBackward E.hCursorBackward
 
 cursorUpCode :: Int -> String
-cursorUpCode = if isANSIEnabled then U.cursorUpCode else E.cursorUpCode
+cursorUpCode = nativeOrEmulated U.cursorUpCode E.cursorUpCode
 
 cursorDownCode :: Int -> String
-cursorDownCode = if isANSIEnabled then U.cursorDownCode else E.cursorDownCode
+cursorDownCode = nativeOrEmulated U.cursorDownCode E.cursorDownCode
 
 cursorForwardCode :: Int -> String
-cursorForwardCode = if isANSIEnabled
-                    then U.cursorForwardCode
-                    else E.cursorForwardCode
+cursorForwardCode = nativeOrEmulated U.cursorForwardCode E.cursorForwardCode
 
 cursorBackwardCode :: Int -> String
-cursorBackwardCode = if isANSIEnabled
-                     then U.cursorBackwardCode
-                     else E.cursorBackwardCode
+cursorBackwardCode = nativeOrEmulated U.cursorBackwardCode E.cursorBackwardCode
 
 -- * Cursor movement by line
-hCursorUpLine = if isANSIEnabled then U.hCursorUpLine else E.hCursorUpLine
-
-hCursorDownLine = if isANSIEnabled then U.hCursorDownLine else E.hCursorDownLine
+hCursorUpLine   = nativeOrEmulated U.hCursorUpLine   E.hCursorUpLine
+hCursorDownLine = nativeOrEmulated U.hCursorDownLine E.hCursorDownLine
 
 cursorUpLineCode :: Int -> String
-cursorUpLineCode = if isANSIEnabled
-                   then U.cursorUpLineCode
-                   else E.cursorUpLineCode
+cursorUpLineCode = nativeOrEmulated U.cursorUpLineCode E.cursorUpLineCode
 
 cursorDownLineCode :: Int -> String
-cursorDownLineCode = if isANSIEnabled
-                     then U.cursorDownLineCode
-                     else E.cursorDownLineCode
+cursorDownLineCode = nativeOrEmulated U.cursorDownLineCode E.cursorDownLineCode
 
 -- * Directly changing cursor position
-hSetCursorColumn = if isANSIEnabled
-                   then U.hSetCursorColumn
-                   else E.hSetCursorColumn
+hSetCursorColumn = nativeOrEmulated U.hSetCursorColumn E.hSetCursorColumn
 
 setCursorColumnCode :: Int -> String
-setCursorColumnCode = if isANSIEnabled
-                      then U.setCursorColumnCode
-                      else E.setCursorColumnCode
+setCursorColumnCode = nativeOrEmulated
+    U.setCursorColumnCode E.setCursorColumnCode
 
-hSetCursorPosition = if isANSIEnabled
-                     then U.hSetCursorPosition
-                     else E.hSetCursorPosition
+hSetCursorPosition = nativeOrEmulated U.hSetCursorPosition E.hSetCursorPosition
 
 setCursorPositionCode :: Int -> Int -> String
-setCursorPositionCode = if isANSIEnabled
-                        then U.setCursorPositionCode
-                        else E.setCursorPositionCode
+setCursorPositionCode = nativeOrEmulated
+    U.setCursorPositionCode E.setCursorPositionCode
 
 -- * Clearing parts of the screen
-hClearFromCursorToScreenEnd = if isANSIEnabled
-                              then U.hClearFromCursorToScreenEnd
-                              else E.hClearFromCursorToScreenEnd
-
-hClearFromCursorToScreenBeginning = if isANSIEnabled
-                                    then U.hClearFromCursorToScreenBeginning
-                                    else E.hClearFromCursorToScreenBeginning
-
-hClearScreen = if isANSIEnabled then U.hClearScreen else E.hClearScreen
+hClearFromCursorToScreenEnd = nativeOrEmulatedWithDefault
+    U.hClearFromCursorToScreenEnd E.hClearFromCursorToScreenEnd
+hClearFromCursorToScreenBeginning = nativeOrEmulatedWithDefault
+    U.hClearFromCursorToScreenBeginning E.hClearFromCursorToScreenBeginning
+hClearScreen = nativeOrEmulatedWithDefault U.hClearScreen E.hClearScreen
 
 clearFromCursorToScreenEndCode :: String
-clearFromCursorToScreenEndCode = if isANSIEnabled
-                                 then U.clearFromCursorToScreenEndCode
-                                 else E.clearFromCursorToScreenEndCode
+clearFromCursorToScreenEndCode = nativeOrEmulated
+    U.clearFromCursorToScreenEndCode E.clearFromCursorToScreenEndCode
 
 clearFromCursorToScreenBeginningCode :: String
-clearFromCursorToScreenBeginningCode =
-    if isANSIEnabled
-    then U.clearFromCursorToScreenBeginningCode
-    else E.clearFromCursorToScreenBeginningCode
+clearFromCursorToScreenBeginningCode = nativeOrEmulated
+    U.clearFromCursorToScreenBeginningCode E.clearFromCursorToScreenBeginningCode
 
 clearScreenCode :: String
-clearScreenCode = if isANSIEnabled then U.clearScreenCode else E.clearScreenCode
+clearScreenCode = nativeOrEmulated U.clearScreenCode E.clearScreenCode
 
-hClearFromCursorToLineEnd = if isANSIEnabled
-                            then U.hClearFromCursorToLineEnd
-                            else E.hClearFromCursorToLineEnd
-
-hClearFromCursorToLineBeginning = if isANSIEnabled
-                                  then U.hClearFromCursorToLineBeginning
-                                  else E.hClearFromCursorToLineBeginning
-
-hClearLine = if isANSIEnabled then U.hClearLine else E.hClearLine
+hClearFromCursorToLineEnd = nativeOrEmulatedWithDefault
+    U.hClearFromCursorToLineEnd E.hClearFromCursorToLineEnd
+hClearFromCursorToLineBeginning = nativeOrEmulatedWithDefault
+    U.hClearFromCursorToLineBeginning E.hClearFromCursorToLineBeginning
+hClearLine = nativeOrEmulatedWithDefault U.hClearLine E.hClearLine
 
 clearFromCursorToLineEndCode :: String
-clearFromCursorToLineEndCode = if isANSIEnabled
-                               then U.clearFromCursorToLineEndCode
-                               else E.clearFromCursorToLineEndCode
+clearFromCursorToLineEndCode = nativeOrEmulated
+    U.clearFromCursorToLineEndCode E.clearFromCursorToLineEndCode
 
 clearFromCursorToLineBeginningCode :: String
-clearFromCursorToLineBeginningCode = if isANSIEnabled
-                                     then U.clearFromCursorToLineBeginningCode
-                                     else E.clearFromCursorToLineBeginningCode
+clearFromCursorToLineBeginningCode = nativeOrEmulated
+    U.clearFromCursorToLineBeginningCode E.clearFromCursorToLineBeginningCode
 
 clearLineCode :: String
-clearLineCode = if isANSIEnabled then U.clearLineCode else E.clearLineCode
+clearLineCode = nativeOrEmulated U.clearLineCode E.clearLineCode
 
 -- * Scrolling the screen
-hScrollPageUp = if isANSIEnabled then U.hScrollPageUp else E.hScrollPageUp
-hScrollPageDown = if isANSIEnabled then U.hScrollPageDown else E.hScrollPageDown
+hScrollPageUp   = nativeOrEmulatedWithDefault U.hScrollPageUp   E.hScrollPageUp
+hScrollPageDown = nativeOrEmulatedWithDefault U.hScrollPageDown E.hScrollPageDown
 
 scrollPageUpCode :: Int -> String
-scrollPageUpCode = if isANSIEnabled
-                   then U.scrollPageUpCode
-                   else E.scrollPageUpCode
+scrollPageUpCode = nativeOrEmulated U.scrollPageUpCode E.scrollPageUpCode
 
 scrollPageDownCode :: Int -> String
-scrollPageDownCode = if isANSIEnabled
-                     then U.scrollPageDownCode
-                     else E.scrollPageDownCode
+scrollPageDownCode = nativeOrEmulated U.scrollPageDownCode E.scrollPageDownCode
 
 -- * Select Graphic Rendition mode: colors and other whizzy stuff
 --
@@ -145,24 +127,23 @@ scrollPageDownCode = if isANSIEnabled
 -- 25  SetBlinkSpeed NoBlink
 -- 28  SetVisible True
 
-hSetSGR = if isANSIEnabled then U.hSetSGR else E.hSetSGR
+hSetSGR = nativeOrEmulatedWithDefault U.hSetSGR E.hSetSGR
 
 setSGRCode :: [SGR] -> String
-setSGRCode = if isANSIEnabled then U.setSGRCode else E.setSGRCode
+setSGRCode = nativeOrEmulated U.setSGRCode E.setSGRCode
 
 -- * Cursor visibilty changes
-hHideCursor = if isANSIEnabled then U.hHideCursor else E.hHideCursor
-
-hShowCursor = if isANSIEnabled then U.hShowCursor else E.hShowCursor
+hHideCursor = nativeOrEmulated U.hHideCursor E.hHideCursor
+hShowCursor = nativeOrEmulated U.hShowCursor E.hShowCursor
 
 hideCursorCode :: String
-hideCursorCode = if isANSIEnabled then U.hideCursorCode else E.hideCursorCode
+hideCursorCode = nativeOrEmulated U.hideCursorCode E.hideCursorCode
 
 showCursorCode :: String
-showCursorCode = if isANSIEnabled then U.showCursorCode else E.showCursorCode
+showCursorCode = nativeOrEmulated U.showCursorCode E.showCursorCode
 
 -- * Changing the title
-hSetTitle = if isANSIEnabled then U.hSetTitle else E.hSetTitle
+hSetTitle = nativeOrEmulated U.hSetTitle E.hSetTitle
 
 setTitleCode :: String -> String
-setTitleCode = if isANSIEnabled then U.setTitleCode else E.setTitleCode
+setTitleCode = nativeOrEmulated U.setTitleCode E.setTitleCode

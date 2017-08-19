@@ -13,6 +13,8 @@ Homepage:            https://github.com/feuerbach/ansi-terminal
 Build-Type:          Simple
 
 Extra-Source-Files:     includes/Common-Include.hs
+                        includes/Common-Include-Emulator.hs
+                        includes/Common-Include-Enabled.hs
                         includes/Exports-Include.hs
                         CHANGELOG.md
                         README.md

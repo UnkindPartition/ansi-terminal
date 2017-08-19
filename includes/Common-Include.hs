@@ -37,46 +37,6 @@ setCursorPosition :: Int -- ^ 0-based row to move to
                   -> IO ()
 setCursorPosition = hSetCursorPosition stdout
 
-hClearFromCursorToScreenEnd, hClearFromCursorToScreenBeginning, hClearScreen :: Handle
-                                                                             -> IO ()
-clearFromCursorToScreenEnd, clearFromCursorToScreenBeginning, clearScreen :: IO ()
-clearFromCursorToScreenEnd = hClearFromCursorToScreenEnd stdout
-clearFromCursorToScreenBeginning = hClearFromCursorToScreenBeginning stdout
-clearScreen = hClearScreen stdout
-
-hClearFromCursorToLineEnd, hClearFromCursorToLineBeginning, hClearLine :: Handle
-                                                                       -> IO ()
-clearFromCursorToLineEnd, clearFromCursorToLineBeginning, clearLine :: IO ()
-
-clearFromCursorToLineEnd = hClearFromCursorToLineEnd stdout
-clearFromCursorToLineBeginning = hClearFromCursorToLineBeginning stdout
-clearLine = hClearLine stdout
-
--- | Scroll the displayed information up or down the terminal: not widely supported
-hScrollPageUp, hScrollPageDown :: Handle
-                               -> Int -- ^ Number of lines to scroll by
-                               -> IO ()
--- | Scroll the displayed information up or down the terminal: not widely supported
-scrollPageUp, scrollPageDown :: Int -- ^ Number of lines to scroll by
-                             -> IO ()
--- | Scroll the displayed information up or down the terminal: not widely supported
-scrollPageUp = hScrollPageUp stdout
-scrollPageDown = hScrollPageDown stdout
-
--- | Set the Select Graphic Rendition mode
-hSetSGR :: Handle
-        -> [SGR] -- ^ Commands: these will typically be applied on top of the current console SGR mode.
-                 -- An empty list of commands is equivalent to the list @[Reset]@. Commands are applied
-                 -- left to right.
-        -> IO ()
--- | Set the Select Graphic Rendition mode
-setSGR :: [SGR] -- ^ Commands: these will typically be applied on top of the current console SGR mode.
-                -- An empty list of commands is equivalent to the list @[Reset]@. Commands are applied
-                -- left to right.
-       -> IO ()
--- | Set the Select Graphic Rendition mode
-setSGR = hSetSGR stdout
-
 hHideCursor, hShowCursor :: Handle
                          -> IO ()
 hideCursor, showCursor :: IO ()
