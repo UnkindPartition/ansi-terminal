@@ -1,10 +1,15 @@
 Changes
 =======
 
+Version 0.7
+-----------
+
+Add 24-bit RGB color support
+
 Version 0.6.3.1
 ---------------
 
-Fix Windows + ghc 7.8 compatibility,
+Fix Windows + ghc 7.8 compatibility
 
 Version 0.6.3
 -------------
