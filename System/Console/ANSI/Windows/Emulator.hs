@@ -1,9 +1,12 @@
+{-# OPTIONS_HADDOCK hide #-}
+
 module System.Console.ANSI.Windows.Emulator (
 #include "Exports-Include.hs"
     ) where
 
 import System.Console.ANSI.Types
 import qualified System.Console.ANSI.Unix as Unix
+import System.Console.ANSI.Windows.Detect
 import System.Console.ANSI.Windows.Foreign
 import System.Console.ANSI.Windows.Emulator.Codes
 
@@ -19,7 +22,10 @@ import Data.List
 
 
 #include "Common-Include.hs"
-
+-- This file contains code that is required in the case of the module
+-- System.Console.ANSI.Windows.Emulator and differs from the common code in
+-- file Common-Include-Enabled.hs.
+#include "Common-Include-Emulator.hs"
 
 withHandle :: Handle -> (HANDLE -> IO a) -> IO a
 withHandle handle action = do
@@ -72,11 +78,16 @@ hSetCursorPosition h y x = emulatorFallback (Unix.hSetCursorPosition h y x) $ wi
 clearChar :: WCHAR
 clearChar = charToWCHAR ' '
 
-clearAttribute :: WORD
-clearAttribute = 0
+-- | The 'clear' attribute is equated with the default background attributes.
+clearAttribute :: ConsoleDefaultState -> WORD
+clearAttribute = defaultBackgroundAttributes
 
-hClearScreenFraction :: HANDLE -> (SMALL_RECT -> COORD -> (DWORD, COORD)) -> IO ()
-hClearScreenFraction handle fraction_finder = do
+hClearScreenFraction
+    :: ConsoleDefaultState
+    -> HANDLE
+    -> (SMALL_RECT -> COORD -> (DWORD, COORD))
+    -> IO ()
+hClearScreenFraction cds handle fraction_finder = do
     screen_buffer_info <- getConsoleScreenBufferInfo handle
 
     let window = csbi_window screen_buffer_info
@@ -84,10 +95,13 @@ hClearScreenFraction handle fraction_finder = do
         (fill_length, fill_cursor_pos) = fraction_finder window cursor_pos
 
     fillConsoleOutputCharacter handle clearChar fill_length fill_cursor_pos
-    fillConsoleOutputAttribute handle clearAttribute fill_length fill_cursor_pos
+    fillConsoleOutputAttribute handle (clearAttribute cds) fill_length
+        fill_cursor_pos
     return ()
 
-hClearFromCursorToScreenEnd h = emulatorFallback (Unix.hClearFromCursorToScreenEnd h) $ withHandle h $ \handle -> hClearScreenFraction handle go
+hClearFromCursorToScreenEnd cds h
+    = emulatorFallback (Unix.hClearFromCursorToScreenEnd h) $ withHandle h $
+          \handle -> hClearScreenFraction cds handle go
   where
     go window cursor_pos = (fromIntegral fill_length, cursor_pos)
       where
@@ -96,7 +110,9 @@ hClearFromCursorToScreenEnd h = emulatorFallback (Unix.hClearFromCursorToScreenE
         line_remainder = size_x - coord_x cursor_pos
         fill_length = size_x * size_y + line_remainder
 
-hClearFromCursorToScreenBeginning h = emulatorFallback (Unix.hClearFromCursorToScreenBeginning h) $ withHandle h $ \handle -> hClearScreenFraction handle go
+hClearFromCursorToScreenBeginning cds h
+    = emulatorFallback (Unix.hClearFromCursorToScreenBeginning h) $ withHandle h $
+          \handle -> hClearScreenFraction cds handle go
   where
     go window cursor_pos = (fromIntegral fill_length, rect_top_left window)
       where
@@ -105,7 +121,9 @@ hClearFromCursorToScreenBeginning h = emulatorFallback (Unix.hClearFromCursorToS
         line_remainder = coord_x cursor_pos
         fill_length = size_x * size_y + line_remainder
 
-hClearScreen h = emulatorFallback (Unix.hClearScreen h) $ withHandle h $ \handle -> hClearScreenFraction handle go
+hClearScreen cds h
+    = emulatorFallback (Unix.hClearScreen h) $ withHandle h $
+          \handle -> hClearScreenFraction cds handle go
   where
     go window _ = (fromIntegral fill_length, rect_top_left window)
       where
@@ -113,28 +131,46 @@ hClearScreen h = emulatorFallback (Unix.hClearScreen h) $ withHandle h $ \handle
         size_y = rect_height window
         fill_length = size_x * size_y
 
-hClearFromCursorToLineEnd h = emulatorFallback (Unix.hClearFromCursorToLineEnd h) $ withHandle h $ \handle -> hClearScreenFraction handle go
+hClearFromCursorToLineEnd cds h
+    = emulatorFallback (Unix.hClearFromCursorToLineEnd h) $ withHandle h $
+          \handle -> hClearScreenFraction cds handle go
   where
-    go window cursor_pos = (fromIntegral (rect_right window - coord_x cursor_pos), cursor_pos)
+    go window cursor_pos
+        = (fromIntegral (rect_right window - coord_x cursor_pos), cursor_pos)
 
-hClearFromCursorToLineBeginning h = emulatorFallback (Unix.hClearFromCursorToLineBeginning h) $ withHandle h $ \handle -> hClearScreenFraction handle go
+hClearFromCursorToLineBeginning cds h
+    = emulatorFallback (Unix.hClearFromCursorToLineBeginning h) $ withHandle h $
+          \handle -> hClearScreenFraction cds handle go
   where
-    go window cursor_pos = (fromIntegral (coord_x cursor_pos), cursor_pos { coord_x = rect_left window })
+    go window cursor_pos
+        = (fromIntegral (coord_x cursor_pos), cursor_pos { coord_x = rect_left window })
 
-hClearLine h = emulatorFallback (Unix.hClearLine h) $ withHandle h $ \handle -> hClearScreenFraction handle go
+hClearLine cds h
+    = emulatorFallback (Unix.hClearLine h) $ withHandle h $
+          \handle -> hClearScreenFraction cds handle go
   where
-    go window cursor_pos = (fromIntegral (rect_width window), cursor_pos { coord_x = rect_left window })
+    go window cursor_pos
+        = (fromIntegral (rect_width window), cursor_pos { coord_x = rect_left window })
 
-hScrollPage :: HANDLE -> Int -> IO ()
-hScrollPage handle new_origin_y = do
+hScrollPage
+    :: ConsoleDefaultState -- ^ The default console state
+    -> HANDLE
+    -> Int
+    -> IO ()
+hScrollPage cds handle new_origin_y = do
     screen_buffer_info <- getConsoleScreenBufferInfo handle
-    let fill = CHAR_INFO clearChar clearAttribute
+    let fill = CHAR_INFO clearChar (clearAttribute cds)
         window = csbi_window screen_buffer_info
         origin = COORD (rect_left window) (rect_top window + fromIntegral new_origin_y)
     scrollConsoleScreenBuffer handle window Nothing origin fill
 
-hScrollPageUp   h n = emulatorFallback (Unix.hScrollPageUp   h n) $ withHandle h $ \handle -> hScrollPage handle (negate n)
-hScrollPageDown h n = emulatorFallback (Unix.hScrollPageDown h n) $ withHandle h $ \handle -> hScrollPage handle n
+hScrollPageUp cds h n
+    = emulatorFallback (Unix.hScrollPageUp   h n) $ withHandle h $
+          \handle -> hScrollPage cds handle (negate n)
+
+hScrollPageDown cds h n
+    = emulatorFallback (Unix.hScrollPageDown h n) $ withHandle h $
+          \handle -> hScrollPage cds handle n
 
 {-# INLINE applyANSIColorToAttribute #-}
 applyANSIColorToAttribute :: WORD -> WORD -> WORD -> Color -> WORD -> WORD
@@ -164,9 +200,9 @@ swapForegroundBackgroundColors attribute = clean_attribute .|. foreground_attrib
     foreground_attribute' = background_attribute `shiftR` 4
     background_attribute' = foreground_attribute `shiftL` 4
 
-applyANSISGRToAttribute :: SGR -> WORD -> WORD
-applyANSISGRToAttribute sgr attribute = case sgr of
-    Reset -> fOREGROUND_WHITE
+applyANSISGRToAttribute :: WORD -> SGR -> WORD -> WORD
+applyANSISGRToAttribute def sgr attribute = case sgr of
+    Reset -> def
     SetConsoleIntensity intensity -> case intensity of
         BoldIntensity   -> attribute .|. iNTENSITY
         FaintIntensity  -> attribute .&. (complement iNTENSITY) -- Not supported
@@ -206,10 +242,12 @@ applyANSISGRToAttribute sgr attribute = case sgr of
   where
     iNTENSITY = fOREGROUND_INTENSITY
 
-hSetSGR h sgr = emulatorFallback (Unix.hSetSGR h sgr) $ withHandle h $ \handle -> do
+hSetSGR cds h sgr = emulatorFallback (Unix.hSetSGR h sgr) $ withHandle h $ \handle -> do
     screen_buffer_info <- getConsoleScreenBufferInfo handle
     let attribute = csbi_attributes screen_buffer_info
-        attribute' = foldl' (flip applyANSISGRToAttribute) attribute
+        def       =     defaultForegroundAttributes cds
+                    .|. defaultBackgroundAttributes cds
+        attribute' = foldl' (flip $ applyANSISGRToAttribute def) attribute
           -- make [] equivalent to [Reset], as documented
           (if null sgr then [Reset] else sgr)
     setConsoleTextAttribute handle attribute'
