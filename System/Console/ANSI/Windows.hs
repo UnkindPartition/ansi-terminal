@@ -69,6 +69,22 @@ setCursorPositionCode :: Int -> Int -> String
 setCursorPositionCode = nativeOrEmulated
     U.setCursorPositionCode E.setCursorPositionCode
 
+-- * Saving, restoring and reporting cursor position
+hSaveCursor = nativeOrEmulated U.hSaveCursor E.hSaveCursor
+hRestoreCursor = nativeOrEmulated U.hRestoreCursor E.hRestoreCursor
+hReportCursorPosition = nativeOrEmulated
+    U.hReportCursorPosition E.hReportCursorPosition
+
+saveCursorCode :: String
+saveCursorCode = nativeOrEmulated U.saveCursorCode E.saveCursorCode
+
+restoreCursorCode :: String
+restoreCursorCode = nativeOrEmulated U.restoreCursorCode E.restoreCursorCode
+
+reportCursorPositionCode :: String
+reportCursorPositionCode = nativeOrEmulated
+    U.reportCursorPositionCode E.reportCursorPositionCode
+
 -- * Clearing parts of the screen
 hClearFromCursorToScreenEnd = nativeOrEmulatedWithDefault
     U.hClearFromCursorToScreenEnd E.hClearFromCursorToScreenEnd

@@ -1,4 +1,5 @@
 {-# OPTIONS_HADDOCK hide #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 
 -- | "System.Win32.Console" is really very impoverished, so I have had to do all the FFI myself.
@@ -6,6 +7,10 @@ module System.Console.ANSI.Windows.Foreign (
         -- Re-exports from Win32.Types
         BOOL, WORD, DWORD, WCHAR, HANDLE, iNVALID_HANDLE_VALUE, nullHANDLE,
         SHORT,
+
+        -- 'Re-exports from System.Win32.Console.Extra'
+        INPUT_RECORD(..), INPUT_RECORD_EVENT(..), kEY_EVENT,
+        KEY_EVENT_RECORD(..), UNICODE_ASCII_CHAR (..), writeConsoleInput,
 
         charToWCHAR,
 
@@ -38,7 +43,6 @@ module System.Console.ANSI.Windows.Foreign (
 
         withTString, withHandleToHANDLE,
 
-        --
         ConsoleException(..)
     ) where
 
@@ -260,6 +264,8 @@ bACKGROUND_WHITE = bACKGROUND_RED .|. bACKGROUND_GREEN .|. bACKGROUND_BLUE
 fOREGROUND_INTENSE_WHITE = fOREGROUND_WHITE .|. fOREGROUND_INTENSITY
 bACKGROUND_INTENSE_WHITE = bACKGROUND_WHITE .|. bACKGROUND_INTENSITY
 
+kEY_EVENT :: WORD
+kEY_EVENT = 1
 foreign import WINDOWS_CCONV unsafe "windows.h GetStdHandle" getStdHandle :: DWORD -> IO HANDLE
 foreign import WINDOWS_CCONV unsafe "windows.h GetConsoleScreenBufferInfo" cGetConsoleScreenBufferInfo :: HANDLE -> Ptr CONSOLE_SCREEN_BUFFER_INFO -> IO BOOL
 foreign import WINDOWS_CCONV unsafe "windows.h GetConsoleCursorInfo" cGetConsoleCursorInfo :: HANDLE -> Ptr CONSOLE_CURSOR_INFO -> IO BOOL
@@ -274,6 +280,8 @@ foreign import WINDOWS_CCONV unsafe "windows.h SetConsoleMode" cSetConsoleMode :
 foreign import WINDOWS_CCONV unsafe "windows.h FillConsoleOutputAttribute" cFillConsoleOutputAttribute :: HANDLE -> WORD -> DWORD -> UNPACKED_COORD -> Ptr DWORD -> IO BOOL
 foreign import WINDOWS_CCONV unsafe "windows.h FillConsoleOutputCharacterW" cFillConsoleOutputCharacter :: HANDLE -> TCHAR -> DWORD -> UNPACKED_COORD -> Ptr DWORD -> IO BOOL
 foreign import WINDOWS_CCONV unsafe "windows.h ScrollConsoleScreenBufferW" cScrollConsoleScreenBuffer :: HANDLE -> Ptr SMALL_RECT -> Ptr SMALL_RECT -> UNPACKED_COORD -> Ptr CHAR_INFO -> IO BOOL
+
+foreign import stdcall "windows.h WriteConsoleInputW" cWriteConsoleInput :: HANDLE -> Ptr INPUT_RECORD -> DWORD -> LPDWORD -> IO BOOL
 
 data ConsoleException = ConsoleException !ErrCode deriving (Show, Eq, Typeable)
 
@@ -380,3 +388,115 @@ foreign import WINDOWS_CCONV unsafe "_get_osfhandle" cget_osfhandle :: IOBase.FD
 withStablePtr :: a -> (StablePtr a -> IO b) -> IO b
 withStablePtr value = bracket (newStablePtr value) freeStablePtr
 #endif
+
+-- The following is based on module System.Win32.Console.Extra from package
+-- Win32-console, cut down for the WCHAR version of writeConsoleInput.
+
+writeConsoleInput :: HANDLE -> [INPUT_RECORD] -> IO DWORD
+writeConsoleInput hdl evs =
+    writeConsoleInputWith hdl $ \act -> withArrayLen evs $ \len ptr -> act (ptr, toEnum len)
+
+writeConsoleInputWith :: HANDLE -> InputHandler (Ptr INPUT_RECORD, DWORD) -> IO DWORD
+writeConsoleInputWith hdl withBuffer =
+    returnWith_ $ \ptrN ->
+        withBuffer $ \(ptrBuf, len) ->
+            failIfFalse_ "WriteConsoleInputW" $ cWriteConsoleInput hdl ptrBuf len ptrN
+
+returnWith_ :: Storable a => (Ptr a -> IO b) -> IO a
+returnWith_ act = alloca $ \ptr -> act ptr >> peek ptr
+
+type InputHandler i = forall a. (i -> IO a) -> IO a
+
+{-
+typedef union _UNICODE_ASCII_CHAR {
+    WCHAR UnicodeChar;
+    CHAR  AsciiChar;
+} UNICODE_ASCII_CHAR;
+-}
+newtype UNICODE_ASCII_CHAR   = UnicodeAsciiChar { unicodeAsciiChar :: WCHAR }
+                               deriving (Show, Read, Eq)
+
+instance Storable UNICODE_ASCII_CHAR where
+    sizeOf _    = 2
+    alignment _ = 2
+    peek ptr = UnicodeAsciiChar <$> (`peekByteOff` 0) ptr
+    poke ptr val = case val of
+        UnicodeAsciiChar c -> (`pokeByteOff` 0) ptr c
+
+{-
+typedef struct _KEY_EVENT_RECORD {
+	BOOL bKeyDown;
+	WORD wRepeatCount;
+	WORD wVirtualKeyCode;
+	WORD wVirtualScanCode;
+	union {
+		WCHAR UnicodeChar;
+		CHAR AsciiChar;
+	} uChar;
+	DWORD dwControlKeyState;
+}
+#ifdef __GNUC__
+/* gcc's alignment is not what win32 expects */
+ PACKED
+#endif
+KEY_EVENT_RECORD;
+-}
+data KEY_EVENT_RECORD = KEY_EVENT_RECORD {
+        keyEventKeyDown         :: BOOL,
+        keyEventRepeatCount     :: WORD,
+        keyEventVirtualKeyCode  :: WORD,
+        keyEventVirtualScanCode :: WORD,
+        keyEventChar            :: UNICODE_ASCII_CHAR,
+        keyEventControlKeystate :: DWORD
+    } deriving (Show, Read, Eq)
+
+instance Storable KEY_EVENT_RECORD where
+    sizeOf _    = 16
+    alignment _ =  4
+    peek ptr = KEY_EVENT_RECORD <$> (`peekByteOff`  0) ptr
+                                <*> (`peekByteOff`  4) ptr
+                                <*> (`peekByteOff`  6) ptr
+                                <*> (`peekByteOff`  8) ptr
+                                <*> (`peekByteOff` 10) ptr
+                                <*> (`peekByteOff` 12) ptr
+    poke ptr val = do
+        (`pokeByteOff`  0) ptr $ keyEventKeyDown val
+        (`pokeByteOff`  4) ptr $ keyEventRepeatCount val
+        (`pokeByteOff`  6) ptr $ keyEventVirtualKeyCode val
+        (`pokeByteOff`  8) ptr $ keyEventVirtualScanCode val
+        (`pokeByteOff` 10) ptr $ keyEventChar val
+        (`pokeByteOff` 12) ptr $ keyEventControlKeystate val
+
+data INPUT_RECORD_EVENT   = InputKeyEvent KEY_EVENT_RECORD
+                            deriving (Show, Read, Eq)
+
+{-
+typedef struct _INPUT_RECORD {
+	WORD EventType;
+	union {
+		KEY_EVENT_RECORD KeyEvent;
+		MOUSE_EVENT_RECORD MouseEvent;
+		WINDOW_BUFFER_SIZE_RECORD WindowBufferSizeEvent;
+		MENU_EVENT_RECORD MenuEvent;
+		FOCUS_EVENT_RECORD FocusEvent;
+	} Event;
+} INPUT_RECORD,*PINPUT_RECORD;
+-}
+data INPUT_RECORD = INPUT_RECORD {
+        inputEventType :: WORD,
+        inputEvent     :: INPUT_RECORD_EVENT
+    } deriving (Show, Read, Eq)
+
+instance Storable INPUT_RECORD where
+    sizeOf _    = 20
+    alignment _ =  4
+    peek ptr = do
+        evType <- (`peekByteOff` 0) ptr
+        event <- case evType of
+            _ | evType == kEY_EVENT -> InputKeyEvent <$> (`peekByteOff` 4) ptr
+            _ -> error $ "peek (INPUT_RECORD): Unknown event type " ++ show evType
+        return $ INPUT_RECORD evType event
+    poke ptr val = do
+        (`pokeByteOff` 0) ptr $ inputEventType val
+        case inputEvent val of
+            InputKeyEvent ev -> (`pokeByteOff` 4) ptr ev

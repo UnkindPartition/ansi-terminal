@@ -11,6 +11,9 @@ module System.Console.ANSI.Windows.Emulator.Codes
       -- * Directly changing cursor position
     , setCursorColumnCode, setCursorPositionCode
 
+      -- * Saving, restoring and reporting cursor position
+    , saveCursorCode, restoreCursorCode, reportCursorPositionCode
+
       -- * Clearing parts of the screen
     , clearFromCursorToScreenEndCode, clearFromCursorToScreenBeginningCode
     , clearScreenCode, clearFromCursorToLineEndCode
@@ -51,6 +54,11 @@ setCursorPositionCode :: Int -- ^ 0-based row to move to
                       -> Int -- ^ 0-based column to move to
                       -> String
 setCursorPositionCode _ _ = ""
+
+saveCursorCode, restoreCursorCode, reportCursorPositionCode :: String
+saveCursorCode = ""
+restoreCursorCode = ""
+reportCursorPositionCode = ""
 
 clearFromCursorToScreenEndCode, clearFromCursorToScreenBeginningCode, clearScreenCode :: String
 clearFromCursorToLineEndCode, clearFromCursorToLineBeginningCode, clearLineCode :: String

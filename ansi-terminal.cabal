@@ -3,8 +3,9 @@ Version:             0.7
 Cabal-Version:       >= 1.6
 Category:            User Interfaces
 Synopsis:            Simple ANSI terminal support, with Windows compatibility
-Description:         ANSI terminal support for Haskell: allows cursor movement, screen clearing, color output, showing or hiding the cursor, and
-                     changing the title. Works on UNIX and Windows.
+Description:         ANSI terminal support for Haskell: allows cursor movement,
+                     screen clearing, color output, showing or hiding the
+                     cursor, and changing the title. Works on UNIX and Windows.
 License:             BSD3
 License-File:        LICENSE
 Author:              Max Bolingbroke
@@ -38,6 +39,7 @@ Library
                               , colour
         if os(windows)
                 Build-Depends:          base-compat >= 0.9.1
+                                      , containers
                                       , Win32 >= 2.0
                                       , process
                 Cpp-Options:            -DWINDOWS
@@ -70,6 +72,7 @@ Executable ansi-terminal-example
 
         if os(windows)
                 Build-Depends:          base-compat >= 0.9.1
+                                      , containers
                                       , Win32 >= 2.0
                 Cpp-Options:            -DWINDOWS
                 Other-Modules:          System.Console.ANSI.Windows

@@ -21,6 +21,10 @@ hCursorUpLine h n = hPutStr h $ cursorUpLineCode n
 hSetCursorColumn h n = hPutStr h $ setCursorColumnCode n
 hSetCursorPosition h n m = hPutStr h $ setCursorPositionCode n m
 
+hSaveCursor h = hPutStr h saveCursorCode
+hRestoreCursor h = hPutStr h restoreCursorCode
+hReportCursorPosition h = hPutStr h reportCursorPositionCode
+
 hClearFromCursorToScreenEnd h = hPutStr h clearFromCursorToScreenEndCode
 hClearFromCursorToScreenBeginning h = hPutStr h clearFromCursorToScreenBeginningCode
 hClearScreen h = hPutStr h clearScreenCode

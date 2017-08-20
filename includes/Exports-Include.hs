@@ -27,6 +27,19 @@ setCursorPosition,
 hSetCursorPosition,
 setCursorPositionCode,
 
+-- * Saving, restoring and reporting cursor position
+saveCursor,
+hSaveCursor,
+saveCursorCode,
+
+restoreCursor,
+hRestoreCursor,
+restoreCursorCode,
+
+reportCursorPosition,
+hReportCursorPosition,
+reportCursorPositionCode,
+
 -- * Clearing parts of the screen
 -- | Note that these functions only clear parts of the screen. They do not move the
 -- cursor.
