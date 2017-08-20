@@ -25,6 +25,9 @@ module System.Console.ANSI.Codes
       -- * Directly changing cursor position
     , setCursorColumnCode, setCursorPositionCode
 
+      -- * Saving, restoring and reporting cursor position
+    , saveCursorCode, restoreCursorCode, reportCursorPositionCode
+
       -- * Clearing parts of the screen
     , clearFromCursorToScreenEndCode, clearFromCursorToScreenBeginningCode
     , clearScreenCode, clearFromCursorToLineEndCode
@@ -133,6 +136,11 @@ setCursorPositionCode :: Int -- ^ 0-based row to move to
                       -> Int -- ^ 0-based column to move to
                       -> String
 setCursorPositionCode n m = csi [n + 1, m + 1] "H"
+
+saveCursorCode, restoreCursorCode, reportCursorPositionCode :: String
+saveCursorCode = "\ESC7"
+restoreCursorCode = "\ESC8"
+reportCursorPositionCode = csi [] "6n"
 
 clearFromCursorToScreenEndCode, clearFromCursorToScreenBeginningCode, clearScreenCode :: String
 clearFromCursorToLineEndCode, clearFromCursorToLineBeginningCode, clearLineCode :: String

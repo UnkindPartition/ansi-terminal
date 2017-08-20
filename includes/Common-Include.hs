@@ -37,6 +37,23 @@ setCursorPosition :: Int -- ^ 0-based row to move to
                   -> IO ()
 setCursorPosition = hSetCursorPosition stdout
 
+hSaveCursor, hRestoreCursor, hReportCursorPosition :: Handle -> IO ()
+
+-- | Save the cursor position in memory. The only way to access the saved value
+-- is with the `restoreCursor` command.
+saveCursor :: IO ()
+-- | Restore the cursor position from memory. There will be no value saved in
+-- memory until the first use of the `saveCursor` command.
+restoreCursor :: IO ()
+-- | Emit the cursor position into the console input stream, immediately after
+-- being recognised on the output stream, as:
+-- @ESC [ <cursor row> ; <cursor column> R@
+reportCursorPosition :: IO ()
+
+saveCursor = hSaveCursor stdout
+restoreCursor = hRestoreCursor stdout
+reportCursorPosition = hReportCursorPosition stdout
+
 hHideCursor, hShowCursor :: Handle
                          -> IO ()
 hideCursor, showCursor :: IO ()

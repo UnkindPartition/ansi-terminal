@@ -14,11 +14,13 @@ examples :: [IO ()]
 examples = [ cursorMovementExample
            , lineChangeExample
            , setCursorPositionExample
+           , saveRestoreCursorExample
            , clearExample
            , scrollExample
            , sgrExample
            , cursorVisibilityExample
            , titleExample
+           , reportCursorPositionExample
            ]
 
 main :: IO ()
@@ -46,25 +48,25 @@ cursorMovementExample = do
     pause
     -- Line One
     -- Line Two
-    
+
     cursorUp 1
     putStr " - Extras"
     pause
     -- Line One - Extras
     -- Line Two
-    
+
     cursorBackward 2
     putStr "zz"
     pause
     -- Line One - Extrzz
     -- Line Two
-    
+
     cursorForward 2
     putStr "- And More"
     pause
     -- Line One - Extrzz  - And More
     -- Line Two
-    
+
     cursorDown 1
     putStr "Disconnected"
     pause
@@ -78,13 +80,13 @@ lineChangeExample = do
     pause
     -- Line One
     -- Line Two
-    
+
     cursorUpLine 1
     putStr "New Line One"
     pause
     -- New Line One
     -- Line Two
-    
+
     cursorDownLine 1
     putStr "New Line Two"
     pause
@@ -98,24 +100,45 @@ setCursorPositionExample = do
     pause
     -- Line One
     -- Line Two
-    
+
     setCursorPosition 0 5
     putStr "Foo"
     pause
     -- Line Foo
     -- Line Two
-    
+
     setCursorPosition 1 5
     putStr "Bar"
     pause
     -- Line Foo
     -- Line Bar
-    
+
     setCursorColumn 1
     putStr "oaf"
     pause
     -- Line Foo
     -- Loaf Bar
+
+saveRestoreCursorExample :: IO ()
+saveRestoreCursorExample = do
+    putStr "Start sentence ..."
+    pause
+    -- Start sentence ...
+
+    saveCursor
+    setCursorPosition 2 3
+    putStr "SPLASH!"
+    pause
+    -- Start sentence ...
+    --
+    --    SPLASH!
+
+    restoreCursor
+    putStr " end sentence, uninterrupted."
+    pause
+    -- Start sentence ... end sentence, uninterrupted
+    --
+    --    SPLASH!
 
 clearExample :: IO ()
 clearExample = do
@@ -124,50 +147,50 @@ clearExample = do
     pause
     -- Line One
     -- Line Two
-    
+
     setCursorPosition 0 4
     clearFromCursorToScreenEnd
     pause
     -- Line
-    
-    
+
+
     resetScreen
     putStrLn "Line One"
     putStrLn "Line Two"
     pause
     -- Line One
     -- Line Two
-    
+
     setCursorPosition 1 4
     clearFromCursorToScreenBeginning
     pause
     --
     --     Two
-    
-    
+
+
     resetScreen
     putStrLn "Line One"
     putStrLn "Line Two"
     pause
     -- Line One
     -- Line Two
-    
+
     setCursorPosition 0 4
     clearFromCursorToLineEnd
     pause
     -- Line
     -- Line Two
-    
+
     setCursorPosition 1 4
     clearFromCursorToLineBeginning
     pause
     -- Line
     --      Two
-    
+
     clearLine
     pause
     -- Line
-    
+
     clearScreen
     pause
     --
@@ -181,7 +204,7 @@ scrollExample = do
     -- Line One
     -- Line Two
     -- Line Three
-    
+
     scrollPageDown 2
     pause
     --
@@ -189,7 +212,7 @@ scrollExample = do
     -- Line One
     -- Line Two
     -- Line Three
-    
+
     scrollPageUp 3
     pause
     -- Line Two
@@ -207,7 +230,7 @@ sgrExample = do
                 putStrLn (show color)
             pause
     -- All the colors, 4 times in sequence
-    
+
     let named_styles = [ (SetConsoleIntensity BoldIntensity, "Bold")
                        , (SetConsoleIntensity FaintIntensity, "Faint")
                        , (SetConsoleIntensity NormalIntensity, "Normal")
@@ -228,16 +251,16 @@ sgrExample = do
               putStrLn name
               pause
     -- Text describing a style displayed in that style in sequence
-    
+
     setSGR [SetColor Foreground Vivid Red]
     setSGR [SetColor Background Vivid Blue]
-    
+
     clearScreen >> setCursorPosition 0 0
     setSGR [SetSwapForegroundBackground False]
     putStr "Red-On-Blue"
     pause
     -- Red-On-Blue
-    
+
     clearScreen >> setCursorPosition 0 0
     setSGR [SetSwapForegroundBackground True]
     putStr "Blue-On-Red"
@@ -249,11 +272,11 @@ cursorVisibilityExample = do
     putStr "Cursor Demo"
     pause
     -- Cursor Demo|
-    
+
     hideCursor
     pause
     -- Cursor Demo
-    
+
     showCursor
     pause
     -- Cursor Demo|
@@ -265,9 +288,16 @@ titleExample = do
     -- ~/foo/ - ansi-terminal-ex - 83x70
     ------------------------------------
     -- Title Demo
-    
+
     setTitle "Yup, I'm a new title!"
     pause
     -- Yup, I'm a new title! - ansi-terminal-ex - 83x70
     ---------------------------------------------------
     -- Title Demo
+
+reportCursorPositionExample :: IO ()
+reportCursorPositionExample = do
+    putStr "Report cursor position here:"
+    pause
+    reportCursorPosition
+    putStrLn " (1st row, 29th column) to stdin, as CSI 1 ; 29 R."

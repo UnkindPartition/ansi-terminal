@@ -11,15 +11,18 @@ import System.Console.ANSI.Windows.Foreign
 import System.Console.ANSI.Windows.Emulator.Codes
 
 import System.IO
+import System.IO.Unsafe (unsafePerformIO)
 
 import Control.Exception (catchJust)
+import Control.Monad (forM_)
 import Data.Colour (Colour)
 import Data.Colour.Names (black, blue, cyan, green, grey, lime, magenta, maroon,
     navy, olive, purple, red, silver, teal, white, yellow)
 import Data.Colour.SRGB (RGB (..), toSRGB)
 import Data.Bits
+import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Data.List
-
+import qualified Data.Map.Strict as Map
 
 #include "Common-Include.hs"
 -- This file contains code that is required in the case of the module
@@ -269,6 +272,44 @@ hShowCursor h = emulatorFallback (Unix.hShowCursor h) $ withHandle h $ \handle -
 -- assume that that is what the user intended. This will fail if they are sending the command
 -- over e.g. a network link... but that's not really what I'm designing for.
 hSetTitle h title = emulatorFallback (Unix.hSetTitle h title) $ withTString title $ setConsoleTitle
+
+cursorPositionRef :: IORef (Map.Map HANDLE COORD)
+{-# NOINLINE cursorPositionRef #-}
+cursorPositionRef = unsafePerformIO $ newIORef Map.empty
+
+hSaveCursor h = emulatorFallback (Unix.hSaveCursor h) $ withHandle h $ \handle -> do
+    screen_buffer_info <- getConsoleScreenBufferInfo handle
+    m <- readIORef cursorPositionRef
+    writeIORef cursorPositionRef
+        (Map.insert handle (csbi_cursor_position screen_buffer_info) m)
+
+hRestoreCursor h = emulatorFallback (Unix.hRestoreCursor h) $ withHandle h $ \handle -> do
+    m <- readIORef cursorPositionRef
+    let result = Map.lookup handle m
+    forM_ result (setConsoleCursorPosition handle)
+
+hReportCursorPosition h = emulatorFallback (Unix.hReportCursorPosition h) $ withHandle h $ \handle -> do
+    result <- getConsoleScreenBufferInfo handle
+    let (COORD cx cy) = csbi_cursor_position result
+        window = csbi_window result
+        x = cx - rect_left window + 1
+        y = cy - rect_top window + 1
+    hIn <- getStdHandle sTD_INPUT_HANDLE
+    _ <- writeConsoleInput hIn $ keyPresses $
+        "\ESC[" ++ show y ++ ";" ++ show x ++ "R"
+    return ()
+
+keyPress :: Char -> [INPUT_RECORD]
+keyPress c = [keyDown, keyUp]
+  where
+    keyDown = key True
+    keyUp   = key False
+    c' = UnicodeAsciiChar $ charToWCHAR c
+    key isDown = INPUT_RECORD kEY_EVENT $
+        InputKeyEvent (KEY_EVENT_RECORD isDown 1 0 0 c' 0)
+
+keyPresses :: String -> [INPUT_RECORD]
+keyPresses = concatMap keyPress
 
 aNSIColors :: [((ColorIntensity, Color), Colour Float)]
 aNSIColors = [ ((Dull,  Black),   black)
