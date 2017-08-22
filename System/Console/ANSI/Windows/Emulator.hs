@@ -85,72 +85,77 @@ clearAttribute = defaultBackgroundAttributes
 hClearScreenFraction
     :: ConsoleDefaultState
     -> HANDLE
-    -> (SMALL_RECT -> COORD -> (DWORD, COORD))
+    -> (SMALL_RECT -> COORD -> (SHORT, SHORT, SHORT, SHORT, SHORT, SHORT))
     -> IO ()
 hClearScreenFraction cds handle fraction_finder = do
     screen_buffer_info <- getConsoleScreenBufferInfo handle
 
     let window = csbi_window screen_buffer_info
         cursor_pos = csbi_cursor_position screen_buffer_info
-        (fill_length, fill_cursor_pos) = fraction_finder window cursor_pos
-
-    fillConsoleOutputCharacter handle clearChar fill_length fill_cursor_pos
-    fillConsoleOutputAttribute handle (clearAttribute cds) fill_length
-        fill_cursor_pos
-    return ()
+        (left, top, right, bottom, start_x, end_x)
+            = fraction_finder window cursor_pos
+    mapM_ (fill_line left top right bottom start_x end_x) [top .. bottom]
+  where
+    fill_line left top right bottom start_x end_x y = do
+        let left'  = if y == top    then start_x else left
+            right' = if y == bottom then end_x   else right
+            fill_cursor_pos = COORD left' y
+            fill_length = fromIntegral $ right' - left' + 1
+        fillConsoleOutputCharacter handle clearChar fill_length fill_cursor_pos
+        fillConsoleOutputAttribute handle (clearAttribute cds) fill_length fill_cursor_pos
 
 hClearFromCursorToScreenEnd cds h
     = emulatorFallback (Unix.hClearFromCursorToScreenEnd h) $ withHandle h $
           \handle -> hClearScreenFraction cds handle go
   where
-    go window cursor_pos = (fromIntegral fill_length, cursor_pos)
+    go window cursor_pos = (left, top, right, bottom, start_x, right)
       where
-        size_x = rect_width window
-        size_y = rect_bottom window - coord_y cursor_pos
-        line_remainder = size_x - coord_x cursor_pos
-        fill_length = size_x * size_y + line_remainder
+        SMALL_RECT (COORD left _) (COORD right bottom) = window
+        COORD start_x top = cursor_pos
 
 hClearFromCursorToScreenBeginning cds h
     = emulatorFallback (Unix.hClearFromCursorToScreenBeginning h) $ withHandle h $
           \handle -> hClearScreenFraction cds handle go
   where
-    go window cursor_pos = (fromIntegral fill_length, rect_top_left window)
+    go window cursor_pos = (left, top, right, bottom, left, end_x)
       where
-        size_x = rect_width window
-        size_y = coord_y cursor_pos - rect_top window
-        line_remainder = coord_x cursor_pos
-        fill_length = size_x * size_y + line_remainder
+        SMALL_RECT (COORD left top) (COORD right _) = window
+        COORD end_x bottom = cursor_pos
 
 hClearScreen cds h
     = emulatorFallback (Unix.hClearScreen h) $ withHandle h $
           \handle -> hClearScreenFraction cds handle go
   where
-    go window _ = (fromIntegral fill_length, rect_top_left window)
+    go window _ = (left, top, right, bottom, left, right)
       where
-        size_x = rect_width window
-        size_y = rect_height window
-        fill_length = size_x * size_y
+        SMALL_RECT (COORD left top) (COORD right bottom) = window
 
 hClearFromCursorToLineEnd cds h
     = emulatorFallback (Unix.hClearFromCursorToLineEnd h) $ withHandle h $
           \handle -> hClearScreenFraction cds handle go
   where
-    go window cursor_pos
-        = (fromIntegral (rect_right window - coord_x cursor_pos), cursor_pos)
+    go window cursor_pos = (left, y, right, y, start_x, right)
+      where
+        SMALL_RECT (COORD left _) (COORD right _) = window
+        COORD start_x y = cursor_pos
 
 hClearFromCursorToLineBeginning cds h
     = emulatorFallback (Unix.hClearFromCursorToLineBeginning h) $ withHandle h $
           \handle -> hClearScreenFraction cds handle go
   where
-    go window cursor_pos
-        = (fromIntegral (coord_x cursor_pos), cursor_pos { coord_x = rect_left window })
+    go window cursor_pos = (left, y, right, y, left, end_x)
+      where
+        SMALL_RECT (COORD left _) (COORD right _) = window
+        COORD end_x y = cursor_pos
 
 hClearLine cds h
     = emulatorFallback (Unix.hClearLine h) $ withHandle h $
           \handle -> hClearScreenFraction cds handle go
   where
-    go window cursor_pos
-        = (fromIntegral (rect_width window), cursor_pos { coord_x = rect_left window })
+    go window cursor_pos = (left, y, right, y, left, right)
+      where
+        SMALL_RECT (COORD left _) (COORD right _) = window
+        COORD _ y = cursor_pos
 
 hScrollPage
     :: ConsoleDefaultState -- ^ The default console state
@@ -165,7 +170,7 @@ hScrollPage cds handle new_origin_y = do
     scrollConsoleScreenBuffer handle window Nothing origin fill
 
 hScrollPageUp cds h n
-    = emulatorFallback (Unix.hScrollPageUp   h n) $ withHandle h $
+    = emulatorFallback (Unix.hScrollPageUp h n) $ withHandle h $
           \handle -> hScrollPage cds handle (negate n)
 
 hScrollPageDown cds h n
