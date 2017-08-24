@@ -25,8 +25,8 @@
 --    to the supplied handle.  Commands issued like this should also work as you expect on both Windows and Unix.
 --
 --  * Strawberry: has a @String@ type and just consists of an escape code which can be added to any other bit of text
---    before being output. This version of the API is often convenient to use,
---    but will not work on Windows operating systems where the terminal in use
+--    before being output. The use of these codes is generally discouraged
+--    because they will not work on Windows operating systems where the terminal in use
 --    is not ANSI-enabled (such as those before Windows 10 Threshold 2). On
 --    versions of Windows where the terminal in use is not ANSI-enabled, these
 --    codes will always be the empty string, so it is possible to use them
