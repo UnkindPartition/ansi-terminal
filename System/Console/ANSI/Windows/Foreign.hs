@@ -11,8 +11,9 @@ module System.Console.ANSI.Windows.Foreign (
         -- 'Re-exports from System.Win32.Console.Extra'
         INPUT_RECORD(..), INPUT_RECORD_EVENT(..), kEY_EVENT,
         KEY_EVENT_RECORD(..), UNICODE_ASCII_CHAR (..), writeConsoleInput,
+        getNumberOfConsoleInputEvents, readConsoleInput,
 
-        charToWCHAR,
+        charToWCHAR, cWcharsToChars,
 
         COORD(..), SMALL_RECT(..), rect_top, rect_bottom, rect_left, rect_right, rect_width, rect_height,
         CONSOLE_CURSOR_INFO(..), CONSOLE_SCREEN_BUFFER_INFO(..), CHAR_INFO(..),
@@ -122,6 +123,7 @@ data COORD = COORD {
         coord_x :: SHORT,
         coord_y :: SHORT
     }
+    deriving (Read, Eq)
 
 instance Show COORD where
     show (COORD x y) = "(" ++ show x ++ ", " ++ show y ++ ")"
@@ -264,8 +266,13 @@ bACKGROUND_WHITE = bACKGROUND_RED .|. bACKGROUND_GREEN .|. bACKGROUND_BLUE
 fOREGROUND_INTENSE_WHITE = fOREGROUND_WHITE .|. fOREGROUND_INTENSITY
 bACKGROUND_INTENSE_WHITE = bACKGROUND_WHITE .|. bACKGROUND_INTENSITY
 
-kEY_EVENT :: WORD
-kEY_EVENT = 1
+kEY_EVENT, mOUSE_EVENT, wINDOW_BUFFER_SIZE_EVENT, mENU_EVENT, fOCUS_EVENT :: WORD
+kEY_EVENT                =  1
+mOUSE_EVENT              =  2
+wINDOW_BUFFER_SIZE_EVENT =  4
+mENU_EVENT               =  8
+fOCUS_EVENT              = 16
+
 foreign import WINDOWS_CCONV unsafe "windows.h GetStdHandle" getStdHandle :: DWORD -> IO HANDLE
 foreign import WINDOWS_CCONV unsafe "windows.h GetConsoleScreenBufferInfo" cGetConsoleScreenBufferInfo :: HANDLE -> Ptr CONSOLE_SCREEN_BUFFER_INFO -> IO BOOL
 foreign import WINDOWS_CCONV unsafe "windows.h GetConsoleCursorInfo" cGetConsoleCursorInfo :: HANDLE -> Ptr CONSOLE_CURSOR_INFO -> IO BOOL
@@ -282,6 +289,8 @@ foreign import WINDOWS_CCONV unsafe "windows.h FillConsoleOutputCharacterW" cFil
 foreign import WINDOWS_CCONV unsafe "windows.h ScrollConsoleScreenBufferW" cScrollConsoleScreenBuffer :: HANDLE -> Ptr SMALL_RECT -> Ptr SMALL_RECT -> UNPACKED_COORD -> Ptr CHAR_INFO -> IO BOOL
 
 foreign import WINDOWS_CCONV unsafe "windows.h WriteConsoleInputW" cWriteConsoleInput :: HANDLE -> Ptr INPUT_RECORD -> DWORD -> LPDWORD -> IO BOOL
+foreign import WINDOWS_CCONV unsafe "windows.h GetNumberOfConsoleInputEvents" cGetNumberOfConsoleInputEvents :: HANDLE -> Ptr DWORD -> IO BOOL
+foreign import WINDOWS_CCONV unsafe "windows.h ReadConsoleInputW" cReadConsoleInput :: HANDLE -> Ptr INPUT_RECORD -> DWORD -> LPDWORD -> IO BOOL
 
 data ConsoleException = ConsoleException !ErrCode deriving (Show, Eq, Typeable)
 
@@ -467,8 +476,85 @@ instance Storable KEY_EVENT_RECORD where
         (`pokeByteOff` 10) ptr $ keyEventChar val
         (`pokeByteOff` 12) ptr $ keyEventControlKeystate val
 
-data INPUT_RECORD_EVENT   = InputKeyEvent KEY_EVENT_RECORD
-                            deriving (Show, Read, Eq)
+{-
+typedef struct _MOUSE_EVENT_RECORD {
+	COORD dwMousePosition;
+	DWORD dwButtonState;
+	DWORD dwControlKeyState;
+	DWORD dwEventFlags;
+} MOUSE_EVENT_RECORD;
+-}
+data MOUSE_EVENT_RECORD = MOUSE_EVENT_RECORD {
+        mousePosition        :: COORD,
+        mouseButtonState     :: DWORD,
+        mouseControlKeyState :: DWORD,
+        mouseEventFlags      :: DWORD
+    } deriving (Show, Read, Eq)
+
+instance Storable MOUSE_EVENT_RECORD where
+    sizeOf _    = 16
+    alignment _ =  4
+    peek ptr =
+        MOUSE_EVENT_RECORD <$> (`peekByteOff`  0) ptr
+                           <*> (`peekByteOff`  4) ptr
+                           <*> (`peekByteOff`  8) ptr
+                           <*> (`peekByteOff` 12) ptr
+    poke ptr val = do
+        (`pokeByteOff`  0) ptr $ mousePosition val
+        (`pokeByteOff`  4) ptr $ mouseButtonState val
+        (`pokeByteOff`  8) ptr $ mouseControlKeyState val
+        (`pokeByteOff` 12) ptr $ mouseEventFlags val
+
+{-
+typedef struct _WINDOW_BUFFER_SIZE_RECORD {
+    COORD dwSize;
+} WINDOW_BUFFER_SIZE_RECORD;
+-}
+data WINDOW_BUFFER_SIZE_RECORD = WINDOW_BUFFER_SIZE_RECORD {
+        bufSizeNew :: COORD
+    } deriving (Show, Read, Eq)
+
+instance Storable WINDOW_BUFFER_SIZE_RECORD where
+    sizeOf _    = 4
+    alignment _ = 4
+    peek ptr = WINDOW_BUFFER_SIZE_RECORD <$> (`peekByteOff` 0) ptr
+    poke ptr val = (`pokeByteOff` 0) ptr $ bufSizeNew val
+
+{-
+typedef struct _MENU_EVENT_RECORD {
+    UINT dwCommandId;
+} MENU_EVENT_RECORD,*PMENU_EVENT_RECORD;
+-}
+data MENU_EVENT_RECORD = MENU_EVENT_RECORD {
+        menuCommandId :: UINT
+    } deriving (Show, Read, Eq)
+
+instance Storable MENU_EVENT_RECORD where
+    sizeOf _    = 4
+    alignment _ = 4
+    peek ptr = MENU_EVENT_RECORD <$> (`peekByteOff` 0) ptr
+    poke ptr val = (`pokeByteOff` 0) ptr $ menuCommandId val
+
+{-
+typedef struct _FOCUS_EVENT_RECORD { BOOL bSetFocus; } FOCUS_EVENT_RECORD;
+-}
+data FOCUS_EVENT_RECORD = FOCUS_EVENT_RECORD {
+        focusSetFocus :: BOOL
+    } deriving (Show, Read, Eq)
+
+instance Storable FOCUS_EVENT_RECORD where
+    sizeOf _    = 4
+    alignment _ = 4
+    peek ptr = FOCUS_EVENT_RECORD <$> (`peekByteOff` 0) ptr
+    poke ptr val = (`pokeByteOff` 0) ptr $ focusSetFocus val
+
+data INPUT_RECORD_EVENT
+    = InputKeyEvent KEY_EVENT_RECORD
+    | InputMouseEvent MOUSE_EVENT_RECORD
+    | InputWindowBufferSizeEvent WINDOW_BUFFER_SIZE_RECORD
+    | InputMenuEvent MENU_EVENT_RECORD
+    | InputFocusEvent FOCUS_EVENT_RECORD
+    deriving (Show, Read, Eq)
 
 {-
 typedef struct _INPUT_RECORD {
@@ -493,10 +579,58 @@ instance Storable INPUT_RECORD where
     peek ptr = do
         evType <- (`peekByteOff` 0) ptr
         event <- case evType of
-            _ | evType == kEY_EVENT -> InputKeyEvent <$> (`peekByteOff` 4) ptr
+            _ | evType == kEY_EVENT
+                -> InputKeyEvent              <$> (`peekByteOff` 4) ptr
+            _ | evType == mOUSE_EVENT
+                -> InputMouseEvent            <$> (`peekByteOff` 4) ptr
+            _ | evType == wINDOW_BUFFER_SIZE_EVENT
+                -> InputWindowBufferSizeEvent <$> (`peekByteOff` 4) ptr
+            _ | evType == mENU_EVENT
+                -> InputMenuEvent             <$> (`peekByteOff` 4) ptr
+            _ | evType == fOCUS_EVENT
+                -> InputFocusEvent            <$> (`peekByteOff` 4) ptr
             _ -> error $ "peek (INPUT_RECORD): Unknown event type " ++ show evType
         return $ INPUT_RECORD evType event
     poke ptr val = do
         (`pokeByteOff` 0) ptr $ inputEventType val
         case inputEvent val of
-            InputKeyEvent ev -> (`pokeByteOff` 4) ptr ev
+            InputKeyEvent              ev -> (`pokeByteOff` 4) ptr ev
+            InputMouseEvent            ev -> (`pokeByteOff` 4) ptr ev
+            InputWindowBufferSizeEvent ev -> (`pokeByteOff` 4) ptr ev
+            InputMenuEvent             ev -> (`pokeByteOff` 4) ptr ev
+            InputFocusEvent            ev -> (`pokeByteOff` 4) ptr ev
+
+-- The following is based on module System.Win32.Console.Extra from package
+-- Win32-console.
+
+getNumberOfConsoleInputEvents :: HANDLE -> IO DWORD
+getNumberOfConsoleInputEvents hdl =
+    returnWith_ $ \ptrN ->
+        failIfFalse_ "GetNumberOfConsoleInputEvents" $ cGetNumberOfConsoleInputEvents hdl ptrN
+
+-- The following is based on module System.Win32.Console.Extra from package
+-- Win32-console, cut down for the WCHAR version of readConsoleInput.
+
+readConsoleInput :: HANDLE -> DWORD -> IO [INPUT_RECORD]
+readConsoleInput hdl len = readConsoleInputWith hdl len $ \(ptr, n) -> peekArray (fromEnum n) ptr
+
+readConsoleInputWith :: HANDLE -> DWORD -> OutputHandler (Ptr INPUT_RECORD, DWORD)
+readConsoleInputWith hdl len handler =
+    allocaArray (fromEnum len) $ \ptrBuf ->
+        alloca $ \ptrN -> do
+            failIfFalse_ "ReadConsoleInputW" $ cReadConsoleInput hdl ptrBuf len ptrN
+            n <- peek ptrN
+            handler (ptrBuf, n)
+
+type OutputHandler o = forall a. (o -> IO a) -> IO a
+
+-- Replicated from module Foreign.C.String in package base because that module
+-- does not export the function.
+cWcharsToChars :: [CWchar] -> [Char]
+cWcharsToChars = map chr . fromUTF16 . map fromIntegral
+ where
+  fromUTF16 (c1:c2:wcs)
+    | 0xd800 <= c1 && c1 <= 0xdbff && 0xdc00 <= c2 && c2 <= 0xdfff =
+      ((c1 - 0xd800)*0x400 + (c2 - 0xdc00) + 0x10000) : fromUTF16 wcs
+  fromUTF16 (c:wcs) = c : fromUTF16 wcs
+  fromUTF16 [] = []

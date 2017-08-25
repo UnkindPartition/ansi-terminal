@@ -1,5 +1,9 @@
 {-# OPTIONS_HADDOCK hide #-}
+
 module System.Console.ANSI.Windows (
+-- This file contains code that is common to modules
+-- System.Console.ANSI.Unix and System.Console.ANSI.Windows, namely the module
+-- exports and the associated Haddock documentation.
 #include "Exports-Include.hs"
     ) where
 
@@ -10,7 +14,15 @@ import System.Console.ANSI.Windows.Detect (ANSIEnabledStatus (..),
 import qualified System.Console.ANSI.Windows.Emulator as E
 import System.IO (Handle, hIsTerminalDevice, stdout)
 
+-- This file contains code that is common to modules System.Console.ANSI.Unix,
+-- System.Console.ANSI.Windows and System.Console.ANSI.Windows.Emulator, such as
+-- type signatures and the definition of functions specific to stdout in terms
+-- of the corresponding more general functions, inclduding the related Haddock
+-- documentation.
 #include "Common-Include.hs"
+-- This file contains code that is common save that different code is required
+-- in the case of the module System.Console.ANSI.Windows.Emulator (see the file
+-- Common-Include-Emulator.hs in respect of the latter).
 #include "Common-Include-Enabled.hs"
 
 -- | A helper function which returns the native or emulated version, depending
@@ -163,3 +175,11 @@ hSetTitle = nativeOrEmulated U.hSetTitle E.hSetTitle
 
 setTitleCode :: String -> String
 setTitleCode = nativeOrEmulated U.setTitleCode E.setTitleCode
+
+-- getReportedCursorPosition :: IO String
+-- (See Common-Include.hs for Haddock documentation)
+getReportedCursorPosition = E.getReportedCursorPosition
+
+-- getCursorPosition :: IO (Maybe (Int, Int))
+-- (See Common-Include.hs for Haddock documentation)
+getCursorPosition = E.getCursorPosition

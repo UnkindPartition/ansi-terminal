@@ -13,8 +13,8 @@ import System.Console.ANSI.Windows.Emulator.Codes
 import System.IO
 import System.IO.Unsafe (unsafePerformIO)
 
-import Control.Exception (catchJust)
-import Control.Monad (forM_)
+import Control.Exception (catch, catchJust, IOException)
+import Control.Monad (forM_, unless)
 import Data.Colour (Colour)
 import Data.Colour.Names (black, blue, cyan, green, grey, lime, magenta, maroon,
     navy, olive, purple, red, silver, teal, white, yellow)
@@ -22,8 +22,15 @@ import Data.Colour.SRGB (RGB (..), toSRGB)
 import Data.Bits
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Data.List
+import Data.Maybe (mapMaybe)
 import qualified Data.Map.Strict as Map
+import Text.ParserCombinators.ReadP (readP_to_S)
 
+-- This file contains code that is common to modules System.Console.ANSI.Unix,
+-- System.Console.ANSI.Windows and System.Console.ANSI.Windows.Emulator, such as
+-- type signatures and the definition of functions specific to stdout in terms
+-- of the corresponding more general functions, inclduding the related Haddock
+-- documentation.
 #include "Common-Include.hs"
 -- This file contains code that is required in the case of the module
 -- System.Console.ANSI.Windows.Emulator and differs from the common code in
@@ -339,3 +346,53 @@ toANSIColor color = fst $ minimumBy order aNSIColors
                  dg = g' - g
                  db = b' - b
              in  dr * dr + dg * dg + db * db
+
+-- getReportedCursorPosition :: IO String
+-- (See Common-Include.hs for Haddock documentation)
+getReportedCursorPosition = catch getReportedCursorPosition' getCPExceptionHandler
+  where
+    getReportedCursorPosition' = withHandleToHANDLE stdin action
+      where
+        action hdl = do
+            n <- getNumberOfConsoleInputEvents hdl
+            if n == 0
+                then return ""
+                else do
+                    es <- readConsoleInput hdl n
+                    return $ stringFromInputEvents es
+        stringFromInputEvents = cWcharsToChars . wCharsFromInputEvents
+        wCharsFromInputEvents = mapMaybe wCharFromInputEvent
+        wCharFromInputEvent e = if isKeyDownEvent
+            then Just (unicodeAsciiChar $ keyEventChar keyEventRecord)
+            else Nothing
+          where
+            eventType = inputEventType e
+            InputKeyEvent keyEventRecord = inputEvent e
+            isKeyDown = keyEventKeyDown keyEventRecord
+            isKeyDownEvent = eventType == 1 && isKeyDown
+
+-- getCursorPosition :: IO (Maybe (Int, Int))
+-- (See Common-Include.hs for Haddock documentation)
+getCursorPosition = catch getCursorPosition' getCPExceptionHandler
+  where
+    getCursorPosition' = do
+        withHandleToHANDLE stdin flush -- Flush the console input buffer
+        reportCursorPosition
+        hFlush stdout -- ensure the report cursor position code is sent to the
+                      -- operating system
+        input <- getReportedCursorPosition
+        case readP_to_S cursorPosition input of
+            [] -> return Nothing
+            [((row, col),_)] -> return $ Just (row, col)
+            (_:_) -> return Nothing
+      where
+        flush hdl = do
+            n <- getNumberOfConsoleInputEvents hdl
+            unless (n == 0) (void $ readConsoleInput hdl n)
+
+getCPExceptionHandler :: IOException -> IO a
+getCPExceptionHandler e = error msg
+  where
+    msg = "Error: " ++ show e ++ "\nThis error may be avoided by using a " ++
+          "console based on the Win32 console of the Windows API, such as " ++
+          "Command Prompt or PowerShell."

@@ -20,7 +20,7 @@ examples = [ cursorMovementExample
            , sgrExample
            , cursorVisibilityExample
            , titleExample
-           , reportCursorPositionExample
+           , getCursorPositionExample
            ]
 
 main :: IO ()
@@ -295,9 +295,24 @@ titleExample = do
     ---------------------------------------------------
     -- Title Demo
 
-reportCursorPositionExample :: IO ()
-reportCursorPositionExample = do
-    putStr "Report cursor position here:"
+getCursorPositionExample :: IO ()
+getCursorPositionExample = do
+    putStrLn "         11111111112222222222"
+    putStrLn "12345678901234567890123456789"
+    putStr   "Report cursor position here:"
     pause
-    reportCursorPosition
-    putStrLn " (1st row, 29th column) to stdin, as CSI 1 ; 29 R."
+    --          11111111112222222222
+    -- 12345678901234567890123456789
+    -- Report cursor position here:|
+    result <- getCursorPosition
+    putStrLn " (3rd row, 29th column) to stdin, as CSI 3 ; 29 R.\n"
+    case result of
+        Just (row, col) -> putStrLn $ "The cursor was at row number " ++
+            show row ++ " and column number " ++ show col ++ ".\n"
+        Nothing -> putStrLn "Error: unable to get the cursor position\n"
+    pause
+    --          11111111112222222222
+    -- 12345678901234567890123456789
+    -- Report cursor position here: (3rd row, 29th column) to stdin, as CSI 3 ; 29 R.
+    --
+    -- The cursor was at row number 3 and column number 29.
