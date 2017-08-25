@@ -1,3 +1,7 @@
+-- This file contains code that is common to modules
+-- System.Console.ANSI.Unix and System.Console.ANSI.Windows, namely the module
+-- exports and the associated Haddock documentation.
+
 -- * Basic data types
 module System.Console.ANSI.Types,
 
@@ -71,5 +75,6 @@ setTitle,
 hSetTitle,
 setTitleCode,
 
--- * Checking if handle supports ANSI
-hSupportsANSI
+-- * Utilities
+hSupportsANSI,
+cursorPosition

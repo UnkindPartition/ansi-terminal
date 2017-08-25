@@ -1,13 +1,25 @@
+-- This file contains code that is common to modules System.Console.ANSI.Unix,
+-- System.Console.ANSI.Windows and System.Console.ANSI.Windows.Emulator, such as
+-- type signatures and the definition of functions specific to stdout in terms
+-- of the corresponding more general functions, inclduding the related Haddock
+-- documentation.
+
 import System.Environment
 #if !MIN_VERSION_base(4,8,0)
 import Control.Applicative
 #endif
 
-hCursorUp, hCursorDown, hCursorForward, hCursorBackward :: Handle
-                                                        -> Int -- ^ Number of lines or characters to move
-                                                        -> IO ()
-cursorUp, cursorDown, cursorForward, cursorBackward :: Int -- ^ Number of lines or characters to move
-                                                    -> IO ()
+import Control.Monad (void)
+import Data.Char (isDigit)
+import Text.ParserCombinators.ReadP (char, many1, ReadP, satisfy)
+
+hCursorUp, hCursorDown, hCursorForward, hCursorBackward
+    :: Handle
+    -> Int -- ^ Number of lines or characters to move
+    -> IO ()
+cursorUp, cursorDown, cursorForward, cursorBackward
+    :: Int -- ^ Number of lines or characters to move
+    -> IO ()
 cursorUp = hCursorUp stdout
 cursorDown = hCursorDown stdout
 cursorForward = hCursorForward stdout
@@ -48,6 +60,13 @@ restoreCursor :: IO ()
 -- | Emit the cursor position into the console input stream, immediately after
 -- being recognised on the output stream, as:
 -- @ESC [ \<cursor row> ; \<cursor column> R@
+--
+-- This function may be of limited use on Windows operating systems because of
+-- difficulties in obtaining the data emitted into the console input stream.
+-- The function 'hGetBufNonBlocking' in module "System.IO" does not work on
+-- Windows. This has been attributed to the lack of non-blocking primatives in
+-- the operating system (see the GHC bug report #806 at
+-- <https://ghc.haskell.org/trac/ghc/ticket/806>).
 reportCursorPosition :: IO ()
 
 saveCursor = hSaveCursor stdout
@@ -82,3 +101,29 @@ hSupportsANSI h = (&&) <$> hIsTerminalDevice h <*> (not <$> isDumb)
   where
     -- cannot use lookupEnv since it only appeared in GHC 7.6
     isDumb = maybe False (== "dumb") . lookup "TERM" <$> getEnvironment
+
+-- | Parses the characters emitted by 'reportCursorPosition' into the console
+-- input stream. Returns the cursor row and column as a tuple.
+--
+-- For example, if the characters emitted by 'reportCursorPosition' are in
+-- 'String' @input@ then the parser could be applied like this:
+--
+-- > let result = readP_to_S cursorPosition input
+-- > case result of
+-- >     [] -> putStrLn $ "Error: could not parse " ++ show input
+-- >     [((row, column), _)] -> putStrLn $ "The cursor was at row " ++ show row
+-- >         ++ " and column" ++ show column ++ "."
+-- >     (_:_) -> putStrLn $ "Error: parse not unique"
+--
+cursorPosition :: ReadP (Int, Int)
+cursorPosition = do
+    void $ char '\ESC'
+    void $ char '['
+    row <- decimal -- A non-negative whole decimal number
+    void $ char ';'
+    col <- decimal -- A non-negative whole decimal number
+    void $ char 'R'
+    return (read row, read col)
+  where
+    digit = satisfy isDigit
+    decimal = many1 digit
