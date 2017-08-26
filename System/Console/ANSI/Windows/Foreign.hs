@@ -281,7 +281,7 @@ foreign import WINDOWS_CCONV unsafe "windows.h FillConsoleOutputAttribute" cFill
 foreign import WINDOWS_CCONV unsafe "windows.h FillConsoleOutputCharacterW" cFillConsoleOutputCharacter :: HANDLE -> TCHAR -> DWORD -> UNPACKED_COORD -> Ptr DWORD -> IO BOOL
 foreign import WINDOWS_CCONV unsafe "windows.h ScrollConsoleScreenBufferW" cScrollConsoleScreenBuffer :: HANDLE -> Ptr SMALL_RECT -> Ptr SMALL_RECT -> UNPACKED_COORD -> Ptr CHAR_INFO -> IO BOOL
 
-foreign import stdcall "windows.h WriteConsoleInputW" cWriteConsoleInput :: HANDLE -> Ptr INPUT_RECORD -> DWORD -> LPDWORD -> IO BOOL
+foreign import WINDOWS_CCONV unsafe "windows.h WriteConsoleInputW" cWriteConsoleInput :: HANDLE -> Ptr INPUT_RECORD -> DWORD -> LPDWORD -> IO BOOL
 
 data ConsoleException = ConsoleException !ErrCode deriving (Show, Eq, Typeable)
 
