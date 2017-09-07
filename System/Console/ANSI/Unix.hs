@@ -60,7 +60,9 @@ hSetTitle h title = hPutStr h $ setTitleCode title
 
 -- getReportedCursorPosition :: IO String
 -- (See Common-Include.hs for Haddock documentation)
-getReportedCursorPosition = bracket (hGetEcho stdin) (hSetEcho stdin) $ const get
+getReportedCursorPosition = bracket (hGetEcho stdin) (hSetEcho stdin) $ \_ -> do
+  hSetEcho stdin False   -- Turn echo off
+  get
   where
     get = do
         c <- getChar
