@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 0.7.1.1
+---------------
+
+`getReportedCursorPosition`: don't let the cursor reporting code be echo'd
+
 Version 0.7.1
 -------------
 
