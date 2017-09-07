@@ -1,6 +1,12 @@
 Changes
 =======
 
+Version 0.7.1
+-------------
+
+* Allow saving, restoring, and querying the current cursor position
+* Fix a couple of issues with the Reset emulation on Windows
+
 Version 0.7
 -----------
 
