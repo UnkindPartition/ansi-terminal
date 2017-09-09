@@ -1,13 +1,21 @@
--- | Functions that return 'String' values containing codes in accordance with:
--- (1) standard ECMA-48 Control Functions for Coded Character Sets (5th edition,
--- 1991); or (2) in the case of 'setTitleCode', the XTerm control sequence.
+-- | This module exports functions that return 'String' values containing codes
+-- in accordance with: (1) standard ECMA-48 Control Functions for Coded
+-- Character Sets (5th edition, 1991); or (2) in the case of 'saveCursorCode',
+-- 'restoreCursorCode', 'reportCursorPositionCode' and 'setTitleCode', the XTerm
+-- control sequence.
 --
 -- The reference used for the codes in this module was
 -- <http://en.wikipedia.org/wiki/ANSI_escape_sequences>.
 --
--- If module "System.Console.ANSI" is also imported, this module is intended to
--- be imported qualified, to avoid name clashes with functions which return \"\"
--- when Windows ANSI terminal support is emulated. e.g.
+-- The module "System.Console.ANSI" exports functions with the same names as
+-- those in this module. On some versions of Windows, the terminal in use may
+-- not be ANSI-capable. When that is the case, the same-named functions exported
+-- by module "System.Console.ANSI" return \"\", for the reasons set out in the
+-- documentation of that module.
+--
+-- Consequently, if module "System.Console.ANSI" is also imported, this module
+-- is intended to be imported qualified, to avoid name clashes with those
+-- functions. For example:
 --
 -- > import qualified System.Console.ANSI.Codes as ANSI
 --
