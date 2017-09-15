@@ -1,41 +1,42 @@
 {-# OPTIONS_HADDOCK hide #-}
 
 module System.Console.ANSI.Windows.Emulator.Codes
-    (
-      -- * Cursor movement by character
-      cursorUpCode, cursorDownCode, cursorForwardCode, cursorBackwardCode
+  (
+    -- * Cursor movement by character
+    cursorUpCode, cursorDownCode, cursorForwardCode, cursorBackwardCode
 
-      -- * Cursor movement by line
-    , cursorUpLineCode, cursorDownLineCode
+    -- * Cursor movement by line
+  , cursorUpLineCode, cursorDownLineCode
 
-      -- * Directly changing cursor position
-    , setCursorColumnCode, setCursorPositionCode
+    -- * Directly changing cursor position
+  , setCursorColumnCode, setCursorPositionCode
 
-      -- * Saving, restoring and reporting cursor position
-    , saveCursorCode, restoreCursorCode, reportCursorPositionCode
+    -- * Saving, restoring and reporting cursor position
+  , saveCursorCode, restoreCursorCode, reportCursorPositionCode
 
-      -- * Clearing parts of the screen
-    , clearFromCursorToScreenEndCode, clearFromCursorToScreenBeginningCode
-    , clearScreenCode, clearFromCursorToLineEndCode
-    , clearFromCursorToLineBeginningCode, clearLineCode
+    -- * Clearing parts of the screen
+  , clearFromCursorToScreenEndCode, clearFromCursorToScreenBeginningCode
+  , clearScreenCode, clearFromCursorToLineEndCode
+  , clearFromCursorToLineBeginningCode, clearLineCode
 
-      -- * Scrolling the screen
-    , scrollPageUpCode, scrollPageDownCode
+    -- * Scrolling the screen
+  , scrollPageUpCode, scrollPageDownCode
 
-      -- * Select Graphic Rendition mode: colors and other whizzy stuff
-    , setSGRCode
+    -- * Select Graphic Rendition mode: colors and other whizzy stuff
+  , setSGRCode
 
-      -- * Cursor visibilty changes
-    , hideCursorCode, showCursorCode
+    -- * Cursor visibilty changes
+  , hideCursorCode, showCursorCode
 
-      -- * Changing the title
-    , setTitleCode
-    ) where
+    -- * Changing the title
+  , setTitleCode
+  ) where
 
 import System.Console.ANSI.Types
 
-cursorUpCode, cursorDownCode, cursorForwardCode, cursorBackwardCode :: Int -- ^ Number of lines or characters to move
-                                                                    -> String
+cursorUpCode, cursorDownCode, cursorForwardCode, cursorBackwardCode
+  :: Int -- ^ Number of lines or characters to move
+  -> String
 cursorUpCode _       = ""
 cursorDownCode _     = ""
 cursorForwardCode _  = ""
@@ -60,8 +61,10 @@ saveCursorCode = ""
 restoreCursorCode = ""
 reportCursorPositionCode = ""
 
-clearFromCursorToScreenEndCode, clearFromCursorToScreenBeginningCode, clearScreenCode :: String
-clearFromCursorToLineEndCode, clearFromCursorToLineBeginningCode, clearLineCode :: String
+clearFromCursorToScreenEndCode, clearFromCursorToScreenBeginningCode,
+  clearScreenCode :: String
+clearFromCursorToLineEndCode, clearFromCursorToLineBeginningCode,
+  clearLineCode :: String
 
 clearFromCursorToScreenEndCode       = ""
 clearFromCursorToScreenBeginningCode = ""

@@ -20,51 +20,53 @@
 -- > import qualified System.Console.ANSI.Codes as ANSI
 --
 module System.Console.ANSI.Codes
-    (
-      -- * Basic data types
-      module System.Console.ANSI.Types
+  (
+    -- * Basic data types
+    module System.Console.ANSI.Types
 
-      -- * Cursor movement by character
-    , cursorUpCode, cursorDownCode, cursorForwardCode, cursorBackwardCode
+    -- * Cursor movement by character
+  , cursorUpCode, cursorDownCode, cursorForwardCode, cursorBackwardCode
 
-      -- * Cursor movement by line
-    , cursorUpLineCode, cursorDownLineCode
+    -- * Cursor movement by line
+  , cursorUpLineCode, cursorDownLineCode
 
-      -- * Directly changing cursor position
-    , setCursorColumnCode, setCursorPositionCode
+    -- * Directly changing cursor position
+  , setCursorColumnCode, setCursorPositionCode
 
-      -- * Saving, restoring and reporting cursor position
-    , saveCursorCode, restoreCursorCode, reportCursorPositionCode
+    -- * Saving, restoring and reporting cursor position
+  , saveCursorCode, restoreCursorCode, reportCursorPositionCode
 
-      -- * Clearing parts of the screen
-    , clearFromCursorToScreenEndCode, clearFromCursorToScreenBeginningCode
-    , clearScreenCode, clearFromCursorToLineEndCode
-    , clearFromCursorToLineBeginningCode, clearLineCode
+    -- * Clearing parts of the screen
+  , clearFromCursorToScreenEndCode, clearFromCursorToScreenBeginningCode
+  , clearScreenCode, clearFromCursorToLineEndCode
+  , clearFromCursorToLineBeginningCode, clearLineCode
 
-      -- * Scrolling the screen
-    , scrollPageUpCode, scrollPageDownCode
+    -- * Scrolling the screen
+  , scrollPageUpCode, scrollPageDownCode
 
-      -- * Select Graphic Rendition mode: colors and other whizzy stuff
-    , setSGRCode
+    -- * Select Graphic Rendition mode: colors and other whizzy stuff
+  , setSGRCode
 
-      -- * Cursor visibilty changes
-    , hideCursorCode, showCursorCode
+    -- * Cursor visibilty changes
+  , hideCursorCode, showCursorCode
 
-      -- * Changing the title
-      -- | Thanks to Brandon S. Allbery and Curt Sampson for pointing me in the
-      -- right direction on xterm title setting on haskell-cafe. The "0"
-      -- signifies that both the title and "icon" text should be set: i.e. the
-      -- text for the window in the Start bar (or similar) as well as that in
-      -- the actual window title. This is chosen for consistent behaviour
-      -- between Unixes and Windows.
-    , setTitleCode
+    -- * Changing the title
+    -- | Thanks to Brandon S. Allbery and Curt Sampson for pointing me in the
+    -- right direction on xterm title setting on haskell-cafe. The "0"
+    -- signifies that both the title and "icon" text should be set: i.e. the
+    -- text for the window in the Start bar (or similar) as well as that in
+    -- the actual window title. This is chosen for consistent behaviour
+    -- between Unixes and Windows.
+  , setTitleCode
 
-      -- * Utilities
-    , colorToCode, csi, sgrToCode
-    ) where
+    -- * Utilities
+  , colorToCode, csi, sgrToCode
+  ) where
+
+import Data.List (intersperse)
 
 import Data.Colour.SRGB (toSRGB24, RGB (..))
-import Data.List (intersperse)
+
 import System.Console.ANSI.Types
 
 -- | 'csi' @parameters controlFunction@, where @parameters@ is a list of 'Int',
@@ -81,51 +83,52 @@ csi args code = "\ESC[" ++ concat (intersperse ";" (map show args)) ++ code
 -- eight colors in the standard).
 colorToCode :: Color -> Int
 colorToCode color = case color of
-    Black   -> 0
-    Red     -> 1
-    Green   -> 2
-    Yellow  -> 3
-    Blue    -> 4
-    Magenta -> 5
-    Cyan    -> 6
-    White   -> 7
+  Black   -> 0
+  Red     -> 1
+  Green   -> 2
+  Yellow  -> 3
+  Blue    -> 4
+  Magenta -> 5
+  Cyan    -> 6
+  White   -> 7
 
 -- | 'sgrToCode' @sgr@ returns the parameter of the SELECT GRAPHIC RENDITION
 -- (SGR) aspect identified by @sgr@.
 sgrToCode :: SGR -- ^ The SGR aspect
           -> [Int]
 sgrToCode sgr = case sgr of
-    Reset -> [0]
-    SetConsoleIntensity intensity -> case intensity of
-        BoldIntensity   -> [1]
-        FaintIntensity  -> [2]
-        NormalIntensity -> [22]
-    SetItalicized True  -> [3]
-    SetItalicized False -> [23]
-    SetUnderlining underlining -> case underlining of
-        SingleUnderline -> [4]
-        DoubleUnderline -> [21]
-        NoUnderline     -> [24]
-    SetBlinkSpeed blink_speed -> case blink_speed of
-        SlowBlink   -> [5]
-        RapidBlink  -> [6]
-        NoBlink     -> [25]
-    SetVisible False -> [8]
-    SetVisible True  -> [28]
-    SetSwapForegroundBackground True  -> [7]
-    SetSwapForegroundBackground False -> [27]
-    SetColor Foreground Dull color  -> [30 + colorToCode color]
-    SetColor Foreground Vivid color -> [90 + colorToCode color]
-    SetColor Background Dull color  -> [40 + colorToCode color]
-    SetColor Background Vivid color -> [100 + colorToCode color]
-    SetRGBColor Foreground color -> [38, 2] ++ toRGB color
-    SetRGBColor Background color -> [48, 2] ++ toRGB color
-  where
-    toRGB color = let RGB r g b = toSRGB24 color
-                  in  map fromIntegral [r, g, b]
+  Reset -> [0]
+  SetConsoleIntensity intensity -> case intensity of
+    BoldIntensity   -> [1]
+    FaintIntensity  -> [2]
+    NormalIntensity -> [22]
+  SetItalicized True  -> [3]
+  SetItalicized False -> [23]
+  SetUnderlining underlining -> case underlining of
+    SingleUnderline -> [4]
+    DoubleUnderline -> [21]
+    NoUnderline     -> [24]
+  SetBlinkSpeed blink_speed -> case blink_speed of
+    SlowBlink   -> [5]
+    RapidBlink  -> [6]
+    NoBlink     -> [25]
+  SetVisible False -> [8]
+  SetVisible True  -> [28]
+  SetSwapForegroundBackground True  -> [7]
+  SetSwapForegroundBackground False -> [27]
+  SetColor Foreground Dull color  -> [30 + colorToCode color]
+  SetColor Foreground Vivid color -> [90 + colorToCode color]
+  SetColor Background Dull color  -> [40 + colorToCode color]
+  SetColor Background Vivid color -> [100 + colorToCode color]
+  SetRGBColor Foreground color -> [38, 2] ++ toRGB color
+  SetRGBColor Background color -> [48, 2] ++ toRGB color
+ where
+  toRGB color = let RGB r g b = toSRGB24 color
+                in  map fromIntegral [r, g, b]
 
-cursorUpCode, cursorDownCode, cursorForwardCode, cursorBackwardCode :: Int -- ^ Number of lines or characters to move
-                                                                    -> String
+cursorUpCode, cursorDownCode, cursorForwardCode, cursorBackwardCode
+  :: Int -- ^ Number of lines or characters to move
+  -> String
 cursorUpCode n = csi [n] "A"
 cursorDownCode n = csi [n] "B"
 cursorForwardCode n = csi [n] "C"
@@ -150,8 +153,10 @@ saveCursorCode = "\ESC7"
 restoreCursorCode = "\ESC8"
 reportCursorPositionCode = csi [] "6n"
 
-clearFromCursorToScreenEndCode, clearFromCursorToScreenBeginningCode, clearScreenCode :: String
-clearFromCursorToLineEndCode, clearFromCursorToLineBeginningCode, clearLineCode :: String
+clearFromCursorToScreenEndCode, clearFromCursorToScreenBeginningCode,
+  clearScreenCode :: String
+clearFromCursorToLineEndCode, clearFromCursorToLineBeginningCode,
+  clearLineCode :: String
 
 clearFromCursorToScreenEndCode = csi [0] "J"
 clearFromCursorToScreenBeginningCode = csi [1] "J"

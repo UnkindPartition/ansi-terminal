@@ -1,18 +1,20 @@
 {-# OPTIONS_HADDOCK hide #-}
 
-module System.Console.ANSI.Windows (
+module System.Console.ANSI.Windows
+  (
 -- This file contains code that is common to modules
 -- System.Console.ANSI.Unix and System.Console.ANSI.Windows, namely the module
 -- exports and the associated Haddock documentation.
 #include "Exports-Include.hs"
-    ) where
+  ) where
+
+import System.IO (Handle, hIsTerminalDevice, stdout)
 
 import System.Console.ANSI.Types
 import qualified System.Console.ANSI.Unix as U
 import System.Console.ANSI.Windows.Detect (ANSIEnabledStatus (..),
-    ConsoleDefaultState (..), isANSIEnabled)
+  ConsoleDefaultState (..), isANSIEnabled)
 import qualified System.Console.ANSI.Windows.Emulator as E
-import System.IO (Handle, hIsTerminalDevice, stdout)
 
 -- This file contains code that is common to modules System.Console.ANSI.Unix,
 -- System.Console.ANSI.Windows and System.Console.ANSI.Windows.Emulator, such as
@@ -29,15 +31,15 @@ import System.IO (Handle, hIsTerminalDevice, stdout)
 -- on `isANSIEnabled`.
 nativeOrEmulated :: a -> a -> a
 nativeOrEmulated native emulated = case isANSIEnabled of
-    ANSIEnabled      -> native
-    NotANSIEnabled _ -> emulated
+  ANSIEnabled      -> native
+  NotANSIEnabled _ -> emulated
 
 -- | A helper function which returns the native or emulated version, depending
 -- on `isANSIEnabled`, where the emulator uses the default console state.
 nativeOrEmulatedWithDefault :: a -> (ConsoleDefaultState -> a) -> a
 nativeOrEmulatedWithDefault native emulated = case isANSIEnabled of
-    ANSIEnabled        -> native
-    NotANSIEnabled def -> emulated def
+  ANSIEnabled        -> native
+  NotANSIEnabled def -> emulated def
 
 
 -- * Cursor movement by character
@@ -73,19 +75,19 @@ hSetCursorColumn = nativeOrEmulated U.hSetCursorColumn E.hSetCursorColumn
 
 setCursorColumnCode :: Int -> String
 setCursorColumnCode = nativeOrEmulated
-    U.setCursorColumnCode E.setCursorColumnCode
+  U.setCursorColumnCode E.setCursorColumnCode
 
 hSetCursorPosition = nativeOrEmulated U.hSetCursorPosition E.hSetCursorPosition
 
 setCursorPositionCode :: Int -> Int -> String
 setCursorPositionCode = nativeOrEmulated
-    U.setCursorPositionCode E.setCursorPositionCode
+  U.setCursorPositionCode E.setCursorPositionCode
 
 -- * Saving, restoring and reporting cursor position
 hSaveCursor = nativeOrEmulated U.hSaveCursor E.hSaveCursor
 hRestoreCursor = nativeOrEmulated U.hRestoreCursor E.hRestoreCursor
 hReportCursorPosition = nativeOrEmulated
-    U.hReportCursorPosition E.hReportCursorPosition
+  U.hReportCursorPosition E.hReportCursorPosition
 
 saveCursorCode :: String
 saveCursorCode = nativeOrEmulated U.saveCursorCode E.saveCursorCode
@@ -99,14 +101,14 @@ reportCursorPositionCode = nativeOrEmulated
 
 -- * Clearing parts of the screen
 hClearFromCursorToScreenEnd = nativeOrEmulatedWithDefault
-    U.hClearFromCursorToScreenEnd E.hClearFromCursorToScreenEnd
+  U.hClearFromCursorToScreenEnd E.hClearFromCursorToScreenEnd
 hClearFromCursorToScreenBeginning = nativeOrEmulatedWithDefault
-    U.hClearFromCursorToScreenBeginning E.hClearFromCursorToScreenBeginning
+  U.hClearFromCursorToScreenBeginning E.hClearFromCursorToScreenBeginning
 hClearScreen = nativeOrEmulatedWithDefault U.hClearScreen E.hClearScreen
 
 clearFromCursorToScreenEndCode :: String
 clearFromCursorToScreenEndCode = nativeOrEmulated
-    U.clearFromCursorToScreenEndCode E.clearFromCursorToScreenEndCode
+  U.clearFromCursorToScreenEndCode E.clearFromCursorToScreenEndCode
 
 clearFromCursorToScreenBeginningCode :: String
 clearFromCursorToScreenBeginningCode = nativeOrEmulated
@@ -116,18 +118,18 @@ clearScreenCode :: String
 clearScreenCode = nativeOrEmulated U.clearScreenCode E.clearScreenCode
 
 hClearFromCursorToLineEnd = nativeOrEmulatedWithDefault
-    U.hClearFromCursorToLineEnd E.hClearFromCursorToLineEnd
+  U.hClearFromCursorToLineEnd E.hClearFromCursorToLineEnd
 hClearFromCursorToLineBeginning = nativeOrEmulatedWithDefault
-    U.hClearFromCursorToLineBeginning E.hClearFromCursorToLineBeginning
+  U.hClearFromCursorToLineBeginning E.hClearFromCursorToLineBeginning
 hClearLine = nativeOrEmulatedWithDefault U.hClearLine E.hClearLine
 
 clearFromCursorToLineEndCode :: String
 clearFromCursorToLineEndCode = nativeOrEmulated
-    U.clearFromCursorToLineEndCode E.clearFromCursorToLineEndCode
+  U.clearFromCursorToLineEndCode E.clearFromCursorToLineEndCode
 
 clearFromCursorToLineBeginningCode :: String
 clearFromCursorToLineBeginningCode = nativeOrEmulated
-    U.clearFromCursorToLineBeginningCode E.clearFromCursorToLineBeginningCode
+  U.clearFromCursorToLineBeginningCode E.clearFromCursorToLineBeginningCode
 
 clearLineCode :: String
 clearLineCode = nativeOrEmulated U.clearLineCode E.clearLineCode

@@ -14,12 +14,12 @@ import Data.Char (isDigit)
 import Text.ParserCombinators.ReadP (char, many1, ReadP, satisfy)
 
 hCursorUp, hCursorDown, hCursorForward, hCursorBackward
-    :: Handle
-    -> Int -- ^ Number of lines or characters to move
-    -> IO ()
+  :: Handle
+  -> Int -- ^ Number of lines or characters to move
+  -> IO ()
 cursorUp, cursorDown, cursorForward, cursorBackward
-    :: Int -- ^ Number of lines or characters to move
-    -> IO ()
+  :: Int -- ^ Number of lines or characters to move
+  -> IO ()
 cursorUp = hCursorUp stdout
 cursorDown = hCursorDown stdout
 cursorForward = hCursorForward stdout
@@ -102,9 +102,9 @@ hSupportsANSI :: Handle -> IO Bool
 -- Borrowed from an HSpec patch by Simon Hengel
 -- (https://github.com/hspec/hspec/commit/d932f03317e0e2bd08c85b23903fb8616ae642bd)
 hSupportsANSI h = (&&) <$> hIsTerminalDevice h <*> (not <$> isDumb)
-  where
-    -- cannot use lookupEnv since it only appeared in GHC 7.6
-    isDumb = maybe False (== "dumb") . lookup "TERM" <$> getEnvironment
+ where
+  -- cannot use lookupEnv since it only appeared in GHC 7.6
+  isDumb = maybe False (== "dumb") . lookup "TERM" <$> getEnvironment
 
 -- | Parses the characters emitted by 'reportCursorPosition' into the console
 -- input stream. Returns the cursor row and column as a tuple.
@@ -121,16 +121,16 @@ hSupportsANSI h = (&&) <$> hIsTerminalDevice h <*> (not <$> isDumb)
 --
 cursorPosition :: ReadP (Int, Int)
 cursorPosition = do
-    void $ char '\ESC'
-    void $ char '['
-    row <- decimal -- A non-negative whole decimal number
-    void $ char ';'
-    col <- decimal -- A non-negative whole decimal number
-    void $ char 'R'
-    return (read row, read col)
-  where
-    digit = satisfy isDigit
-    decimal = many1 digit
+  void $ char '\ESC'
+  void $ char '['
+  row <- decimal -- A non-negative whole decimal number
+  void $ char ';'
+  col <- decimal -- A non-negative whole decimal number
+  void $ char 'R'
+  return (read row, read col)
+ where
+  digit = satisfy isDigit
+  decimal = many1 digit
 
 -- | Attempts to get the reported cursor position data from the console input
 -- stream. The function is intended to be called immediately after

@@ -1,19 +1,21 @@
 -- | Types used to represent SELECT GRAPHIC RENDITION (SGR) aspects.
 module System.Console.ANSI.Types
-    (
-      SGR (..)
-    , ConsoleLayer (..)
-    , Color (..)
-    , ColorIntensity (..)
-    , ConsoleIntensity (..)
-    , Underlining (..)
-    , BlinkSpeed (..)
-    ) where
+  (
+    SGR (..)
+  , ConsoleLayer (..)
+  , Color (..)
+  , ColorIntensity (..)
+  , ConsoleIntensity (..)
+  , Underlining (..)
+  , BlinkSpeed (..)
+  ) where
+
+import Data.Ix (Ix)
 
 import Data.Colour (Colour)
-import Data.Ix
 
--- | ANSI colors: come in various intensities, which are controlled by 'ColorIntensity'
+-- | ANSI colors: come in various intensities, which are controlled by
+-- 'ColorIntensity'
 data Color = Black
            | Red
            | Green
@@ -46,20 +48,24 @@ data Underlining = SingleUnderline
                  | NoUnderline
                  deriving (Eq, Ord, Bounded ,Enum, Show, Read, Ix)
 
--- | ANSI general console intensity: usually treated as setting the font style (e.g. 'BoldIntensity' causes text to be bold)
+-- | ANSI general console intensity: usually treated as setting the font style
+-- (e.g. 'BoldIntensity' causes text to be bold)
 data ConsoleIntensity = BoldIntensity
-                      | FaintIntensity -- ^ Not widely supported: sometimes treated as concealing text
+                      | FaintIntensity -- ^ Not widely supported: sometimes
+                                       -- treated as concealing text
                       | NormalIntensity
                       deriving (Eq, Ord, Bounded, Enum, Show, Read, Ix)
 
 -- | ANSI Select Graphic Rendition command
 data SGR = Reset
          | SetConsoleIntensity ConsoleIntensity
-         | SetItalicized Bool -- ^ Not widely supported: sometimes treated as swapping foreground and background
+         | SetItalicized Bool -- ^ Not widely supported: sometimes treated as
+                              -- swapping foreground and background
          | SetUnderlining Underlining
          | SetBlinkSpeed BlinkSpeed
          | SetVisible Bool -- ^ Not widely supported
          | SetSwapForegroundBackground Bool
          | SetColor ConsoleLayer ColorIntensity Color
-         | SetRGBColor ConsoleLayer (Colour Float) -- ^ Supported from Windows 10 Creators Update
+         | SetRGBColor ConsoleLayer (Colour Float) -- ^ Supported from Windows 10
+                                                   -- Creators Update
          deriving (Eq, Show, Read)
