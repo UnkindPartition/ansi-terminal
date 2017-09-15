@@ -54,14 +54,11 @@ import Foreign.Storable
 
 import Data.Bits
 import Data.Char
+import Data.Typeable (Typeable, cast)
 
 import System.Win32.Types
 
 import Control.Exception (Exception, throw)
-
-#if __GLASGOW_HASKELL__ >= 612
-import Data.Typeable
-#endif
 
 #if !MIN_VERSION_Win32(2,5,1)
 import Control.Concurrent.MVar
@@ -70,7 +67,6 @@ import Control.Exception (bracket)
 #if __GLASGOW_HASKELL__ >= 612
 import GHC.IO.Handle.Types (Handle(..), Handle__(..))
 import GHC.IO.FD (FD(..)) -- A wrapper around an Int32
-import Data.Typeable
 #else
 import GHC.IOBase (Handle(..), Handle__(..))
 import qualified GHC.IOBase as IOBase (FD) -- Just an Int32
