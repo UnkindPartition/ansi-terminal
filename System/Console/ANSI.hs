@@ -55,17 +55,19 @@
 -- For many more examples, see the project's extensive
 -- <https://raw.githubusercontent.com/feuerbach/ansi-terminal/master/System/Console/ANSI/Example.hs Example.hs> file.
 #if defined(WINDOWS)
-module System.Console.ANSI (
-        module System.Console.ANSI.Windows
-    ) where
+module System.Console.ANSI
+  (
+    module System.Console.ANSI.Windows
+  ) where
 
 import System.Console.ANSI.Windows
 
 #elif defined(UNIX)
 
-module System.Console.ANSI (
-        module System.Console.ANSI.Unix
-    ) where
+module System.Console.ANSI
+  (
+    module System.Console.ANSI.Unix
+  ) where
 
 import System.Console.ANSI.Unix
 
