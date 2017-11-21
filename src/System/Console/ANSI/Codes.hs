@@ -115,6 +115,8 @@ sgrToCode sgr = case sgr of
   SetColor Foreground Vivid color -> [90 + colorToCode color]
   SetColor Background Dull color  -> [40 + colorToCode color]
   SetColor Background Vivid color -> [100 + colorToCode color]
+  SetPaletteColor Foreground index -> [38, 5, fromIntegral index]
+  SetPaletteColor Background index -> [48, 5, fromIntegral index]
   SetRGBColor Foreground color -> [38, 2] ++ toRGB color
   SetRGBColor Background color -> [48, 2] ++ toRGB color
  where

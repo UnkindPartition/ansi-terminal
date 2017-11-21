@@ -308,6 +308,7 @@ applyANSISGRToAttribute def sgr attribute = case sgr of
           Dull  -> attribute .&. complement bACKGROUND_INTENSITY
           Vivid -> attribute .|. bACKGROUND_INTENSITY
     in applyBackgroundANSIColorToAttribute aNSIColor attribute'
+  SetPaletteColor _ _ -> attribute  -- Not supported
  where
   iNTENSITY = fOREGROUND_INTENSITY
 
