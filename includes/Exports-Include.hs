@@ -5,6 +5,9 @@
     -- * Basic data types
     module System.Console.ANSI.Types
 
+    -- * Color utility functions
+  , module System.Console.ANSI.Color
+
     -- * Cursor movement by character
   , cursorUp
   , cursorDown

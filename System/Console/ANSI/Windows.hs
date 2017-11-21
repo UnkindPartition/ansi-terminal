@@ -11,6 +11,7 @@ module System.Console.ANSI.Windows
 import System.IO (Handle, hIsTerminalDevice, stdout)
 
 import System.Console.ANSI.Types
+import System.Console.ANSI.Color
 import qualified System.Console.ANSI.Unix as U
 import System.Console.ANSI.Windows.Detect (ANSIEnabledStatus (..),
   ConsoleDefaultState (..), isANSIEnabled)

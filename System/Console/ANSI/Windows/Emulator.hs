@@ -9,18 +9,14 @@ import Control.Exception (catch, catchJust, IOException)
 import Control.Monad (forM_, unless)
 import Data.Bits ((.&.), (.|.), complement, shiftL, shiftR)
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
-import Data.List (foldl', minimumBy)
+import Data.List (foldl')
 import Data.Maybe (mapMaybe)
 import qualified Data.Map.Strict as Map (Map, empty, insert, lookup)
 import System.IO (Handle, hFlush, hIsTerminalDevice, stdin, stdout)
 import System.IO.Unsafe (unsafePerformIO)
 import Text.ParserCombinators.ReadP (readP_to_S)
 
-import Data.Colour (Colour)
-import Data.Colour.Names (black, blue, cyan, green, grey, lime, magenta, maroon,
-  navy, olive, purple, red, silver, teal, white, yellow)
-import Data.Colour.SRGB (RGB (..), toSRGB)
-
+import System.Console.ANSI.Color
 import System.Console.ANSI.Types
 import qualified System.Console.ANSI.Unix as Unix
 import System.Console.ANSI.Windows.Detect
@@ -144,7 +140,7 @@ hClearScreenFraction cds handle fraction_finder = do
         right' = if y == bottom then end_x   else right
         fill_cursor_pos = COORD left' y
         fill_length = fromIntegral $ right' - left' + 1
-    fillConsoleOutputCharacter handle clearChar fill_length fill_cursor_pos
+    _ <- fillConsoleOutputCharacter handle clearChar fill_length fill_cursor_pos
     fillConsoleOutputAttribute handle (clearAttribute cds) fill_length
       fill_cursor_pos
 
@@ -294,20 +290,27 @@ applyANSISGRToAttribute def sgr attribute = case sgr of
     (attribute .&. (complement bACKGROUND_INTENSITY))
   SetColor Background Vivid color -> applyBackgroundANSIColorToAttribute color
     (attribute .|. bACKGROUND_INTENSITY)
+  SetPaletteColor layer code ->
+    let (intensity, col) = approximateColor8Code code
+    in  applyANSISGRToAttribute def (SetColor layer intensity col) attribute
   SetRGBColor Foreground color ->
-    let (colorIntensity, aNSIColor) = toANSIColor color
+    let (colorIntensity, aNSIColor) = closest4bitsANSIColor color
         attribute' = case colorIntensity of
           Dull  -> attribute .&. complement fOREGROUND_INTENSITY
           Vivid -> attribute .|. fOREGROUND_INTENSITY
     in applyForegroundANSIColorToAttribute aNSIColor attribute'
   SetRGBColor Background color ->
-    let (colorIntensity, aNSIColor) = toANSIColor color
+    let (colorIntensity, aNSIColor) = closest4bitsANSIColor color
         attribute' = case colorIntensity of
           Dull  -> attribute .&. complement bACKGROUND_INTENSITY
           Vivid -> attribute .|. bACKGROUND_INTENSITY
     in applyBackgroundANSIColorToAttribute aNSIColor attribute'
  where
   iNTENSITY = fOREGROUND_INTENSITY
+
+approximateColor8Code :: Color8Code -> (ColorIntensity, Color)
+approximateColor8Code code
+  = closest4bitsANSIColor $ xterm256ToSRGB $ color8CodeToXterm256 code
 
 hSetSGR cds h sgr
   = emulatorFallback (Unix.hSetSGR h sgr) $ withHandle h $ \handle -> do
@@ -382,35 +385,6 @@ keyPress c = [keyDown, keyUp]
 
 keyPresses :: String -> [INPUT_RECORD]
 keyPresses = concatMap keyPress
-
-aNSIColors :: [((ColorIntensity, Color), Colour Float)]
-aNSIColors = [ ((Dull,  Black),   black)
-             , ((Dull,  Blue),    navy)
-             , ((Dull,  Green),   green)
-             , ((Dull,  Cyan),    teal)
-             , ((Dull,  Red),     maroon)
-             , ((Dull,  Magenta), purple)
-             , ((Dull,  Yellow),  olive)
-             , ((Dull,  White),   silver)
-             , ((Vivid, Black),   grey)
-             , ((Vivid, Blue),    blue)
-             , ((Vivid, Green),   lime)
-             , ((Vivid, Cyan),    cyan)
-             , ((Vivid, Red),     red)
-             , ((Vivid, Magenta), magenta)
-             , ((Vivid, Yellow),  yellow)
-             , ((Vivid, White),   white) ]
-
-toANSIColor :: Colour Float -> (ColorIntensity, Color)
-toANSIColor color = fst $ minimumBy order aNSIColors
- where
-  RGB r g b = toSRGB color
-  order (_, c1) (_, c2) = compare (dist c1) (dist c2)
-  dist c = let RGB r' g' b' = toSRGB c
-               dr = r' - r
-               dg = g' - g
-               db = b' - b
-           in  dr * dr + dg * dg + db * db
 
 -- getReportedCursorPosition :: IO String
 -- (See Common-Include.hs for Haddock documentation)

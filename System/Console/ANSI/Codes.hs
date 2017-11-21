@@ -60,13 +60,17 @@ module System.Console.ANSI.Codes
   , setTitleCode
 
     -- * Utilities
-  , colorToCode, csi, sgrToCode
+  , colorToCode -- TODO in the next major release, we can remove the reexport of
+                -- colorToCode, as the origin module, System.Console.ANSI.Color,
+                -- is exposed.
+  , csi
+  , sgrToCode
   ) where
 
+import Data.Colour.SRGB (toSRGB24, RGB (..))
 import Data.List (intersperse)
 
-import Data.Colour.SRGB (toSRGB24, RGB (..))
-
+import System.Console.ANSI.Color
 import System.Console.ANSI.Types
 
 -- | 'csi' @parameters controlFunction@, where @parameters@ is a list of 'Int',
@@ -79,18 +83,10 @@ csi :: [Int]  -- ^ List of parameters for the control sequence
     -> String
 csi args code = "\ESC[" ++ concat (intersperse ";" (map show args)) ++ code
 
--- | 'colorToCode' @color@ returns the 0-based index of the color (one of the
--- eight colors in the standard).
-colorToCode :: Color -> Int
-colorToCode color = case color of
-  Black   -> 0
-  Red     -> 1
-  Green   -> 2
-  Yellow  -> 3
-  Blue    -> 4
-  Magenta -> 5
-  Cyan    -> 6
-  White   -> 7
+-- | Color8Code represents an 8-bit ANSI palette color. This function converts
+-- it to the corresponding code
+color8CodeToCode :: Color8Code -> Int
+color8CodeToCode (Color8Code color) = fromIntegral color
 
 -- | 'sgrToCode' @sgr@ returns the parameter of the SELECT GRAPHIC RENDITION
 -- (SGR) aspect identified by @sgr@.
@@ -120,6 +116,8 @@ sgrToCode sgr = case sgr of
   SetColor Foreground Vivid color -> [90 + colorToCode color]
   SetColor Background Dull color  -> [40 + colorToCode color]
   SetColor Background Vivid color -> [100 + colorToCode color]
+  SetPaletteColor Foreground colorCode -> [38, 5, color8CodeToCode colorCode]
+  SetPaletteColor Background colorCode -> [48, 5, color8CodeToCode colorCode]
   SetRGBColor Foreground color -> [38, 2] ++ toRGB color
   SetRGBColor Background color -> [48, 2] ++ toRGB color
  where

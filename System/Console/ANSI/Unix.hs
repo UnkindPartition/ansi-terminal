@@ -15,6 +15,7 @@ import Text.ParserCombinators.ReadP (readP_to_S)
 
 import System.Console.ANSI.Codes
 import System.Console.ANSI.Types
+import System.Console.ANSI.Color
 
 -- This file contains code that is common to modules System.Console.ANSI.Unix,
 -- System.Console.ANSI.Windows and System.Console.ANSI.Windows.Emulator, such as
