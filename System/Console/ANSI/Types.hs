@@ -58,14 +58,14 @@ data ConsoleIntensity = BoldIntensity
 
 -- | ANSI Select Graphic Rendition command
 data SGR = Reset
-         | SetConsoleIntensity ConsoleIntensity
-         | SetItalicized Bool -- ^ Not widely supported: sometimes treated as
-                              -- swapping foreground and background
-         | SetUnderlining Underlining
-         | SetBlinkSpeed BlinkSpeed
-         | SetVisible Bool -- ^ Not widely supported
-         | SetSwapForegroundBackground Bool
-         | SetColor ConsoleLayer ColorIntensity Color
-         | SetRGBColor ConsoleLayer (Colour Float) -- ^ Supported from Windows 10
-                                                   -- Creators Update
+         | SetConsoleIntensity !ConsoleIntensity
+         | SetItalicized !Bool -- ^ Not widely supported: sometimes treated as
+                               -- swapping foreground and background
+         | SetUnderlining !Underlining
+         | SetBlinkSpeed !BlinkSpeed
+         | SetVisible !Bool -- ^ Not widely supported
+         | SetSwapForegroundBackground !Bool
+         | SetColor !ConsoleLayer !ColorIntensity !Color
+         | SetRGBColor !ConsoleLayer !(Colour Float) -- ^ Supported from Windows 10
+                                                     -- Creators Update
          deriving (Eq, Show, Read)
