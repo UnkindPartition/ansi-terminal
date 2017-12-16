@@ -144,7 +144,7 @@ hClearScreenFraction cds handle fraction_finder = do
         right' = if y == bottom then end_x   else right
         fill_cursor_pos = COORD left' y
         fill_length = fromIntegral $ right' - left' + 1
-    fillConsoleOutputCharacter handle clearChar fill_length fill_cursor_pos
+    _ <- fillConsoleOutputCharacter handle clearChar fill_length fill_cursor_pos
     fillConsoleOutputAttribute handle (clearAttribute cds) fill_length
       fill_cursor_pos
 
