@@ -54,22 +54,29 @@ isANSIEnabled = unsafePerformIO $ do
             , defaultBackgroundAttributes = bgAttributes }
       return $ NotANSIEnabled consoleDefaultState
 
--- This function takes the following approach. If the environment variable TERM
--- exists and is not set to 'dumb' or 'msys' (see below), it assumes the console
--- is ANSI-enabled. Otherwise, it tries to enable virtual terminal processing.
--- If that fails, it assumes the console is not ANSI-enabled.
+-- This function takes the following approach. If the environment variable
+-- APPVEYOR exists and is set to 'True', it assumes the code is running in the
+-- Appveyor build environment and that the build console is ANSI-enabled.
+-- Otherwise, if the environment variable TERM exists and is not set to 'dumb'
+-- or 'msys' (see below), it assumes the console is ANSI-enabled. Otherwise, it
+-- tries to enable virtual terminal processing. If that fails, it assumes the
+-- console is not ANSI-enabled.
 --
 -- In Git Shell, if Command Prompt or PowerShell are used, the environment
 -- variable TERM is set to 'msys'. If 'Git Bash' (mintty) is used, TERM is set
 -- to 'xterm' (by default).
 safeIsANSIEnabled :: IO Bool
 safeIsANSIEnabled = do
-  result <- lookupEnv "TERM"
-  case result of
-    Just "dumb" -> return False
-    Just "msys" -> doesEnableANSIOutSucceed
-    Just _      -> return True
-    Nothing     -> doesEnableANSIOutSucceed
+  appveyor <- lookupEnv "APPVEYOR"
+  case appveyor of
+    Just "True" -> return True
+    _           -> do
+      term <- lookupEnv "TERM"
+      case term of
+        Just "dumb" -> return False
+        Just "msys" -> doesEnableANSIOutSucceed
+        Just _      -> return True
+        Nothing     -> doesEnableANSIOutSucceed
 
 -- This function returns whether or not an attempt to enable virtual terminal
 -- processing succeeded, in the IO monad.
