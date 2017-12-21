@@ -53,8 +53,12 @@ module System.Console.ANSI.Windows.Foreign
 import Control.Exception (Exception, throw)
 import Data.Bits ((.|.), shiftL)
 import Data.Char (chr, ord)
-import Data.Typeable (Typeable, cast)
-import Foreign.C.Types (CInt (..), CShort (..), CWchar (..))
+import Data.Typeable (Typeable)
+import Foreign.C.Types (CInt (..), CWchar (..))
+-- Some Windows types missing from System.Win32 prior to version 2.5.0.0
+#if !MIN_VERSION_Win32(2,5,0)
+import Foreign.C.Types (CShort (..))
+#endif
 import Foreign.Marshal (alloca, allocaArray, maybeWith, peekArray, with,
   withArrayLen)
 import Foreign.Ptr (Ptr, castPtr, plusPtr)
@@ -65,6 +69,7 @@ import Control.Concurrent.MVar (readMVar)
 import Control.Exception (bracket)
 import Foreign.StablePtr (StablePtr, freeStablePtr, newStablePtr)
 #if __GLASGOW_HASKELL__ >= 612
+import Data.Typeable (cast)
 import GHC.IO.FD (FD(..)) -- A wrapper around an Int32
 import GHC.IO.Handle.Types (Handle (..), Handle__ (..))
 #else
@@ -76,9 +81,13 @@ import qualified GHC.IOBase as IOBase (FD)  -- Just an Int32
 import System.Win32.Types (BOOL, DWORD, ErrCode, HANDLE, LPCTSTR, LPDWORD,
   TCHAR, UINT, WORD, failIfFalse_, getLastError, iNVALID_HANDLE_VALUE,
   nullHANDLE, withTString)
--- Some Windows types missing from System.Win32 prior version 2.5.0.0
+-- Missing from System.Win32.Types prior to version 2.5.0.0
 #if MIN_VERSION_Win32(2,5,0)
 import System.Win32.Types (SHORT)
+#endif
+-- withHandleToHANDLE added to System.Win32.Types from version 2.5.1.0
+#if MIN_VERSION_Win32(2,5,1)
+import System.Win32.Types (withHandleToHANDLE)
 #endif
 
 #if defined(i386_HOST_ARCH)
@@ -89,8 +98,8 @@ import System.Win32.Types (SHORT)
 #error Unknown mingw32 arch
 #endif
 
+-- Missing from System.Win32.Types prior to version 2.5.0.0
 #if !MIN_VERSION_Win32(2,5,0)
--- Some Windows types missing from System.Win32 prior version 2.5.0.0
 type SHORT = CShort
 #endif
 type WCHAR = CWchar
@@ -241,9 +250,9 @@ eNABLE_VIRTUAL_TERMINAL_INPUT, eNABLE_VIRTUAL_TERMINAL_PROCESSING :: DWORD
 sTD_INPUT_HANDLE, sTD_OUTPUT_HANDLE, sTD_ERROR_HANDLE :: DWORD
 eNABLE_VIRTUAL_TERMINAL_INPUT      = 512
 eNABLE_VIRTUAL_TERMINAL_PROCESSING =   4
-sTD_INPUT_HANDLE  = -10
-sTD_OUTPUT_HANDLE = -11
-sTD_ERROR_HANDLE  = -12
+sTD_INPUT_HANDLE  = 0xFFFFFFF6 -- minus 10
+sTD_OUTPUT_HANDLE = 0xFFFFFFF5 -- minus 11
+sTD_ERROR_HANDLE  = 0xFFFFFFF4 -- minus 12
 
 fOREGROUND_BLUE, fOREGROUND_GREEN, fOREGROUND_RED, fOREGROUND_INTENSITY,
   bACKGROUND_BLUE, bACKGROUND_GREEN, bACKGROUND_RED, bACKGROUND_INTENSITY,
@@ -408,6 +417,7 @@ scrollConsoleScreenBuffer
     throwIfFalse $ cScrollConsoleScreenBuffer handle ptr_scroll_rectangle
       ptr_clip_rectangle (unpackCOORD destination_origin) ptr_fill
 
+-- withHandleToHANDLE added to System.Win32.Types from version 2.5.1.0
 #if !MIN_VERSION_Win32(2,5,1)
 -- | This bit is all highly dubious. The problem is that we want to output ANSI
 -- to arbitrary Handles rather than forcing people to use stdout.  However, the
