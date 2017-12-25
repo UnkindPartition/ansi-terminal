@@ -1,5 +1,5 @@
 Name:                ansi-terminal
-Version:             0.7.1.1
+Version:             0.8
 Cabal-Version:       >= 1.6
 Category:            User Interfaces
 Synopsis:            Simple ANSI terminal support, with Windows compatibility

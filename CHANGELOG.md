@@ -1,6 +1,14 @@
 Changes
 =======
 
+Version 0.8
+-----------
+
+* Make the fields of `SGR` strict
+* Make compatible with GHC 8.2.2
+* Improve the error message on Windows when not ANSI-capable or ConHost
+* Recognise Appveyor build environment as ANSI-enabled
+
 Version 0.7.1.1
 ---------------
 
