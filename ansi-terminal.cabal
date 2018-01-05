@@ -9,7 +9,7 @@ Description:         ANSI terminal support for Haskell: allows cursor movement,
 License:             BSD3
 License-File:        LICENSE
 Author:              Max Bolingbroke
-Maintainer:          Roman Cheplyaka <roma@ro-che.info>
+Maintainer:          Mike Pilgrem <public@pilgrem.com>, Roman Cheplyaka <roma@ro-che.info>
 Homepage:            https://github.com/feuerbach/ansi-terminal
 Build-Type:          Simple
 

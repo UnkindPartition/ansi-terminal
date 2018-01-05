@@ -82,7 +82,7 @@ The library is originally written by [Max Bolingbroke](https://github.com/batter
 Maintainers
 -----------
 
-[Roman Cheplyaka](https://github.com/feuerbach) is the primary maintainer.
+[Mike Pilgrem](https://github.com/mpilgrem) and [Roman Cheplyaka](https://github.com/feuerbach) are the primary maintainers.
 
 [Oliver Charles](https://github.com/ocharles) is the backup maintainer. Please
-get in touch with him if the primary maintainer cannot be reached.
+get in touch with him if the primary maintainers cannot be reached.
