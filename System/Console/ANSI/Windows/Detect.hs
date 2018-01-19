@@ -43,7 +43,7 @@ isANSIEnabled = unsafePerformIO $ do
   e <- safeIsANSIEnabled
   if e
     then return ANSIEnabled
-    else onException (do
+    else do
       hOut <- getValidStdHandle sTD_OUTPUT_HANDLE
       info <- getConsoleScreenBufferInfo hOut
       let attributes = csbi_attributes info
@@ -52,16 +52,7 @@ isANSIEnabled = unsafePerformIO $ do
           consoleDefaultState = ConsoleDefaultState
             { defaultForegroundAttributes = fgAttributes
             , defaultBackgroundAttributes = bgAttributes }
-      return $ NotANSIEnabled consoleDefaultState)
-      (putStrLn $ "A fatal error has occurred. An attempt has been made to " ++
-        "send console virtual terminal sequences (ANSI codes) to an output " ++
-        "that has not been recognised as an ANSI-capable terminal and also " ++
-        "cannot be emulated as an ANSI-enabled terminal (emulation needs a " ++
-        "ConHost-based terminal, such as Command Prompt or PowerShell).\n\n" ++
-        "If that is unexpected, please post an issue at the home page of " ++
-        "the ansi-terminal package. See " ++
-        "https://hackage.haskell.org/package/ansi-terminal for the home " ++
-        "page location.\n")
+      return $ NotANSIEnabled consoleDefaultState
 
 -- This function takes the following approach. If the environment variable
 -- APPVEYOR exists and is set to 'True', it assumes the code is running in the

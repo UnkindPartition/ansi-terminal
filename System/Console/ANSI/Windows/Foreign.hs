@@ -339,7 +339,20 @@ foreign import WINDOWS_CCONV unsafe "windows.h ReadConsoleInputW"
                     -> LPDWORD
                     -> IO BOOL
 
-data ConsoleException = ConsoleException !ErrCode deriving (Show, Eq, Typeable)
+data ConsoleException = ConsoleException !ErrCode deriving (Eq, Typeable)
+
+instance Show ConsoleException where
+  show (ConsoleException 6) =
+    "A fatal error has occurred.\n\n" ++
+    "An attempt has been made to send console virtual terminal sequences\n" ++
+    "(ANSI codes) to an output that has not been recognised as an\n" ++
+    "ANSI-capable terminal and also cannot be emulated as an ANSI-enabled\n" ++
+    "terminal (emulation needs a ConHost-based terminal, such as Command\n" ++
+    "Prompt or PowerShell). That may occur, for example, if output has\n" ++
+    "been redirected to a file.\n\n" ++
+    "If that is unexpected, please post an issue at:\n" ++
+    "https://github.com/feuerbach/ansi-terminal/issues\n"
+  show (ConsoleException errCode) = "ConsoleException " ++ show errCode
 
 instance Exception ConsoleException
 
