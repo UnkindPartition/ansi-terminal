@@ -59,8 +59,10 @@ isANSIEnabled = unsafePerformIO $ do
 -- Appveyor build environment and that the build console is ANSI-enabled.
 -- Otherwise, if the environment variable TERM exists and is not set to 'dumb'
 -- or 'msys' (see below), it assumes the console is ANSI-enabled. Otherwise, it
--- tries to enable virtual terminal processing. If that fails, it assumes the
--- console is not ANSI-enabled.
+-- tries to get a valid standard output handle. If that does not fail, it
+-- tried to get a ConHost console mode. If that fails, it assumes that the
+-- handle is ANSI-enabled. Otherwise, it tries to enable virtual terminal
+-- processing. If that fails, it assumes the console is not ANSI-enabled.
 --
 -- In Git Shell, if Command Prompt or PowerShell are used, the environment
 -- variable TERM is set to 'msys'. If 'Git Bash' (mintty) is used, TERM is set
@@ -79,7 +81,7 @@ safeIsANSIEnabled = do
         Nothing     -> doesEnableANSIOutSucceed
 
 -- This function returns whether or not an attempt to enable virtual terminal
--- processing succeeded, in the IO monad.
+-- processing succeeded, or was deemed to succeed, in the IO monad.
 doesEnableANSIOutSucceed :: IO Bool
 doesEnableANSIOutSucceed = do
   result <- try enableANSIOut :: IO (Either SomeException ())
@@ -87,14 +89,20 @@ doesEnableANSIOutSucceed = do
     Left _ -> return False
     Right () -> return True
 
--- This function tries to enable virtual terminal processing on the standard
--- output and throws an exception if it cannot.
+-- This function tries to get a valid handle on the standard output and throws
+-- an exception if it cannot. It then tries to get a ConHost console mode for
+-- that handle. If it can not, it assumes that the standard output handle is
+-- ANSI-enabled. If it can, it tries to enable virtual terminal processing and
+-- throws an exception if it can not.
 enableANSIOut :: IO ()
 enableANSIOut = do
   hOut <- getValidStdHandle sTD_OUTPUT_HANDLE
-  mOut <- getConsoleMode hOut
-  let mOut' = mOut .|. eNABLE_VIRTUAL_TERMINAL_PROCESSING
-  setConsoleMode hOut mOut'
+  result <- conHostConsoleMode hOut
+  case result of
+    Nothing -> return ()  -- assume hOut is ANSI-enabled
+    Just mOut -> do
+      let mOut' = mOut .|. eNABLE_VIRTUAL_TERMINAL_PROCESSING
+      setConsoleMode hOut mOut'
 
 -- This function tries to get a valid standard handle and throws an exception if
 -- it cannot.
@@ -102,5 +110,14 @@ getValidStdHandle :: DWORD -> IO HANDLE
 getValidStdHandle nStdHandle = do
   h <- getStdHandle nStdHandle
   if h == iNVALID_HANDLE_VALUE || h == nullHANDLE
-    then throwIO $ ConsoleException 6 -- Invalid Handle
+    then throwIO $ ConsoleException 6 -- Invalid handle or no handle
     else return h
+
+-- The function tries to get a ConHost console mode from a handle that is
+-- assumed to be a valid standard handle (see getValidStdHandle)
+conHostConsoleMode :: HANDLE -> IO (Maybe DWORD)
+conHostConsoleMode h = do
+  result <- try (getConsoleMode h) :: IO (Either SomeException DWORD)
+  case result of
+    Left _ -> return Nothing
+    Right mode -> return (Just mode)
