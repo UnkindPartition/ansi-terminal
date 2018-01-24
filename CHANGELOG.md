@@ -1,6 +1,14 @@
 Changes
 =======
 
+Version 0.8.0.1
+---------------
+
+* On Windows, if the standard output channel is valid but not a ConHost
+  terminal, assume it is ANSI-enabled rather than failing
+* On Windows, output the improved error message to the standard error channel
+  rather than the standard output channel
+
 Version 0.8
 -----------
 
