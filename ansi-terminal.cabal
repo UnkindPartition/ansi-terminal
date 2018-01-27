@@ -41,7 +41,6 @@ Library
                 Build-Depends:          base-compat >= 0.9.1
                                       , containers
                                       , Win32 >= 2.0
-                                      , process
                 Cpp-Options:            -DWINDOWS
                 Other-Modules:          System.Console.ANSI.Windows
                                         System.Console.ANSI.Windows.Detect
