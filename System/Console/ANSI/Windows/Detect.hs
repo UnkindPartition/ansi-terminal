@@ -7,7 +7,7 @@ module System.Console.ANSI.Windows.Detect
   , isANSIEnabled
   ) where
 
-import Control.Exception (SomeException(..), onException, throwIO, try)
+import Control.Exception (SomeException(..), throwIO, try)
 import Data.Bits ((.&.), (.|.))
 -- 'lookupEnv' is not available until base-4.6.0.0 (GHC 7.6.1)
 import System.Environment.Compat (lookupEnv)
