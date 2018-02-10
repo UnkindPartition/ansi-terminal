@@ -3,6 +3,9 @@ dist/
 *.hi
 *.o
 
+# Haddock documentation
+docs/
+
 # Operating system rubbish
 .DS_Store
 Thumbs.db

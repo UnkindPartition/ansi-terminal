@@ -1,44 +1,46 @@
 ansi-terminal
 =============
 
-Haskell ANSI Terminal Package For Windows, OS X and Linux
+A Haskell package providing support for 'ANSI' control character sequences for
+terminals on Unix-like operating systems and Windows
 
 Description
 -----------
 
-[ANSI](http://en.wikipedia.org/wiki/ANSI_escape_sequences) terminal
+['ANSI' terminal escape code](http://en.wikipedia.org/wiki/ANSI_escape_sequences)
 support for Haskell, which allows:
+-   Colored text output, with control over both foreground and background
+    colors
+-   Clearing parts of a line or the screen
+-   Hiding or showing the cursor
+-   Moving the cursor around
+-   Reporting the position of the cursor
+-   Changing the title of the terminal
 
--   Cursor movement
--   Screen and line clearing
--   Color output
--   Showing or hiding the cursor
--   Changing the console title (though this is not strictly part of
-    ANSI, it is widely supported in Unix)
-
-It is compatible with Windows (via an emulation layer) and those Unixes
-with ANSI terminals.
+By using emulation, it is compatible with versions of 'Command Prompt' and
+'PowerShell' on Windows that did not recognise 'ANSI' escape codes before
+Windows 10 version 1511 was released in November 2015.
 
 If you like this, you may be interested in
 [ansi-wl-pprint](http://github.com/batterseapower/ansi-wl-pprint), which
-provides a pretty-printer that can construct strings containing ANSI
+provides a pretty-printer that can construct strings containing 'ANSI'
 colorisation.
 
-Not all of the ANSI escape codes are provided by this module, but most
-(if not all) of the popular and well supported ones are. For a full
-list, have a look at the [current version of the
+Not all 'ANSI' escape codes are suported by this library but most (if not
+all) of the popular ones that are well-supported by terminal software are. For a
+full list, have a look at the [current version of the
 API](http://github.com/feuerbach/ansi-terminal/tree/master/includes/Common-Include.hs).
+
 Each supported escape code or family of codes has a corresponding
 function that comes in three variants:
 
--   A straight `IO` variant that doesn't take a `Handle` and just
-    applies the ANSI escape code to the terminal attached to stdout
--   An `IO` variant similar to above, but which takes a `Handle` to
-    which the ANSI escape should be applied
+-   A straight `IO` variant that doesn't take a `Handle` and just applies the
+    escape code to `stdout` and any terminal attached to it
+-   An `IO` variant similar to above, but which takes a `Handle` to which the
+    escape code should be applied
 -   A `String` variant that returns a literal string that should be
-    included to get the effect of the code. This is the only one of the
-    three API variants that only works on Unix-like operating systems:
-    on Windows these strings will always be blank!
+    included to get the effect of the code. However, on Windows systems where
+    emulation has been necessary, these strings will always be blank!
 
 Example
 -------

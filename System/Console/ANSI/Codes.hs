@@ -1,11 +1,6 @@
 -- | This module exports functions that return 'String' values containing codes
--- in accordance with: (1) standard ECMA-48 Control Functions for Coded
--- Character Sets (5th edition, 1991); or (2) in the case of 'saveCursorCode',
--- 'restoreCursorCode', 'reportCursorPositionCode' and 'setTitleCode', the XTerm
--- control sequence.
---
--- The reference used for the codes in this module was
--- <http://en.wikipedia.org/wiki/ANSI_escape_sequences>.
+-- in accordance with the \'ANSI\' standards for control character sequences
+-- described in the documentation of module "System.Console.ANSI".
 --
 -- The module "System.Console.ANSI" exports functions with the same names as
 -- those in this module. On some versions of Windows, the terminal in use may
