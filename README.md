@@ -15,6 +15,7 @@ support for Haskell, which allows:
 -   Hiding or showing the cursor
 -   Moving the cursor around
 -   Reporting the position of the cursor
+-   Scrolling the screen up or down
 -   Changing the title of the terminal
 
 By using emulation, it is compatible with versions of 'Command Prompt' and
@@ -27,9 +28,22 @@ provides a pretty-printer that can construct strings containing 'ANSI'
 colorisation.
 
 Not all 'ANSI' escape codes are suported by this library but most (if not
-all) of the popular ones that are well-supported by terminal software are. For a
-full list, have a look at the [current version of the
-API](http://github.com/feuerbach/ansi-terminal/tree/master/includes/Common-Include.hs).
+all) of the popular ones that are well-supported by terminal software are,
+including:
+-   Select Graphic Rendition mode (colors and other attributes): `setSGR`
+-   Clearing parts of the screen: `clearFromCursorToScreenEnd`,
+    `clearFromCursorToScreenBeginning`, `clearScreen`,
+    `clearFromCursorToLineEnd`, `clearFromCursorToLineBeginning` and
+    `clearLine`
+-   Cursor visibility changes: `hideCursor` and `showCursor`
+-   Cursor movement by character: `cursorUp`, `cursorDown`, `cursorForward` and
+    `cursorBackward`
+-   Cursor movement by line: `cursorUpLine` and `cursorDownLine`
+-   Directly changing cursor position: `setCursorColumn` and `setCursorPosition`
+-   Saving, restoring and reporting cursor position: `saveCursor`,
+    `restoreCursor` and `reportCursorPosition`
+-   Scrolling the screen: `scrollPageUp` and `scrollPageDown`
+-   Changing the title: `setTitle`
 
 Each supported escape code or family of codes has a corresponding
 function that comes in three variants:

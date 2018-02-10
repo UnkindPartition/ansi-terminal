@@ -18,6 +18,8 @@
 --
 --  * Reporting the position of the cursor
 --
+--  * Scrolling the screen up or down
+--
 --  * Changing the title of the terminal
 --
 -- The native terminal software on Windows is \'Command Prompt\' or
