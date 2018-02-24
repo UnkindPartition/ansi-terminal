@@ -35,7 +35,7 @@ Library
 
         Include-Dirs:           includes
 
-        Build-Depends:          base >= 4 && < 5
+        Build-Depends:          base >= 4.2.0.0 && < 5
                               , colour
         if os(windows)
                 Build-Depends:          base-compat >= 0.9.1
@@ -83,7 +83,7 @@ Executable ansi-terminal-example
                 -- We assume any non-Windows platform is Unix
                 Cpp-Options:            -DUNIX
 
-        Build-Depends:          base >= 4 && < 5
+        Build-Depends:          base >= 4.2.0.0 && < 5
         Extensions:             CPP
                                 ForeignFunctionInterface
 
