@@ -49,6 +49,7 @@ Library
                                         System.Console.ANSI.Windows.Foreign
                                         -- NB: used for fallback by the emulator
                                         System.Console.ANSI.Unix
+                                        System.Win32.Compat
         else
                 -- We assume any non-Windows platform is Unix
                 Cpp-Options:            -DUNIX
@@ -79,6 +80,7 @@ Executable ansi-terminal-example
                                         System.Console.ANSI.Windows.Emulator
                                         System.Console.ANSI.Windows.Emulator.Codes
                                         System.Console.ANSI.Windows.Foreign
+                                        System.Win32.Compat
         else
                 -- We assume any non-Windows platform is Unix
                 Cpp-Options:            -DUNIX
