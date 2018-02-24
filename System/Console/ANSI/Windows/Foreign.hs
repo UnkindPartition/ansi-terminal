@@ -71,14 +71,9 @@ import Foreign.Storable (Storable (..))
 import Control.Concurrent.MVar (readMVar)
 import Control.Exception (bracket)
 import Foreign.StablePtr (StablePtr, freeStablePtr, newStablePtr)
-#if __GLASGOW_HASKELL__ >= 612
 import Data.Typeable (cast)
 import GHC.IO.FD (FD(..)) -- A wrapper around an Int32
 import GHC.IO.Handle.Types (Handle (..), Handle__ (..))
-#else
-import GHC.IOBase (Handle (..), Handle__ (..))
-import qualified GHC.IOBase as IOBase (FD)  -- Just an Int32
-#endif
 #endif
 
 import System.Win32.Types (BOOL, DWORD, ErrCode, HANDLE, LPCTSTR, LPDWORD,
@@ -455,14 +450,8 @@ withHandleToHANDLE haskell_handle action =
           -- we could also take the "read" one
 
     -- Get the FD from the algebraic data type
-#if __GLASGOW_HASKELL__ < 612
-    fd <- fmap haFD $ readMVar write_handle_mvar
-#else
-    -- readMVar write_handle_mvar >>= \(Handle__ { haDevice = dev }) ->
-    -- print (typeOf dev)
     Just fd <- fmap (\(Handle__ { haDevice = dev }) ->
       fmap fdFD (cast dev)) $ readMVar write_handle_mvar
-#endif
 
     -- Finally, turn that (C-land) FD into a HANDLE using msvcrt
     windows_handle <- cget_osfhandle fd
@@ -473,13 +462,8 @@ withHandleToHANDLE haskell_handle action =
 -- This essential function comes from the C runtime system. It is certainly
 -- provided by msvcrt, and also seems to be provided by the mingw C library -
 -- hurrah!
-#if __GLASGOW_HASKELL__ >= 612
 foreign import WINDOWS_CCONV unsafe "_get_osfhandle"
   cget_osfhandle :: CInt -> IO HANDLE
-#else
-foreign import WINDOWS_CCONV unsafe "_get_osfhandle"
-  cget_osfhandle :: IOBase.FD -> IO HANDLE
-#endif
 
 -- withStablePtr was added in Win32-2.5.1.0
 withStablePtr :: a -> (StablePtr a -> IO b) -> IO b
