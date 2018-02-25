@@ -50,6 +50,9 @@ module System.Console.ANSI.Windows.Foreign
     ConsoleException (..)
   ) where
 
+#if !MIN_VERSION_base(4,8,0)
+import Control.Applicative ((<$>), (<*>))
+#endif
 import Control.Exception (Exception, throw)
 import Data.Bits ((.|.), shiftL)
 import Data.Char (chr, ord)

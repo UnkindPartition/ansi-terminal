@@ -5,8 +5,9 @@ module System.Console.ANSI.Windows.Emulator
 #include "Exports-Include.hs"
   ) where
 
-import Control.Exception (catch, catchJust, IOException)
-import Control.Monad (forM_, unless)
+import Control.Exception (catchJust, IOException)
+import qualified Control.Exception as CE (catch)
+import Control.Monad (unless)
 import Data.Bits ((.&.), (.|.), complement, shiftL, shiftR)
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Data.List (foldl', minimumBy)
@@ -356,7 +357,7 @@ hRestoreCursor h
   = emulatorFallback (Unix.hRestoreCursor h) $ withHandle h $ \handle -> do
       m <- readIORef cursorPositionRef
       let result = Map.lookup handle m
-      forM_ result (setConsoleCursorPosition handle)
+      maybe (return ()) (setConsoleCursorPosition handle) result
 
 hReportCursorPosition h
   = emulatorFallback (Unix.hReportCursorPosition h) $ withHandle h $
@@ -415,7 +416,7 @@ toANSIColor color = fst $ minimumBy order aNSIColors
 -- getReportedCursorPosition :: IO String
 -- (See Common-Include.hs for Haddock documentation)
 getReportedCursorPosition
-  = catch getReportedCursorPosition' getCPExceptionHandler
+  = CE.catch getReportedCursorPosition' getCPExceptionHandler
  where
   getReportedCursorPosition' = withHandleToHANDLE stdin action
    where
@@ -439,7 +440,7 @@ getReportedCursorPosition
 
 -- getCursorPosition :: IO (Maybe (Int, Int))
 -- (See Common-Include.hs for Haddock documentation)
-getCursorPosition = catch getCursorPosition' getCPExceptionHandler
+getCursorPosition = CE.catch getCursorPosition' getCPExceptionHandler
  where
   getCursorPosition' = do
     withHandleToHANDLE stdin flush -- Flush the console input buffer
