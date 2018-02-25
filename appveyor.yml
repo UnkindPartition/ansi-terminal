@@ -1,19 +1,32 @@
-# copied from the filepath package
+version: "{build}"
+clone_folder: "c:\\WORK"
+
+environment:
+  global:
+    CABOPTS:  "--store-dir=C:\\SR --http-transport=plain-http"
+  matrix:
+    - GHCVER: "7.8.4.1"
+    - GHCVER: "8.2.2"
+    - GHCVER: "8.0.2"
+    - GHCVER: "7.10.3.2"
+
 cache:
-- "c:\\sr -> appveyor.yml" # stack root, short paths == less problems
+ - "C:\\SR"
+
+install:
+ - "choco install -y cabal"
+ - "choco install -y ghc --version %GHCVER%"
+ - "refreshenv"
+ - "set PATH=C:\\msys64\\mingw64\\bin;C:\\msys64\\usr\\bin;%PATH%"
+ - "cabal --version"
+ - "ghc --version"
+ - "cabal %CABOPTS% update -vverbose+nowrap"
 
 build: off
 
-before_test:
-- set PATH=C:\Program Files\Git\mingw64\bin;%PATH% # for curl
-- curl -ostack.zip -L --insecure http://www.stackage.org/stack/windows-i386
-- 7z x stack.zip stack.exe
-
-clone_folder: "c:\\project"
-environment:
-  global:
-    STACK_ROOT: "c:\\sr"
-
 test_script:
-- stack setup > nul
-- echo "" | stack --no-terminal build
+ - IF EXIST configure.ac bash -c "autoreconf -i"
+ - "cabal %CABOPTS% new-build -j1 -vnormal+nowrap --dry all"
+ - ps: Push-AppveyorArtifact dist-newstyle\cache\plan.json
+ - "cabal %CABOPTS% new-build -j1 -vnormal+nowrap all"
+# - "cabal %CABOPTS% new-test  -j1 -vnormal+nowrap all"
