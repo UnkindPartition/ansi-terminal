@@ -39,7 +39,7 @@ Library
                               , colour
         if os(windows)
                 Build-Depends:          base-compat >= 0.9.1
-                                      , containers
+                                      , containers >= 0.5.0.0
                                       , Win32 >= 2.0
                 Cpp-Options:            -DWINDOWS
                 Other-Modules:          System.Console.ANSI.Windows
@@ -71,7 +71,7 @@ Executable ansi-terminal-example
 
         if os(windows)
                 Build-Depends:          base-compat >= 0.9.1
-                                      , containers
+                                      , containers >= 0.5.0.0
                                       , Win32 >= 2.0
                 Cpp-Options:            -DWINDOWS
                 Other-Modules:          System.Console.ANSI.Windows
