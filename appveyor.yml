@@ -5,11 +5,12 @@ environment:
   global:
     CABOPTS:  "--store-dir=C:\\SR --http-transport=plain-http"
   matrix:
+    - GHCVER: "7.4.2"
     - GHCVER: "7.6.3.1"
     - GHCVER: "7.8.4.1"
-    - GHCVER: "8.2.2"
-    - GHCVER: "8.0.2"
     - GHCVER: "7.10.3.2"
+    - GHCVER: "8.0.2"
+    - GHCVER: "8.2.2"
 
 cache:
  - "C:\\SR"
@@ -18,7 +19,7 @@ install:
  - "choco install -y cabal"
  - "choco install -y ghc --version %GHCVER%"
  - "refreshenv"
- - "set PATH=C:\\msys64\\mingw64\\bin;C:\\msys64\\usr\\bin;%PATH%"
+ - "set PATH=C:\\msys64\\mingw64\\bin;C:\\msys64\\usr\\bin;C:\\ghc\\ghc-%GHCVER%\\bin;%PATH%"
  - "cabal --version"
  - "ghc --version"
  - "cabal %CABOPTS% update -vverbose+nowrap"
