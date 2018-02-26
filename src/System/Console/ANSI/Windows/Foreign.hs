@@ -58,35 +58,14 @@ import Data.Bits ((.|.), shiftL)
 import Data.Char (chr, ord)
 import Data.Typeable (Typeable)
 import Foreign.C.Types (CInt (..), CWchar (..))
--- Some Windows types missing from System.Win32 prior to version 2.5.0.0
-#if !MIN_VERSION_Win32(2,5,0)
-import Foreign.C.Types (CShort (..))
-#endif
 import Foreign.Marshal (alloca, allocaArray, maybeWith, peekArray, with,
   withArrayLen)
 import Foreign.Ptr (Ptr, castPtr, plusPtr)
 import Foreign.Storable (Storable (..))
-
-#if !MIN_VERSION_Win32(2,5,1)
-import Control.Concurrent.MVar (readMVar)
-import Control.Exception (bracket)
-import Foreign.StablePtr (StablePtr, freeStablePtr, newStablePtr)
-import Data.Typeable (cast)
-import GHC.IO.FD (FD(..)) -- A wrapper around an Int32
-import GHC.IO.Handle.Types (Handle (..), Handle__ (..))
-#endif
-
-import System.Win32.Types (BOOL, DWORD, ErrCode, HANDLE, LPCTSTR, LPDWORD,
-  TCHAR, UINT, WORD, failIfFalse_, getLastError, iNVALID_HANDLE_VALUE,
-  nullHANDLE, withTString)
--- Missing from System.Win32.Types prior to version 2.5.0.0
-#if MIN_VERSION_Win32(2,5,0)
-import System.Win32.Types (SHORT)
-#endif
--- withHandleToHANDLE added to System.Win32.Types from version 2.5.1.0
-#if MIN_VERSION_Win32(2,5,1)
-import System.Win32.Types (withHandleToHANDLE)
-#endif
+-- `SHORT` and `withHandleToHANDLE` are not both available before Win32-2.5.1.0
+import System.Win32.Compat (BOOL, DWORD, ErrCode, HANDLE, LPCTSTR, LPDWORD,
+  SHORT, TCHAR, UINT, WORD, failIfFalse_, getLastError, iNVALID_HANDLE_VALUE,
+  nullHANDLE, withHandleToHANDLE, withTString)
 
 #if defined(i386_HOST_ARCH)
 #define WINDOWS_CCONV stdcall
@@ -96,10 +75,6 @@ import System.Win32.Types (withHandleToHANDLE)
 #error Unknown mingw32 arch
 #endif
 
--- Missing from System.Win32.Types prior to version 2.5.0.0
-#if !MIN_VERSION_Win32(2,5,0)
-type SHORT = CShort
-#endif
 type WCHAR = CWchar
 
 charToWCHAR :: Char -> WCHAR
@@ -427,48 +402,6 @@ scrollConsoleScreenBuffer
     with fill $ \ptr_fill ->
     throwIfFalse $ cScrollConsoleScreenBuffer handle ptr_scroll_rectangle
       ptr_clip_rectangle (unpackCOORD destination_origin) ptr_fill
-
--- withHandleToHANDLE added to System.Win32.Types from version 2.5.1.0
-#if !MIN_VERSION_Win32(2,5,1)
--- | This bit is all highly dubious. The problem is that we want to output ANSI
--- to arbitrary Handles rather than forcing people to use stdout.  However, the
--- Windows ANSI emulator needs a Windows HANDLE to work it's magic, so we need
--- to be able to extract one of those from the Haskell Handle.
---
--- This code accomplishes this, albeit at the cost of only being compatible with
--- GHC. withHandleToHANDLE was added in Win32-2.5.1.0
-withHandleToHANDLE :: Handle -> (HANDLE -> IO a) -> IO a
-withHandleToHANDLE haskell_handle action =
-  -- Create a stable pointer to the Handle. This prevents the garbage collector
-  -- getting to it while we are doing horrible manipulations with it, and hence
-  -- stops it being finalized (and closed).
-  withStablePtr haskell_handle $ const $ do
-    -- Grab the write handle variable from the Handle
-    let write_handle_mvar = case haskell_handle of
-          FileHandle _ handle_mvar     -> handle_mvar
-          DuplexHandle _ _ handle_mvar -> handle_mvar -- This is "write" MVar,
-          -- we could also take the "read" one
-
-    -- Get the FD from the algebraic data type
-    Just fd <- fmap (\(Handle__ { haDevice = dev }) ->
-      fmap fdFD (cast dev)) $ readMVar write_handle_mvar
-
-    -- Finally, turn that (C-land) FD into a HANDLE using msvcrt
-    windows_handle <- cget_osfhandle fd
-
-    -- Do what the user originally wanted
-    action windows_handle
-
--- This essential function comes from the C runtime system. It is certainly
--- provided by msvcrt, and also seems to be provided by the mingw C library -
--- hurrah!
-foreign import WINDOWS_CCONV unsafe "_get_osfhandle"
-  cget_osfhandle :: CInt -> IO HANDLE
-
--- withStablePtr was added in Win32-2.5.1.0
-withStablePtr :: a -> (StablePtr a -> IO b) -> IO b
-withStablePtr value = bracket (newStablePtr value) freeStablePtr
-#endif
 
 -- The following is based on module System.Win32.Console.Extra from package
 -- Win32-console, cut down for the WCHAR version of writeConsoleInput.
