@@ -38,6 +38,7 @@ import Foreign.C.Types (CShort (..))
 #if !MIN_VERSION_Win32(2,5,1)
 import Control.Concurrent.MVar (readMVar)
 import Control.Exception (bracket)
+import Foreign.C.Types (CInt (..))
 import Foreign.StablePtr (StablePtr, freeStablePtr, newStablePtr)
 import Data.Typeable (cast)
 import GHC.IO.FD (FD(..)) -- A wrapper around an Int32
