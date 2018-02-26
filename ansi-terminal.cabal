@@ -1,6 +1,6 @@
 Name:                ansi-terminal
 Version:             0.8.0.1
-Cabal-Version:       >= 1.6
+Cabal-Version:       >= 1.8
 Category:            User Interfaces
 Synopsis:            Simple ANSI terminal support, with Windows compatibility
 Description:         ANSI terminal support for Haskell: allows cursor movement,
@@ -13,10 +13,10 @@ Maintainer:          Mike Pilgrem <public@pilgrem.com>, Roman Cheplyaka <roma@ro
 Homepage:            https://github.com/feuerbach/ansi-terminal
 Build-Type:          Simple
 
-Extra-Source-Files:     includes/Common-Include.hs
-                        includes/Common-Include-Emulator.hs
-                        includes/Common-Include-Enabled.hs
-                        includes/Exports-Include.hs
+Extra-Source-Files:     src/includes/Common-Include.hs
+                        src/includes/Common-Include-Emulator.hs
+                        src/includes/Common-Include-Enabled.hs
+                        src/includes/Exports-Include.hs
                         CHANGELOG.md
                         README.md
 
@@ -29,11 +29,12 @@ Flag Example
         Default:        False
 
 Library
+        Hs-Source-Dirs:         src
         Exposed-Modules:        System.Console.ANSI
                                 System.Console.ANSI.Types
                                 System.Console.ANSI.Codes
 
-        Include-Dirs:           includes
+        Include-Dirs:           src/includes
 
         Build-Depends:          base >= 4.2.0.0 && < 5
                               , colour
@@ -60,34 +61,10 @@ Library
         Ghc-Options:                    -Wall
 
 Executable ansi-terminal-example
-        Main-Is:                System/Console/ANSI/Example.hs
-
-        Include-Dirs:           includes
-
-        Other-Modules:          System.Console.ANSI
-                                System.Console.ANSI.Codes
-                                System.Console.ANSI.Types
-                                System.Console.ANSI.Unix
-
-        if os(windows)
-                Build-Depends:          base-compat >= 0.9.1
-                                      , containers >= 0.5.0.0
-                                      , Win32 >= 2.0
-                Cpp-Options:            -DWINDOWS
-                Other-Modules:          System.Console.ANSI.Windows
-                                        System.Console.ANSI.Windows.Detect
-                                        System.Console.ANSI.Windows.Emulator
-                                        System.Console.ANSI.Windows.Emulator.Codes
-                                        System.Console.ANSI.Windows.Foreign
-        else
-                -- We assume any non-Windows platform is Unix
-                Cpp-Options:            -DUNIX
-
+        Hs-Source-Dirs:         app
+        Main-Is:                Example.hs
         Build-Depends:          base >= 4.2.0.0 && < 5
-        Extensions:             CPP
-                                ForeignFunctionInterface
-
+                              , ansi-terminal
         Ghc-Options:            -Wall
-
         if !flag(example)
                 Buildable:              False
