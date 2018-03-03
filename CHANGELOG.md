@@ -1,6 +1,14 @@
 Changes
 =======
 
+Version 0.8.0.2
+---------------
+
+* Improve README and Haddock documentation
+* On Windows, fix compatability with earlier GHC versions
+* Drop support for GHC versions before 6.12.1 (released December 2009)
+
+
 Version 0.8.0.1
 ---------------
 
