@@ -93,7 +93,7 @@
 -- >   putStrLn "Default colors."
 --
 -- For many more examples, see the project's extensive
--- <https://raw.githubusercontent.com/feuerbach/ansi-terminal/master/System/Console/ANSI/Example.hs Example.hs> file.
+-- <https://github.com/feuerbach/ansi-terminal/blob/master/app/Example.hs Example.hs> file.
 #if defined(WINDOWS)
 module System.Console.ANSI
   (

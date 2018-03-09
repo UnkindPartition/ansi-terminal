@@ -60,7 +60,7 @@ Example
 -------
 
 A full example is
-[available](http://github.com/feuerbach/ansi-terminal/tree/master/System/Console/ANSI/Example.hs),
+[available](https://github.com/feuerbach/ansi-terminal/blob/master/app/Example.hs),
 but for a taste of how the library works try the following code:
 
 ``` haskell
