@@ -12,8 +12,8 @@ import System.IO (Handle, hIsTerminalDevice, stdout)
 
 import System.Console.ANSI.Types
 import qualified System.Console.ANSI.Unix as U
-import System.Console.ANSI.Windows.Detect (ANSIEnabledStatus (..),
-  ConsoleDefaultState (..), isANSIEnabled)
+import System.Console.ANSI.Windows.Detect (ANSISupport (..),
+  ConsoleDefaultState (..), aNSISupport)
 import qualified System.Console.ANSI.Windows.Emulator as E
 
 -- This file contains code that is common to modules System.Console.ANSI.Unix,
@@ -28,18 +28,18 @@ import qualified System.Console.ANSI.Windows.Emulator as E
 #include "Common-Include-Enabled.hs"
 
 -- | A helper function which returns the native or emulated version, depending
--- on `isANSIEnabled`.
+-- on `aNSISupport`.
 nativeOrEmulated :: a -> a -> a
-nativeOrEmulated native emulated = case isANSIEnabled of
-  ANSIEnabled      -> native
-  NotANSIEnabled _ -> emulated
+nativeOrEmulated native emulated = case aNSISupport of
+  Native     -> native
+  Emulated _ -> emulated
 
 -- | A helper function which returns the native or emulated version, depending
--- on `isANSIEnabled`, where the emulator uses the default console state.
+-- on `aNSISupport`, where the emulator uses the default console state.
 nativeOrEmulatedWithDefault :: a -> (ConsoleDefaultState -> a) -> a
-nativeOrEmulatedWithDefault native emulated = case isANSIEnabled of
-  ANSIEnabled        -> native
-  NotANSIEnabled def -> emulated def
+nativeOrEmulatedWithDefault native emulated = case aNSISupport of
+  Native       -> native
+  Emulated def -> emulated def
 
 
 -- * Cursor movement by character
