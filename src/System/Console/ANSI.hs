@@ -31,11 +31,7 @@
 -- Terminal software other than the native software exists for Windows. One
 -- example is the \'mintty\' terminal emulator for \'Cygwin\', \'MSYS\' or
 -- \'MSYS2\', and dervied projects, and for \'WSL\' (Windows Subsystem for
--- Linux). On Windows, this library makes use of the existence of, and content
--- of, the @TERM@ environment variable to detect the use of non-native terminal
--- software. If you are using a native terminal on Windows (outside of WSL) and
--- this library is not working as you expect, check that the @TERM@ variable
--- does not exist.
+-- Linux).
 --
 -- The \'ANSI\' standards refer to (1) standard ECMA-48 \`Control Functions for
 -- Coded Character Sets\' (5th edition, 1991); (2) extensions in ITU-T
