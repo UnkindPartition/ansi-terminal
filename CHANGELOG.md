@@ -1,13 +1,19 @@
 Changes
 =======
 
+Version 0.8.0.3
+---------------
+
+* On Windows, try to enable ANSI on ConHost terminals even if a TERM environment
+  variable exits (such as with the Hyper 2 terminal)
+* Minor improvements to Haddock documentation
+
 Version 0.8.0.2
 ---------------
 
 * Improve README and Haddock documentation
 * On Windows, fix compatability with earlier GHC versions
 * Drop support for GHC versions before 6.12.1 (released December 2009)
-
 
 Version 0.8.0.1
 ---------------
