@@ -105,7 +105,7 @@
   , hSetTitle
   , setTitleCode
 
-    -- * Checking if handle supports ANSI
+    -- * Checking if handle supports ANSI (not portable: GHC only)
   , hSupportsANSI
 
     -- * Getting the cursor position
