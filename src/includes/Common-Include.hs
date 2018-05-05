@@ -95,9 +95,14 @@ setTitle = hSetTitle stdout
 -- | Use heuristics to determine whether the functions defined in this
 -- package will work with a given handle.
 --
--- The current implementation checks that the handle is a terminal, and
--- that the @TERM@ environment variable doesn't say @dumb@ (which is what
--- Emacs sets for its own terminal).
+-- For Unix-like operating systems or Windows, the current implementation checks
+-- that: (1) the handle is a terminal (see further below); and (2) a @TERM@
+-- environment variable is not set to @dumb@ (which is what the GNU Emacs text
+-- editor sets for its integrated terminal).
+--
+-- The function 'hIsTerminalDevice' is used to check if the handle is a
+-- terminal. However, on Windows, this function may not identify a handle to a
+-- non-native terminal (for example, 'mintty') as a terminal.
 hSupportsANSI :: Handle -> IO Bool
 -- Borrowed from an HSpec patch by Simon Hengel
 -- (https://github.com/hspec/hspec/commit/d932f03317e0e2bd08c85b23903fb8616ae642bd)
