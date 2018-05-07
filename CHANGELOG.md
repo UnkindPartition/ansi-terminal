@@ -1,6 +1,12 @@
 Changes
 =======
 
+Version 0.8.0.4
+---------------
+
+* On Windows, `hSupportsANSI` now recognises if the handle is connected to a
+  'mintty' terminal.
+
 Version 0.8.0.3
 ---------------
 
