@@ -13,6 +13,7 @@ import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Data.List (foldl', minimumBy)
 import Data.Maybe (mapMaybe)
 import qualified Data.Map.Strict as Map (Map, empty, insert, lookup)
+import System.Environment (getEnvironment)
 import System.IO (Handle, hFlush, hIsTerminalDevice, stdin, stdout)
 import System.IO.Unsafe (unsafePerformIO)
 import Text.ParserCombinators.ReadP (readP_to_S)
@@ -21,6 +22,7 @@ import Data.Colour (Colour)
 import Data.Colour.Names (black, blue, cyan, green, grey, lime, magenta, maroon,
   navy, olive, purple, red, silver, teal, white, yellow)
 import Data.Colour.SRGB (RGB (..), toSRGB)
+import System.Console.MinTTY (isMinTTYHandle)
 
 import System.Console.ANSI.Types
 import qualified System.Console.ANSI.Unix as Unix
@@ -412,6 +414,17 @@ toANSIColor color = fst $ minimumBy order aNSIColors
                dg = g' - g
                db = b' - b
            in  dr * dr + dg * dg + db * db
+
+-- hSupportsANSI :: Handle -> IO Bool
+-- (See Common-Include.hs for Haddock documentation)
+hSupportsANSI h = (||) <$> isTDNotDumb <*> isMinTTY
+ where
+  isMinTTY = withHandleToHANDLE h isMinTTYHandle
+-- Borrowed from an HSpec patch by Simon Hengel
+-- (https://github.com/hspec/hspec/commit/d932f03317e0e2bd08c85b23903fb8616ae642bd)
+  isTDNotDumb = (&&) <$> hIsTerminalDevice h <*> isNotDumb
+  -- cannot use lookupEnv since it only appeared in GHC 7.6
+  isNotDumb = (/= Just "dumb") . lookup "TERM" <$> getEnvironment
 
 -- getReportedCursorPosition :: IO String
 -- (See Common-Include.hs for Haddock documentation)

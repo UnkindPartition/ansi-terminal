@@ -40,6 +40,7 @@ Library
                               , colour
         if os(windows)
                 Build-Depends:          containers >= 0.5.0.0
+                                      , mintty
                                       , Win32 >= 2.0
                 Cpp-Options:            -DWINDOWS
                 Other-Modules:          System.Console.ANSI.Windows
