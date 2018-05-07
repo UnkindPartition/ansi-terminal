@@ -9,6 +9,7 @@ module System.Console.ANSI.Unix
   ) where
 
 import Control.Exception.Base (bracket)
+import System.Environment (getEnvironment)
 import System.IO (BufferMode (..), Handle, hFlush, hGetBuffering, hGetEcho,
   hIsTerminalDevice, hPutStr, hSetBuffering, hSetEcho, stdin, stdout)
 import Text.ParserCombinators.ReadP (readP_to_S)
@@ -60,6 +61,16 @@ hHideCursor h = hPutStr h hideCursorCode
 hShowCursor h = hPutStr h showCursorCode
 
 hSetTitle h title = hPutStr h $ setTitleCode title
+
+-- hSupportsANSI :: Handle -> IO Bool
+-- (See Common-Include.hs for Haddock documentation)
+--
+-- Borrowed from an HSpec patch by Simon Hengel
+-- (https://github.com/hspec/hspec/commit/d932f03317e0e2bd08c85b23903fb8616ae642bd)
+hSupportsANSI h = (&&) <$> hIsTerminalDevice h <*> isNotDumb
+ where
+  -- cannot use lookupEnv since it only appeared in GHC 7.6
+  isNotDumb = (/= Just "dumb") . lookup "TERM" <$> getEnvironment
 
 -- getReportedCursorPosition :: IO String
 -- (See Common-Include.hs for Haddock documentation)

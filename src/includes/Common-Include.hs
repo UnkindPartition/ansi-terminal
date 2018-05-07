@@ -4,7 +4,6 @@
 -- of the corresponding more general functions, inclduding the related Haddock
 -- documentation.
 
-import System.Environment
 #if !MIN_VERSION_base(4,8,0)
 import Control.Applicative
 #endif
@@ -95,21 +94,19 @@ setTitle = hSetTitle stdout
 -- | Use heuristics to determine whether the functions defined in this
 -- package will work with a given handle.
 --
--- For Unix-like operating systems or Windows, the current implementation checks
--- that: (1) the handle is a terminal (see further below); and (2) a @TERM@
+-- For Unix-like operating systems, the current implementation checks
+-- that: (1) the handle is a terminal; and (2) a @TERM@
 -- environment variable is not set to @dumb@ (which is what the GNU Emacs text
 -- editor sets for its integrated terminal).
 --
--- The function 'hIsTerminalDevice' is used to check if the handle is a
--- terminal. However, on Windows, this function may not identify a handle to a
--- non-native terminal (for example, 'mintty') as a terminal.
+-- For Windows, the current implementation performs the same checks as for
+-- Unix-like operating systems and, as an alternative, checks whether the
+-- handle is connected to a \'mintty\' terminal. (That is because the function
+-- 'hIsTerminalDevice' is used to check if the handle is a
+-- terminal. However, where a non-native Windows terminal (such as \'mintty\')
+-- is implemented using redirection, that function will not identify a
+-- handle to the terminal as a terminal.)
 hSupportsANSI :: Handle -> IO Bool
--- Borrowed from an HSpec patch by Simon Hengel
--- (https://github.com/hspec/hspec/commit/d932f03317e0e2bd08c85b23903fb8616ae642bd)
-hSupportsANSI h = (&&) <$> hIsTerminalDevice h <*> (not <$> isDumb)
- where
-  -- cannot use lookupEnv since it only appeared in GHC 7.6
-  isDumb = maybe False (== "dumb") . lookup "TERM" <$> getEnvironment
 
 -- | Parses the characters emitted by 'reportCursorPosition' into the console
 -- input stream. Returns the cursor row and column as a tuple.

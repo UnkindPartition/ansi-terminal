@@ -8,7 +8,7 @@ module System.Console.ANSI.Windows
 #include "Exports-Include.hs"
   ) where
 
-import System.IO (Handle, hIsTerminalDevice, stdout)
+import System.IO (Handle, stdout)
 
 import System.Console.ANSI.Types
 import qualified System.Console.ANSI.Unix as U
@@ -177,6 +177,10 @@ hSetTitle = nativeOrEmulated U.hSetTitle E.hSetTitle
 
 setTitleCode :: String -> String
 setTitleCode = nativeOrEmulated U.setTitleCode E.setTitleCode
+
+-- hSupportsANSI :: Handle -> IO Bool
+-- (See Common-Include.hs for Haddock documentation)
+hSupportsANSI = E.hSupportsANSI
 
 -- getReportedCursorPosition :: IO String
 -- (See Common-Include.hs for Haddock documentation)
