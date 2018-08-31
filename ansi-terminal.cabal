@@ -36,7 +36,7 @@ Library
 
         Include-Dirs:           src/includes
 
-        Build-Depends:          base >= 4.2.0.0 && < 5
+        Build-Depends:          base >= 4.3.0.0 && < 5
                               , colour
         if os(windows)
                 Build-Depends:          containers >= 0.5.0.0
@@ -64,7 +64,7 @@ Library
 Executable ansi-terminal-example
         Hs-Source-Dirs:         app
         Main-Is:                Example.hs
-        Build-Depends:          base >= 4.2.0.0 && < 5
+        Build-Depends:          base >= 4.3.0.0 && < 5
                               , ansi-terminal
         Ghc-Options:            -Wall
         if !flag(example)

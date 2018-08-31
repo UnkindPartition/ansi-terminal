@@ -182,6 +182,10 @@ setTitleCode = nativeOrEmulated U.setTitleCode E.setTitleCode
 -- (See Common-Include.hs for Haddock documentation)
 hSupportsANSI = E.hSupportsANSI
 
+-- hSupportsANSIWithoutEmulation :: Handle -> IO (Maybe Bool)
+-- (See Common-Include.hs for Haddock documentation)
+hSupportsANSIWithoutEmulation = E.hSupportsANSIWithoutEmulation
+
 -- getReportedCursorPosition :: IO String
 -- (See Common-Include.hs for Haddock documentation)
 getReportedCursorPosition = E.getReportedCursorPosition

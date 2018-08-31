@@ -107,6 +107,7 @@
 
     -- * Checking if handle supports ANSI (not portable: GHC only)
   , hSupportsANSI
+  , hSupportsANSIWithoutEmulation
 
     -- * Getting the cursor position
   , getCursorPosition

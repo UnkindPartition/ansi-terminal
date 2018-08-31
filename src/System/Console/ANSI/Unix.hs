@@ -11,7 +11,8 @@ module System.Console.ANSI.Unix
 import Control.Exception.Base (bracket)
 import System.Environment (getEnvironment)
 import System.IO (BufferMode (..), Handle, hFlush, hGetBuffering, hGetEcho,
-  hIsTerminalDevice, hPutStr, hSetBuffering, hSetEcho, stdin, stdout)
+  hIsTerminalDevice, hIsWritable, hPutStr, hSetBuffering, hSetEcho, stdin,
+  stdout)
 import Text.ParserCombinators.ReadP (readP_to_S)
 
 import System.Console.ANSI.Codes
@@ -71,6 +72,11 @@ hSupportsANSI h = (&&) <$> hIsTerminalDevice h <*> isNotDumb
  where
   -- cannot use lookupEnv since it only appeared in GHC 7.6
   isNotDumb = (/= Just "dumb") . lookup "TERM" <$> getEnvironment
+
+-- hSupportsANSIWithoutEmulation :: Handle -> IO (Maybe Bool)
+-- (See Common-Include.hs for Haddock documentation)
+hSupportsANSIWithoutEmulation h =
+  Just <$> ((&&) <$> hIsWritable h <*> hSupportsANSI h)
 
 -- getReportedCursorPosition :: IO String
 -- (See Common-Include.hs for Haddock documentation)

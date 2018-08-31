@@ -417,14 +417,33 @@ toANSIColor color = fst $ minimumBy order aNSIColors
 
 -- hSupportsANSI :: Handle -> IO Bool
 -- (See Common-Include.hs for Haddock documentation)
-hSupportsANSI h = (||) <$> isTDNotDumb <*> isMinTTY
+hSupportsANSI h = (||) <$> isTDNotDumb h <*> isMinTTY
  where
   isMinTTY = withHandleToHANDLE h isMinTTYHandle
+
+-- hSupportsANSIWithoutEmulation :: Handle -> IO (Maybe Bool)
+-- (See Common-Include.hs for Haddock documentation)
+hSupportsANSIWithoutEmulation handle = do
+  supportsANSI <- detectHandleSupportsANSI handle  -- Without reference to the
+                                                   -- environment
+  case supportsANSI of
+    Just isSupported -> return (Just isSupported)
+    Nothing -> do  -- Not sure, based on the handle alone
+      notDumb <- isNotDumb  -- Test the environment
+      if notDumb
+        then return Nothing  -- Still not sure!
+        else return (Just False) -- A dumb terminal
+
 -- Borrowed from an HSpec patch by Simon Hengel
 -- (https://github.com/hspec/hspec/commit/d932f03317e0e2bd08c85b23903fb8616ae642bd)
-  isTDNotDumb = (&&) <$> hIsTerminalDevice h <*> isNotDumb
-  -- cannot use lookupEnv since it only appeared in GHC 7.6
-  isNotDumb = (/= Just "dumb") . lookup "TERM" <$> getEnvironment
+isTDNotDumb :: Handle -> IO Bool
+isTDNotDumb h = (&&) <$> hIsTerminalDevice h <*> isNotDumb
+
+-- Borrowed from an HSpec patch by Simon Hengel
+-- (https://github.com/hspec/hspec/commit/d932f03317e0e2bd08c85b23903fb8616ae642bd)
+isNotDumb :: IO Bool
+-- cannot use lookupEnv since it only appeared in GHC 7.6
+isNotDumb = (/= Just "dumb") . lookup "TERM" <$> getEnvironment
 
 -- getReportedCursorPosition :: IO String
 -- (See Common-Include.hs for Haddock documentation)
