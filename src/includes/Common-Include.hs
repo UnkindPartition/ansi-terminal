@@ -92,7 +92,8 @@ setTitle :: String -- ^ New title
 setTitle = hSetTitle stdout
 
 -- | Use heuristics to determine whether the functions defined in this
--- package will work with a given handle.
+-- package will work with a given handle. This function assumes that the handle
+-- is writable (that is, it manages output - see 'hIsWritable').
 --
 -- For Unix-like operating systems, the current implementation checks
 -- that: (1) the handle is a terminal; and (2) a @TERM@
@@ -105,8 +106,37 @@ setTitle = hSetTitle stdout
 -- 'hIsTerminalDevice' is used to check if the handle is a
 -- terminal. However, where a non-native Windows terminal (such as \'mintty\')
 -- is implemented using redirection, that function will not identify a
--- handle to the terminal as a terminal.)
+-- handle to the terminal as a terminal.) On Windows 10, if the handle is
+-- identified as connected to a native terminal, this function does /not/ enable
+-- the processing of \'ANSI\' control characters in output (see
+-- 'hSupportsANSIWithoutEmulation').
 hSupportsANSI :: Handle -> IO Bool
+
+-- | Use heuristics to determine whether a given handle will support \'ANSI\'
+-- control characters in output. (On Windows versions before Windows 10, that
+-- means \'support without emulation\'.)
+--
+-- If the handle is not writable (that is, it cannot manage output - see
+-- 'hIsWritable'), then @return (Just False)@ is returned.
+--
+-- On Unix-like operating systems, with one exception, the function is
+-- consistent with 'hSupportsANSI'. The exception is if the handle is not
+-- writable.
+--
+-- On Windows, what is returned will depend on what the handle is connected to
+-- and the version of the operating system. If the handle is identified as
+-- connected to a \'mintty\' terminal, @return (Just True)@ is
+-- returned. If it is identifed as connected to a native terminal, then, on
+-- Windows 10, the processing of \'ANSI\' control characters will be enabled and
+-- @return (Just True)@ returned; and, on versions of Windows before Windows 10,
+-- @return (Just False)@ is returned. Otherwise, if a @TERM@ environment
+-- variable is set to @dumb@, @return (Just False)@ is returned. In all other
+-- cases of a writable handle, @return Nothing@ is returned; this indicates that
+-- the heuristics cannot assist - the handle may be connected to a file or
+-- to another type of terminal.
+--
+-- @since 0.8.1
+hSupportsANSIWithoutEmulation :: Handle -> IO (Maybe Bool)
 
 -- | Parses the characters emitted by 'reportCursorPosition' into the console
 -- input stream. Returns the cursor row and column as a tuple.
