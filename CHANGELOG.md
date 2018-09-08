@@ -1,11 +1,19 @@
 Changes
 =======
 
+Version 0.8.1
+-------------
+
+* Add `hSupportsANSIWithoutEmulation`. On Windows 10, if the handle is identifed
+  as connected to a native terminal ('Command Prompt' or 'PowerShell'), the
+  processing of 'ANSI' control characters will be enabled.
+
 Version 0.8.0.4
 ---------------
 
 * On Windows, `hSupportsANSI` now recognises if the handle is connected to a
   'mintty' terminal.
+* Drop support for GHC versions before GHC 7.0.1 (released November 2010)
 
 Version 0.8.0.3
 ---------------
