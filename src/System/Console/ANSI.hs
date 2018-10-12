@@ -22,6 +22,13 @@
 --
 --  * Changing the title of the terminal
 --
+-- The functions moving the cursor to an absolute position are 0-based (the
+-- top-left corner is considered to be at row 0 column 0) (see
+-- 'setCursorPosition') and so is 'getCursorPosition0'. The \'ANSI\' standards
+-- themselves are 1-based (that is, the top-left corner is considered to be at
+-- row 1 column 1) and some functions reporting the position of the cursor are
+-- too (see 'reportCursorPosition').
+--
 -- The native terminal software on Windows is \'Command Prompt\' or
 -- \`PowerShell\`. Before Windows 10 version 1511 (known as the \'November
 -- [2015] Update\' or \'Threshold 2\') that software did not support such

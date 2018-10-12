@@ -35,6 +35,9 @@ cursorUpLine = hCursorUpLine stdout
 hSetCursorColumn :: Handle
                  -> Int -- ^ 0-based column to move to
                  -> IO ()
+
+-- | Move the cursor to the specified column. The column numbering is 0-based
+-- (that is, the left-most column is numbered 0).
 setCursorColumn :: Int -- ^ 0-based column to move to
                 -> IO ()
 setCursorColumn = hSetCursorColumn stdout
@@ -43,6 +46,9 @@ hSetCursorPosition :: Handle
                    -> Int -- ^ 0-based row to move to
                    -> Int -- ^ 0-based column to move to
                    -> IO ()
+
+-- | Move the cursor to the specified position (row and column). The position is
+-- 0-based (that is, the top-left corner is at row 0 column 0).
 setCursorPosition :: Int -- ^ 0-based row to move to
                   -> Int -- ^ 0-based column to move to
                   -> IO ()
@@ -52,24 +58,36 @@ hSaveCursor, hRestoreCursor, hReportCursorPosition :: Handle -> IO ()
 
 -- | Save the cursor position in memory. The only way to access the saved value
 -- is with the 'restoreCursor' command.
+--
+-- @since 0.7.1
 saveCursor :: IO ()
+
 -- | Restore the cursor position from memory. There will be no value saved in
 -- memory until the first use of the 'saveCursor' command.
+--
+-- @since 0.7.1
 restoreCursor :: IO ()
+
 -- | Looking for a way to get the cursors position? See
--- 'getCursorPosition'.
+-- 'getCursorPosition0'.
 --
 -- Emit the cursor position into the console input stream, immediately after
 -- being recognised on the output stream, as:
 -- @ESC [ \<cursor row> ; \<cursor column> R@
 --
--- In isolation of 'getReportedCursorPosition' or 'getCursorPosition', this
+-- Note that the information that is emitted is 1-based (the top-left corner is
+-- at row 1 column 1) but 'setCursorColumn' and 'setCursorPosition' are
+-- 0-based.
+--
+-- In isolation of 'getReportedCursorPosition' or 'getCursorPosition0', this
 -- function may be of limited use on Windows operating systems because of
 -- difficulties in obtaining the data emitted into the console input stream.
 -- The function 'hGetBufNonBlocking' in module "System.IO" does not work on
 -- Windows. This has been attributed to the lack of non-blocking primatives in
 -- the operating system (see the GHC bug report #806 at
 -- <https://ghc.haskell.org/trac/ghc/ticket/806>).
+--
+-- @since 0.7.1
 reportCursorPosition :: IO ()
 
 saveCursor = hSaveCursor stdout
@@ -151,6 +169,7 @@ hSupportsANSIWithoutEmulation :: Handle -> IO (Maybe Bool)
 -- >         ++ " and column" ++ show column ++ "."
 -- >     (_:_) -> putStrLn $ "Error: parse not unique"
 --
+-- @since 0.7.1
 cursorPosition :: ReadP (Int, Int)
 cursorPosition = do
   void $ char '\ESC'
@@ -183,14 +202,31 @@ cursorPosition = do
 -- On Windows operating systems, the function is not supported on consoles, such
 -- as mintty, that are not based on the Win32 console of the Windows API.
 -- (Command Prompt and PowerShell are based on the Win32 console.)
+--
+-- @since 0.7.1
 getReportedCursorPosition :: IO String
 
 -- | Attempts to get the reported cursor position, combining the functions
--- 'reportCursorPosition', 'getReportedCursorPosition' and 'cursorPosition'.
--- Returns 'Nothing' if any data emitted by 'reportCursorPosition', obtained by
--- 'getReportedCursorPosition', cannot be parsed by 'cursorPosition'.
+-- 'reportCursorPosition', 'getReportedCursorPosition' and 'cursorPosition'. Any
+-- position @(row, column)@ is translated to be 0-based (that is, the top-left
+-- corner is at @(0, 0)@), consistent with `setCursorColumn` and
+-- `setCursorPosition`. (Note that the information emitted by
+-- 'reportCursorPosition' is 1-based.) Returns 'Nothing' if any data emitted by
+-- 'reportCursorPosition', obtained by 'getReportedCursorPosition', cannot be
+-- parsed by 'cursorPosition'.
 --
 -- On Windows operating systems, the function is not supported on consoles, such
 -- as mintty, that are not based on the Win32 console of the Windows API.
 -- (Command Prompt and PowerShell are based on the Win32 console.)
+--
+-- @since 0.8.2
+getCursorPosition0 :: IO (Maybe (Int, Int))
+getCursorPosition0 = fmap to0base <$> getCursorPosition
+ where
+  to0base (row, col) = (row - 1, col - 1)
+
+-- | Similar to 'getCursorPosition0', but does not translate the 1-based data
+-- emitted by 'reportCursorPosition' to be 0-based.
+--
+-- @since 0.7.1
 getCursorPosition :: IO (Maybe (Int, Int))

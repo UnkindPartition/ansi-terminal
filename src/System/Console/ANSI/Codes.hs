@@ -134,18 +134,42 @@ cursorDownLineCode, cursorUpLineCode :: Int -- ^ Number of lines to move
 cursorDownLineCode n = csi [n] "E"
 cursorUpLineCode n = csi [n] "F"
 
+-- | Code to move the cursor to the specified column. The column numbering is
+-- 0-based (that is, the left-most column is numbered 0).
 setCursorColumnCode :: Int -- ^ 0-based column to move to
                     -> String
 setCursorColumnCode n = csi [n + 1] "G"
 
+-- | Code to move the cursor to the specified position (row and column). The
+-- position is 0-based (that is, the top-left corner is at row 0 column 0).
 setCursorPositionCode :: Int -- ^ 0-based row to move to
                       -> Int -- ^ 0-based column to move to
                       -> String
 setCursorPositionCode n m = csi [n + 1, m + 1] "H"
 
-saveCursorCode, restoreCursorCode, reportCursorPositionCode :: String
+-- | @since 0.7.1
+saveCursorCode, restoreCursorCode :: String
 saveCursorCode = "\ESC7"
 restoreCursorCode = "\ESC8"
+
+-- | Code to emit the cursor position into the console input stream, immediately
+-- after being recognised on the output stream, as:
+-- @ESC [ \<cursor row> ; \<cursor column> R@
+--
+-- Note that the information that is emitted is 1-based (the top-left corner is
+-- at row 1 column 1) but 'setCursorPositionCode' is 0-based.
+--
+-- In isolation of 'getReportedCursorPosition' or 'getCursorPosition0', this
+-- function may be of limited use on Windows operating systems because of
+-- difficulties in obtaining the data emitted into the console input stream.
+-- The function 'hGetBufNonBlocking' in module "System.IO" does not work on
+-- Windows. This has been attributed to the lack of non-blocking primatives in
+-- the operating system (see the GHC bug report #806 at
+-- <https://ghc.haskell.org/trac/ghc/ticket/806>).
+--
+-- @since 0.7.1
+reportCursorPositionCode :: String
+
 reportCursorPositionCode = csi [] "6n"
 
 clearFromCursorToScreenEndCode, clearFromCursorToScreenBeginningCode,
