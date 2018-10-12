@@ -192,4 +192,5 @@ getReportedCursorPosition = E.getReportedCursorPosition
 
 -- getCursorPosition :: IO (Maybe (Int, Int))
 -- (See Common-Include.hs for Haddock documentation)
+{-# DEPRECATED getCursorPosition "Use getCursorPosition0 instead." #-}
 getCursorPosition = E.getCursorPosition

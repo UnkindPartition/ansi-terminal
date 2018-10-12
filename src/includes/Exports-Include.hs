@@ -110,6 +110,9 @@
   , hSupportsANSIWithoutEmulation
 
     -- * Getting the cursor position
-  , getCursorPosition
+  , getCursorPosition0
   , getReportedCursorPosition
   , cursorPosition
+
+    -- * Deprecated
+  , getCursorPosition
