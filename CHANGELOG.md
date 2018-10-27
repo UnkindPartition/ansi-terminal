@@ -1,6 +1,15 @@
 Changes
 =======
 
+Version 0.8.2
+-------------
+
+* Add `getCursorPosition0` and deprecate `getCursorPosition`. Any position
+  provided by the latter is 1-based. Any position provided by the former is
+  0-based, consistent with `setCursorColumn` and `setCursorPosition`.
+* Improvements to Haddock documentation in respect of 0-based and 1-based
+  cursor positions.
+
 Version 0.8.1
 -------------
 
