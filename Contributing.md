@@ -1,7 +1,8 @@
-The package aims:
-* to have limited dependency on other packages, other than those included with
-  GHC; and
-* to have a high degree of backwards compatibility with earlier versions of GHC.
+The package aims to have:
+* limited dependency on other packages, other than those included with
+  GHC;
+* a high degree of backwards compatibility with earlier versions of GHC; and
+* comprehensive and high-quality Haddock documentation.
 
 As of `ansi-terminal-0.8.0.4`, the package aims to be compatible with versions
 of GHC from GHC 7.0.1 (released November 2010). GHC 7.0.1 comes with:
@@ -27,3 +28,12 @@ exported by the `Prelude`.
 CPP `#include` pragmas are also used to include code from files to limit code
 duplication in modules that are specific to the 'Unix' or Windows versions of
 the package. The common code is located in folder `src\includes`.
+
+The source code generally follows
+[Johan Tibell's style guide](https://github.com/tibbe/haskell-style-guide), but
+with code blocks indented with 2 spaces (rather than 4 spaces).
+
+Pull requests should be organised into logical commits with useful commit
+messages. There is no need to change the package version number or update
+`CHANGELOG.md`. This will be done by the package maintainers when a further
+version is published on Hackage.
