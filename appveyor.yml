@@ -11,7 +11,8 @@ environment:
     - GHCVER: "7.10.3.2"
     - GHCVER: "8.0.2"
     - GHCVER: "8.2.2"
-    - GHCVER: "8.4.3"
+    - GHCVER: "8.4.4"
+    - GHCVER: "8.6.2"
 
 cache:
  - "C:\\SR"
