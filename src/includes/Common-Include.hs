@@ -10,6 +10,8 @@ import Control.Applicative
 
 import Control.Monad (void)
 import Data.Char (isDigit)
+import Data.Functor ((<$>))
+import System.Environment (getEnvironment)
 import Text.ParserCombinators.ReadP (char, many1, ReadP, satisfy)
 
 hCursorUp, hCursorDown, hCursorForward, hCursorBackward
@@ -129,6 +131,16 @@ setTitle = hSetTitle stdout
 -- the processing of \'ANSI\' control characters in output (see
 -- 'hSupportsANSIWithoutEmulation').
 hSupportsANSI :: Handle -> IO Bool
+
+-- | Some terminals (e.g. Emacs) are not fully ANSI compliant but can support
+-- ANSI colors. This can be used in such cases, if colors are all that is
+-- needed.
+hSupportsANSIColor :: Handle -> IO Bool
+hSupportsANSIColor h = (||) <$> hSupportsANSI h <*> isEmacsTerm
+  where
+    isEmacsTerm = (\env -> (insideEmacs env) && (isDumb env)) <$> getEnvironment
+    insideEmacs env = any (\(k, _) -> k == "INSIDE_EMACS") env
+    isDumb env = Just "dumb" == lookup "TERM" env
 
 -- | Use heuristics to determine whether a given handle will support \'ANSI\'
 -- control characters in output. (On Windows versions before Windows 10, that

@@ -9,7 +9,6 @@ module System.Console.ANSI.Unix
   ) where
 
 import Control.Exception.Base (bracket)
-import System.Environment (getEnvironment)
 import System.IO (BufferMode (..), Handle, hFlush, hGetBuffering, hGetEcho,
   hIsTerminalDevice, hIsWritable, hPutStr, hSetBuffering, hSetEcho, stdin,
   stdout)
