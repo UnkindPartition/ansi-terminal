@@ -130,6 +130,8 @@ setTitle = hSetTitle stdout
 -- identified as connected to a native terminal, this function does /not/ enable
 -- the processing of \'ANSI\' control characters in output (see
 -- 'hSupportsANSIWithoutEmulation').
+--
+-- @since 0.6.2
 hSupportsANSI :: Handle -> IO Bool
 
 -- | Some terminals (e.g. Emacs) are not fully ANSI compliant but can support
