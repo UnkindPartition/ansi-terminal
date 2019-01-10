@@ -6,10 +6,11 @@
 -- graphic rendition for subsequent text are referred to as SELECT GRAPHIC
 -- RENDITION (SGR).
 --
--- This module exports types used to represent SGR aspects. See also
--- 'System.Console.ANSI.setSGR' and related functions.
+-- This module exports types used to represent SGR aspects. See
+-- also 'System.Console.ANSI.setSGR' and related functions.
 module System.Console.ANSI.Types
   (
+  -- * Types used to represent SGR aspects
     SGR (..)
   , ConsoleLayer (..)
   , Color (..)
@@ -23,10 +24,11 @@ import Data.Ix (Ix)
 
 import Data.Colour (Colour)
 
--- | ANSI standard eight colors come in two intensities, which are controlled by
--- 'ColorIntensity'. Many terminals allow the colors of the standard palette to
--- be customised, so that, for example, @setSGR [ SetColor Foreground Vivid
--- Green ]@ may not result in bright green characters.
+-- | ANSI's eight standard colors. They come in two intensities, which are
+-- controlled by 'ColorIntensity'. Many terminals allow the colors of the
+-- standard palette to be customised, so that, for example,
+-- @setSGR [ SetColor Foreground Vivid Green ]@ may not result in bright green
+-- characters.
 data Color = Black
            | Red
            | Green
@@ -37,7 +39,7 @@ data Color = Black
            | White
            deriving (Eq, Ord, Bounded, Enum, Show, Read, Ix)
 
--- | ANSI colors come in two intensities
+-- | ANSI's standard colors come in two intensities
 data ColorIntensity = Dull
                     | Vivid
                     deriving (Eq, Ord, Bounded, Enum, Show, Read, Ix)
@@ -71,7 +73,17 @@ data ConsoleIntensity
   | NormalIntensity
   deriving (Eq, Ord, Bounded, Enum, Show, Read, Ix)
 
--- | ANSI Select Graphic Rendition command
+-- | ANSI Select Graphic Rendition (SGR) command
+--
+-- In respect of colors, there are two alternative commands:
+--
+-- (1) the \'ANSI\' standards allow for eight standard colors (with two
+-- intensities) and extended colors. Windows and many other terminals (including
+-- xterm) allow the user to redefine the standard colors (so, for example
+-- 'Vivid' 'Green' may not correspond to bright green; and
+--
+-- (2) an extension of the standard that allows true colors (24 bit color depth)
+-- in RGB space.
 data SGR
   -- | Default rendition, cancels the effect of any preceding occurrence of SGR
   -- (implementation-defined)

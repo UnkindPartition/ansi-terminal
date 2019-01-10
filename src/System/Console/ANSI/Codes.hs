@@ -75,7 +75,7 @@ csi :: [Int]  -- ^ List of parameters for the control sequence
 csi args code = "\ESC[" ++ concat (intersperse ";" (map show args)) ++ code
 
 -- | 'colorToCode' @color@ returns the 0-based index of the color (one of the
--- eight colors in the standard).
+-- eight colors in the ANSI standard).
 colorToCode :: Color -> Int
 colorToCode color = case color of
   Black   -> 0
