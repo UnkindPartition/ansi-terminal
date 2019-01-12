@@ -78,9 +78,9 @@ data ConsoleIntensity
 -- In respect of colors, there are two alternative commands:
 --
 -- (1) the \'ANSI\' standards allow for eight standard colors (with two
--- intensities) and extended colors. Windows and many other terminals (including
--- xterm) allow the user to redefine the standard colors (so, for example
--- 'Vivid' 'Green' may not correspond to bright green; and
+-- intensities). Windows and many other terminals (including xterm) allow the
+-- user to redefine the standard colors (so, for example 'Vivid' 'Green' may not
+-- correspond to bright green; and
 --
 -- (2) an extension of the standard that allows true colors (24 bit color depth)
 -- in RGB space.
