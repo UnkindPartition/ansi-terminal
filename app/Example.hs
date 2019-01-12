@@ -4,8 +4,10 @@ module Main
   ) where
 
 import Control.Concurrent (threadDelay)
-import Control.Monad (forM_)
+import Control.Monad (forM_, replicateM_)
 import System.IO (hFlush, stdout)
+
+import Data.Colour.SRGB (sRGB24)
 
 import System.Console.ANSI
 
@@ -227,7 +229,24 @@ sgrColorExample = do
         setSGR [SetColor layer intensity color]
         putStrLn (show color)
       pause
-  -- All the colors, 4 times in sequence
+  -- The ANSI eight standard colors, 4 times in sequence (two layers and two
+  -- intensities)
+
+  resetScreen
+  putStrLn "True color (24 bit color depth)"
+  putStrLn "-------------------------------"
+  putStrLn ""
+  setSGR [SetRGBColor Foreground $ sRGB24 0 0 0]
+  forM_ [0 .. 23] $ \row -> do
+    forM_ [0 .. 47] $ \col -> do
+      let r = row * 11
+          g = 255 - r
+          b = col * 5
+      setSGR [SetRGBColor Background $ sRGB24 r g b]
+      putStr "-"
+    putStrLn ""
+  replicateM_ 5 pause
+  -- True colors, a swatch of 24 rows and 48 columns
 
 sgrOtherExample :: IO ()
 sgrOtherExample = do

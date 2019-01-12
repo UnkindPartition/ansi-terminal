@@ -66,6 +66,7 @@ Executable ansi-terminal-example
         Main-Is:                Example.hs
         Build-Depends:          base >= 4.3.0.0 && < 5
                               , ansi-terminal
+                              , colour
         Ghc-Options:            -Wall
         if !flag(example)
                 Buildable:              False
