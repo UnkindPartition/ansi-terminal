@@ -6,6 +6,7 @@ module Main
 import Control.Concurrent (threadDelay)
 import Control.Monad (forM_, replicateM_)
 import System.IO (hFlush, stdout)
+import Text.Printf(printf)
 
 import Data.Colour.SRGB (sRGB24)
 
@@ -247,6 +248,69 @@ sgrColorExample = do
     putStrLn ""
   replicateM_ 5 pause
   -- True colors, a swatch of 24 rows and 48 columns
+
+  resetScreen
+  putStrLn "A 256-color palette"
+  putStrLn "-------------------"
+  putStrLn ""
+
+  -- First 16 colors ('system' colors in xterm protocol), in a row
+  --
+  -- 0 0 1 1 2 2 3 3 4 4 5 5 6 6 7 7 8 8 9 9 A A B B C C D D E E F F
+  forM_ [Dull .. Vivid] $ \intensity -> do
+    forM_ [Black .. White] $ \color -> do
+    let i = fromEnum intensity * 8 + fromEnum color
+        eol = i == 15
+    setSGR [SetPaletteColor Background $ xtermSystem intensity color]
+    setSGR [SetPaletteColor Foreground $ xtermSystem Dull Black]
+    printf "%X " i
+    setSGR [SetPaletteColor Foreground $ xtermSystem Vivid White]
+    printf "%X" i
+    if eol
+      then putStrLn ""
+      else do
+        setSGR [Reset]
+        putStr " "
+  putStrLn ""
+
+  -- Next 216 colors (6 level RGB in xterm protocol), in 12 rows of 18
+  --
+  -- 000 001 002 003 004 005 010 011 012 013 014 015 020 021 022 023 024 025
+  -- 030 031 032 033 034 035 040 041 042 043 044 045 050 051 052 053 054 055
+  -- 100 101 102 103 104 105 110 111 112 113 114 115 120 121 122 123 124 125
+  -- ... and so on ...
+  forM_ [0 .. 5] $ \r -> do
+    forM_ [0 .. 5] $ \g -> do
+      forM_ [0 .. 5] $ \b -> do
+        let i = 16 + b + g * 6 + r * 36
+            eol = i `mod` 18 == 15
+            r' = (r + 3) `mod` 6
+            g' = (g + 3) `mod` 6
+            b' = (b + 3) `mod` 6
+        setSGR [SetPaletteColor Foreground $ xterm6LevelRGB r' g' b']
+        setSGR [SetPaletteColor Background $ xterm6LevelRGB r g b]
+        putStr $ show r ++ show g ++ show b
+        if eol
+          then putStrLn ""
+          else do
+            setSGR [Reset]
+            putStr " "
+  putStrLn ""
+
+  -- Final 24 colors (24 levels of gray in xterm protocol), in two rows
+  --
+  --   0   1   2   3   4   5   6   7   8   9  10  11
+  --  12  13  14  15  16  17  18  19  20  21  22  23
+  forM_ [0 .. 23] $ \y -> do
+    setSGR [SetPaletteColor Foreground $ xterm24LevelGray $ (y + 12) `mod` 24]
+    setSGR [SetPaletteColor Background $ xterm24LevelGray y]
+    printf "%3d" y
+    if y == 11
+      then putStrLn ""
+      else do
+        setSGR [Reset]
+        putStr " "
+  replicateM_ 5 pause
 
 sgrOtherExample :: IO ()
 sgrOtherExample = do
