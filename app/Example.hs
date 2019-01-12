@@ -16,7 +16,8 @@ examples = [ cursorMovementExample
            , saveRestoreCursorExample
            , clearExample
            , scrollExample
-           , sgrExample
+           , sgrColorExample
+           , sgrOtherExample
            , cursorVisibilityExample
            , titleExample
            , getCursorPositionExample
@@ -215,8 +216,8 @@ scrollExample = do
   -- Line Two
   -- Line Three
 
-sgrExample :: IO ()
-sgrExample = do
+sgrColorExample :: IO ()
+sgrColorExample = do
   let colors = enumFromTo minBound maxBound :: [Color]
   forM_ [Foreground, Background] $ \layer ->  do
     forM_ [Dull, Vivid] $ \intensity -> do
@@ -228,6 +229,8 @@ sgrExample = do
       pause
   -- All the colors, 4 times in sequence
 
+sgrOtherExample :: IO ()
+sgrOtherExample = do
   let named_styles = [ (SetConsoleIntensity BoldIntensity, "Bold")
                      , (SetConsoleIntensity FaintIntensity, "Faint")
                      , (SetConsoleIntensity NormalIntensity, "Normal")
