@@ -24,6 +24,7 @@ examples = [ cursorMovementExample
            , cursorVisibilityExample
            , titleExample
            , getCursorPositionExample
+           , getTerminalSizeExample
            ]
 
 main :: IO ()
@@ -393,9 +394,19 @@ getCursorPositionExample = do
     Just (row, col) -> putStrLn $ "The cursor was at row number " ++
       show (row + 1) ++ " and column number " ++ show (col + 1) ++ ".\n"
     Nothing -> putStrLn "Error: unable to get the cursor position\n"
-  pause
+  replicateM_ 3 pause
   --          11111111112222222222
   -- 12345678901234567890123456789
   -- Report cursor position here: (3rd row, 29th column) to stdin, as CSI 3 ; 29 R.
   --
   -- The cursor was at row number 3 and column number 29.
+
+getTerminalSizeExample :: IO ()
+getTerminalSizeExample = do
+  result <- getTerminalSize
+  case result of
+    Just (h, w) -> putStrLn $ "The size of the terminal is " ++ show h ++
+      " rows by " ++ show w ++ " columns.\n"
+    Nothing -> putStrLn "Error: unable to get the terminal size\n"
+  pause
+  -- The size of the terminal is 25 rows by 80 columns.
