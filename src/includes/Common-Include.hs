@@ -244,3 +244,21 @@ getCursorPosition0 = fmap to0base <$> getCursorPosition
 --
 -- @since 0.7.1
 getCursorPosition :: IO (Maybe (Int, Int))
+
+-- | Attempts to get the current terminal size (height in rows, width in
+-- columns), by using `getCursorPosition0` after attempting to set the cursor
+-- position beyond the bottom right corner of the terminal.
+--
+-- On Windows operating systems, the function is not supported on consoles, such
+-- as mintty, that are not based on the Win32 console of the Windows API.
+-- (Command Prompt and PowerShell are based on the Win32 console.)
+--
+-- @since 0.9
+getTerminalSize :: IO (Maybe (Int, Int))
+getTerminalSize = do
+  saveCursor
+  setCursorPosition 999 999  -- Attempt to set the cursor position beyond the
+                             -- bottom right corner of the terminal.
+  mPos <- getCursorPosition0
+  restoreCursor
+  return $ fmap (\(r, c) -> (r + 1, c + 1)) mPos
