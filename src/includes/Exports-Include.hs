@@ -117,6 +117,3 @@
 
     -- * Getting the terminal size
   , getTerminalSize
-
-    -- * Deprecated
-  , getCursorPosition

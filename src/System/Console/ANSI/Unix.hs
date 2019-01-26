@@ -98,20 +98,22 @@ getReportedCursorPosition = bracket (hGetEcho stdin) (hSetEcho stdin) $ \_ -> do
                       -- in order to avoid O(n^2) complexity.
       else return $ reverse (c:s) -- Reverse the order of the built list.
 
--- getCursorPosition :: IO (Maybe (Int, Int))
+-- getCursorPosition0 :: IO (Maybe (Int, Int))
 -- (See Common-Include.hs for Haddock documentation)
-{-# DEPRECATED getCursorPosition "Use getCursorPosition0 instead." #-}
-getCursorPosition = do
-  input <- bracket (hGetBuffering stdin) (hSetBuffering stdin) $ \_ -> do
-    hSetBuffering stdin NoBuffering -- set no buffering (the contents of the
-                                    -- buffer will be discarded, so this needs
-                                    -- to be done before the cursor positon is
-                                    -- emitted)
-    reportCursorPosition
-    hFlush stdout -- ensure the report cursor position code is sent to the
-                  -- operating system
-    getReportedCursorPosition
-  case readP_to_S cursorPosition input of
-    [] -> return Nothing
-    [((row, col),_)] -> return $ Just (row, col)
-    (_:_) -> return Nothing
+getCursorPosition0 = fmap to0base <$> getCursorPosition
+ where
+  to0base (row, col) = (row - 1, col - 1)
+  getCursorPosition = do
+    input <- bracket (hGetBuffering stdin) (hSetBuffering stdin) $ \_ -> do
+      hSetBuffering stdin NoBuffering -- set no buffering (the contents of the
+                                      -- buffer will be discarded, so this needs
+                                      -- to be done before the cursor positon is
+                                      -- emitted)
+      reportCursorPosition
+      hFlush stdout -- ensure the report cursor position code is sent to the
+                    -- operating system
+      getReportedCursorPosition
+    case readP_to_S cursorPosition input of
+      [] -> return Nothing
+      [((row, col),_)] -> return $ Just (row, col)
+      (_:_) -> return Nothing

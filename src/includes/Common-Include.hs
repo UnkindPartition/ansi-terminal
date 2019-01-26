@@ -235,15 +235,6 @@ getReportedCursorPosition :: IO String
 --
 -- @since 0.8.2
 getCursorPosition0 :: IO (Maybe (Int, Int))
-getCursorPosition0 = fmap to0base <$> getCursorPosition
- where
-  to0base (row, col) = (row - 1, col - 1)
-
--- | Similar to 'getCursorPosition0', but does not translate the 1-based data
--- emitted by 'reportCursorPosition' to be 0-based.
---
--- @since 0.7.1
-getCursorPosition :: IO (Maybe (Int, Int))
 
 -- | Attempts to get the current terminal size (height in rows, width in
 -- columns), by using `getCursorPosition0` after attempting to set the cursor
