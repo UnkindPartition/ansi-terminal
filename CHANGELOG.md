@@ -1,6 +1,16 @@
 Changes
 =======
 
+Version 0.9
+-----------
+
+* Add support for 256-color palettes with new `SetPaletteColor` constructor of
+  `SGR` type, and `xterm6LevelRGB`, `xterm24LevelGray` and `xtermSystem`.
+* Remove deprecated `getCursorPosition`. (Use `getCursorPosition0` instead.)
+* Add `hSupportsANSIColor`.
+* Add `getTerminalSize`.
+* Improvements to Haddock documentation.
+
 Version 0.8.2
 -------------
 
