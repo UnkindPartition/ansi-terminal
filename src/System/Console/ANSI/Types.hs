@@ -137,7 +137,7 @@ data SGR
 -- colors. Throws an error if any of the red, green or blue channels is outside
 -- the range 0 to 5. An example of use is:
 --
--- >>> setSGR [ SetRGBColor $ xterm6LevelRGB 5 2 0 ] -- Dark Orange
+-- >>> setSGR [ SetPaletteColor $ xterm6LevelRGB 5 2 0 ] -- Dark Orange
 --
 -- @since 0.9
 xterm6LevelRGB :: Int -> Int -> Int -> Word8
@@ -155,7 +155,7 @@ xterm6LevelRGB r g b
 -- gray (0) to near white (23) (black and white are themselves excluded). Throws
 -- an error if the gray is outside of the range 0 to 23. An example of use is:
 --
--- >>> setSGR [ SetRGBColor $ xterm24LevelGray 12 ] -- Gray50
+-- >>> setSGR [ SetPaletteColor $ xterm24LevelGray 12 ] -- Gray50
 --
 -- @since 0.9
 xterm24LevelGray :: Int -> Word8
@@ -171,7 +171,7 @@ xterm24LevelGray y
 -- standard, or \'system\', colors (eight colors in two intensities). An example
 -- of use is:
 --
--- >>> setSGR [ SetRGBColor $ xtermSystem Vivid Green ]
+-- >>> setSGR [ SetPaletteColor $ xtermSystem Vivid Green ]
 --
 -- @since 0.9
 xtermSystem :: ColorIntensity -> Color -> Word8
