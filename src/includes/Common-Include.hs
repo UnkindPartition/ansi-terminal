@@ -137,6 +137,8 @@ hSupportsANSI :: Handle -> IO Bool
 -- | Some terminals (e.g. Emacs) are not fully ANSI compliant but can support
 -- ANSI colors. This can be used in such cases, if colors are all that is
 -- needed.
+--
+-- @since 0.9
 hSupportsANSIColor :: Handle -> IO Bool
 hSupportsANSIColor h = (||) <$> hSupportsANSI h <*> isEmacsTerm
   where
