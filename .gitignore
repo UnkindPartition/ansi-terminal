@@ -8,6 +8,9 @@ dist-newstyle/
 # Haddock documentation
 docs/
 
+# Haskell Tool Stack-related
+stack.yaml.lock
+
 # Operating system rubbish
 .DS_Store
 Thumbs.db
