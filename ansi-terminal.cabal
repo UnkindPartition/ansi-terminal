@@ -38,7 +38,7 @@ Library
         Include-Dirs:           src/includes
 
         Build-Depends:          base >= 4.3.0.0 && < 5
-                              , colour
+                              , colour >=2.1.0
         if os(windows)
                 Build-Depends:          containers >= 0.5.0.0
                                       , mintty
