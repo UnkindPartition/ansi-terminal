@@ -16,6 +16,7 @@ Build-Type:          Simple
 Extra-Source-Files:     src/includes/Common-Include.hs
                         src/includes/Common-Include-Emulator.hs
                         src/includes/Common-Include-Enabled.hs
+                        src/includes/Common-Safe-Haskell.hs
                         src/includes/Exports-Include.hs
                         CHANGELOG.md
                         README.md

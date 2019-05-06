@@ -97,6 +97,9 @@
 --
 -- For many more examples, see the project's extensive
 -- <https://github.com/feuerbach/ansi-terminal/blob/master/app/Example.hs Example.hs> file.
+
+#include "Common-Safe-Haskell.hs"
+
 #if defined(WINDOWS)
 module System.Console.ANSI
   (

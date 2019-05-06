@@ -1,3 +1,5 @@
+#include "Common-Safe-Haskell.hs"
+
 {-# OPTIONS_HADDOCK hide #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE DeriveDataTypeable #-}
@@ -58,8 +60,12 @@ import Data.Bits ((.|.), shiftL)
 import Data.Char (chr, ord)
 import Data.Typeable (Typeable)
 import Foreign.C.Types (CInt (..), CWchar (..))
-import Foreign.Marshal (alloca, allocaArray, maybeWith, peekArray, with,
-  withArrayLen)
+#if MIN_VERSION_base(4,8,0)
+import Foreign.Marshal
+#else
+import Foreign.Marshal.Safe
+#endif
+  (alloca, allocaArray, maybeWith, peekArray, with, withArrayLen)
 import Foreign.Ptr (Ptr, castPtr, plusPtr)
 import Foreign.Storable (Storable (..))
 -- `SHORT` and `withHandleToHANDLE` are not both available before Win32-2.5.1.0
