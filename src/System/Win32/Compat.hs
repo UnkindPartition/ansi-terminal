@@ -1,3 +1,4 @@
+#include "Common-Safe-Haskell.hs"
 {-# OPTIONS_HADDOCK hide #-}
 
 {-| The Win32 library ships with GHC. Win32-2.1 first shipped with GHC 6.6

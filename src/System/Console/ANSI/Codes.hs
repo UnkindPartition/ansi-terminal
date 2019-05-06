@@ -14,6 +14,9 @@
 --
 -- > import qualified System.Console.ANSI.Codes as ANSI
 --
+
+#include "Common-Safe-Haskell.hs"
+
 module System.Console.ANSI.Codes
   (
     -- * Basic data types
