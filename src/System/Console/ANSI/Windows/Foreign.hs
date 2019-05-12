@@ -60,12 +60,9 @@ import Data.Bits ((.|.), shiftL)
 import Data.Char (chr, ord)
 import Data.Typeable (Typeable)
 import Foreign.C.Types (CInt (..), CWchar (..))
-#if MIN_VERSION_base(4,8,0)
-import Foreign.Marshal
-#else
-import Foreign.Marshal.Safe
-#endif
-  (alloca, allocaArray, maybeWith, peekArray, with, withArrayLen)
+import Foreign.Marshal.Alloc (alloca)
+import Foreign.Marshal.Array (allocaArray, peekArray, withArrayLen)
+import Foreign.Marshal.Utils (maybeWith, with)
 import Foreign.Ptr (Ptr, castPtr, plusPtr)
 import Foreign.Storable (Storable (..))
 -- `SHORT` and `withHandleToHANDLE` are not both available before Win32-2.5.1.0
