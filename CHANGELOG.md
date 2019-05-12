@@ -1,6 +1,12 @@
 Changes
 =======
 
+Version 0.9.1
+-------------
+
+* Flag modules with GHC's 'Safe Haskell' language extensions (from GHC 7.2.1).
+* Improvements and corrections to Haddock documentation.
+
 Version 0.9
 -----------
 
