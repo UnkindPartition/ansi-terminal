@@ -1,22 +1,21 @@
--- | This module exports functions that return 'String' values containing codes
--- in accordance with the \'ANSI\' standards for control character sequences
--- described in the documentation of module "System.Console.ANSI".
---
--- The module "System.Console.ANSI" exports functions with the same names as
--- those in this module. On some versions of Windows, the terminal in use may
--- not be ANSI-capable. When that is the case, the same-named functions exported
--- by module "System.Console.ANSI" return \"\", for the reasons set out in the
--- documentation of that module.
---
--- Consequently, if module "System.Console.ANSI" is also imported, this module
--- is intended to be imported qualified, to avoid name clashes with those
--- functions. For example:
---
--- > import qualified System.Console.ANSI.Codes as ANSI
---
-
 #include "Common-Safe-Haskell.hs"
 
+{-| This module exports functions that return 'String' values containing codes
+in accordance with the \'ANSI\' standards for control character sequences
+described in the documentation of module "System.Console.ANSI".
+
+The module "System.Console.ANSI" exports functions with the same names as those
+in this module. On some versions of Windows, the terminal in use may not be
+ANSI-capable. When that is the case, the same-named functions exported by module
+"System.Console.ANSI" return \"\", for the reasons set out in the documentation
+of that module.
+
+Consequently, if module "System.Console.ANSI" is also imported, this module is
+intended to be imported qualified, to avoid name clashes with those functions.
+For example:
+
+> import qualified System.Console.ANSI.Codes as ANSI
+-}
 module System.Console.ANSI.Codes
   (
     -- * Basic data types

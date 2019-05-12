@@ -2,8 +2,8 @@
 {-# OPTIONS_HADDOCK hide #-}
 
 {-| The Win32 library ships with GHC. Win32-2.1 first shipped with GHC 6.6
-(released October 2006). Win32-2.5.4.1 first shipped with GHC 8.2.1
-(released July 2017), replacing Win32-2.3.1.1.
+(released October 2006). Win32-2.5.4.1 first shipped with GHC 8.2.1 (released
+July 2017), replacing Win32-2.3.1.1.
 
 The ansi-terminal library makes use of functionality in Win32-2.1 and other
 functionality first added to Win32-2.5.0.0 or Win32-2.5.1.0 (from ansi-terminal

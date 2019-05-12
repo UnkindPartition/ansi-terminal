@@ -1,5 +1,4 @@
 #include "Common-Safe-Haskell.hs"
-
 {-# OPTIONS_HADDOCK hide #-}
 
 module System.Console.ANSI.Windows.Emulator.Codes
