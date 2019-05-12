@@ -1,3 +1,8 @@
+Many other packages depend on `ansi-terminal`. As at May 2019, over 190 packages
+on [Hackage](https:https://hackage.haskell.org/) depend on it. Consider
+raising an [issue](https://github.com/feuerbach/ansi-terminal/issues) to
+discuss a proposed change before making a pull request.
+
 The package aims to have:
 * limited dependency on other packages, other than those included with
   GHC;
@@ -12,7 +17,8 @@ of GHC from GHC 7.0.1 (released November 2010). GHC 7.0.1 comes with:
 * `Win32-2.2.0.1` (only on Windows)
 
 The package also depends on:
-* `colour`, used for 24-bit colour (`Colour`, `RGB`, `toSRGB` and `toSRGB24`)
+* `colour-2.1.0` or later, used for 24-bit colour (`Colour`, `RGB`, `toSRGB` and
+  `toSRGB24`)
 * `mintty` (which depends on `base >= 4.3`), used for its `isMinTTYHandle`
   function only in the Windows version of the package. The function was later
   added to `Win32-2.5.0.0` (first included with GHC 8.2.1 with `base-4.10.0.0`)
@@ -28,6 +34,13 @@ exported by the `Prelude`.
 CPP `#include` pragmas are also used to include code from files to limit code
 duplication in modules that are specific to the 'Unix' or Windows versions of
 the package. The common code is located in folder `src\includes`.
+
+The package uses GHC's 'Safe Haskell' language extensions `Trustworthy`
+(introduced in GHC 7.2.1) and `Safe` (introduced in GHC 7.2.1 but not stable
+until GHC 7.4.1) to add flags explicitly to all modules. For most modules, that
+is done using a CPP pragma: `#include "Common-Safe-Haskell.hs"`. Modules
+`System.Console.ANSI.Windows.Detect` and `System.Console.ANSI.Windows.Emulator`
+use `System.IO.Unsafe.unsafePerformIO` but are flagged `Trustworthy`.
 
 The source code generally follows
 [Johan Tibell's style guide](https://github.com/tibbe/haskell-style-guide), but

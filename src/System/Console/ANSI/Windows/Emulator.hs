@@ -1,5 +1,4 @@
 {-# LANGUAGE Trustworthy #-}
-
 {-# OPTIONS_HADDOCK hide #-}
 
 module System.Console.ANSI.Windows.Emulator

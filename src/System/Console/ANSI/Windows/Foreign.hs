@@ -1,11 +1,11 @@
 #include "Common-Safe-Haskell.hs"
-
-{-# OPTIONS_HADDOCK hide #-}
-{-# LANGUAGE RankNTypes #-}
+{-# OPTIONS_HADDOCK hide        #-}
+{-# LANGUAGE RankNTypes         #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 
--- | "System.Win32.Console" is really very impoverished, so I have had to do all
--- the FFI myself.
+{-| "System.Win32.Console" is really very impoverished, so I have had to do all
+the FFI myself.
+-}
 module System.Console.ANSI.Windows.Foreign
   (
     -- Re-exports from Win32.Types

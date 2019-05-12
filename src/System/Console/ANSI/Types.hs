@@ -1,17 +1,15 @@
--- | The \'ANSI\' standards refer to the visual style of displaying characters
--- as their \'graphic rendition\'. The style includes the color of a character
--- or its background, the intensity (bold, normal or faint) of a character, or
--- whether the character is italic or underlined (single or double), blinking
--- (slowly or rapidly) or visible or not. The \'ANSI\' codes to establish the
--- graphic rendition for subsequent text are referred to as SELECT GRAPHIC
--- RENDITION (SGR).
---
--- This module exports types and functions used to represent SGR aspects. See
--- also 'System.Console.ANSI.setSGR' and related functions.
---
-
 #include "Common-Safe-Haskell.hs"
 
+{-| The \'ANSI\' standards refer to the visual style of displaying characters as
+their \'graphic rendition\'. The style includes the color of a character or its
+background, the intensity (bold, normal or faint) of a character, or whether the
+character is italic or underlined (single or double), blinking (slowly or
+rapidly) or visible or not. The \'ANSI\' codes to establish the graphic
+rendition for subsequent text are referred to as SELECT GRAPHIC RENDITION (SGR).
+
+This module exports types and functions used to represent SGR aspects. See also
+'System.Console.ANSI.setSGR' and related functions.
+-}
 module System.Console.ANSI.Types
   (
   -- * Types used to represent SGR aspects
