@@ -132,6 +132,10 @@ data SGR
   --
   -- @since 0.9
   | SetPaletteColor !ConsoleLayer !Word8
+  -- | Set a color to the default (implementation-defined)
+  --
+  -- @since 0.9
+  | SetDefaultColor !ConsoleLayer
   deriving (Eq, Show, Read)
 
 -- | Given xterm's standard protocol for a 256-color palette, returns the index
