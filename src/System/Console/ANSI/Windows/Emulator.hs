@@ -263,6 +263,12 @@ swapForegroundBackgroundColors attribute
 applyANSISGRToAttribute :: WORD -> SGR -> WORD -> WORD
 applyANSISGRToAttribute def sgr attribute = case sgr of
   Reset -> def
+  SetDefaultColor Foreground ->
+    (attribute .&. complement fOREGROUND_INTENSE_WHITE) .|.
+    (def .&. fOREGROUND_INTENSE_WHITE)
+  SetDefaultColor Background ->
+    (attribute .&. complement bACKGROUND_INTENSE_WHITE) .|.
+    (def .&. bACKGROUND_INTENSE_WHITE)
   SetConsoleIntensity intensity -> case intensity of
     BoldIntensity   -> attribute .|. iNTENSITY
     FaintIntensity  -> attribute .&. (complement iNTENSITY) -- Not supported
