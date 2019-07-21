@@ -68,10 +68,9 @@ matrix:
 
   # The Stack builds. We can pass in arbitrary Stack arguments via the ARGS
   # variable, such as using --stack-yaml to point to a different file.
-  - env: BUILD=stack ARGS="--resolver lts-2"
-    compiler: ": #stack 7.8.4"
-    addons: {apt: {packages: [libgmp-dev]}}
-
+  #
+  # Stack versions from 2.1.1 do not support Cabal versions before 1.19.2 and
+  # projects using snapshots earlier than lts-3.0 will no longer build.
   - env: BUILD=stack ARGS="--resolver lts-3"
     compiler: ": #stack 7.10.2"
     addons: {apt: {packages: [libgmp-dev]}}
