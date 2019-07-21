@@ -121,6 +121,8 @@ sgrToCode sgr = case sgr of
   SetPaletteColor Background index -> [48, 5, fromIntegral index]
   SetRGBColor Foreground color -> [38, 2] ++ toRGB color
   SetRGBColor Background color -> [48, 2] ++ toRGB color
+  SetDefaultColor Foreground -> [39]
+  SetDefaultColor Background -> [49]
  where
   toRGB color = let RGB r g b = toSRGB24 color
                 in  map fromIntegral [r, g, b]
