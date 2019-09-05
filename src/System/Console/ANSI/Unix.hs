@@ -10,9 +10,8 @@ module System.Console.ANSI.Unix
   ) where
 
 import Control.Exception.Base (bracket)
-import System.IO (BufferMode (..), Handle, hFlush, hGetBuffering, hGetEcho,
-  hIsTerminalDevice, hIsWritable, hPutStr, hSetBuffering, hSetEcho, stdin,
-  stdout)
+import System.IO (BufferMode (..), Handle, hGetBuffering, hGetEcho,
+  hIsTerminalDevice, hIsWritable, hPutStr, hSetBuffering, hSetEcho, stdin)
 import Text.ParserCombinators.ReadP (readP_to_S)
 
 import System.Console.ANSI.Codes

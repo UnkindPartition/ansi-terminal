@@ -14,7 +14,7 @@ import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Data.List (foldl', minimumBy)
 import Data.Maybe (mapMaybe)
 import qualified Data.Map.Strict as Map (Map, empty, insert, lookup)
-import System.IO (Handle, hFlush, hIsTerminalDevice, stdin, stdout)
+import System.IO (Handle, hIsTerminalDevice, stdin)
 import System.IO.Unsafe (unsafePerformIO)
 import Text.ParserCombinators.ReadP (readP_to_S)
 

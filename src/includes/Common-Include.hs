@@ -12,6 +12,7 @@ import Control.Monad (void)
 import Data.Char (isDigit)
 import Data.Functor ((<$>))
 import System.Environment (getEnvironment)
+import System.IO (hFlush, stdout)
 import Text.ParserCombinators.ReadP (char, many1, ReadP, satisfy)
 
 hCursorUp, hCursorDown, hCursorForward, hCursorBackward
@@ -254,4 +255,6 @@ getTerminalSize = do
                              -- bottom right corner of the terminal.
   mPos <- getCursorPosition0
   restoreCursor
+  hFlush stdout -- ensure the restore cursor position code is sent to the
+                -- operating system
   return $ fmap (\(r, c) -> (r + 1, c + 1)) mPos

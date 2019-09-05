@@ -9,7 +9,7 @@ module System.Console.ANSI.Windows
 #include "Exports-Include.hs"
   ) where
 
-import System.IO (Handle, stdout)
+import System.IO (Handle)
 
 import System.Console.ANSI.Types
 import qualified System.Console.ANSI.Unix as U
