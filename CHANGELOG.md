@@ -1,6 +1,14 @@
 Changes
 =======
 
+Version 0.10
+------------
+
+* Add support for setting the default color with new `SetDefaultColor`
+  constructor of the `SGR` type.
+* `getTerminalSize` now flushes the `stdout` channel, to ensure the cursor
+  position is unaffected.
+
 Version 0.9.1
 -------------
 
@@ -11,7 +19,7 @@ Version 0.9
 -----------
 
 * Add support for 256-color palettes with new `SetPaletteColor` constructor of
-  `SGR` type, and `xterm6LevelRGB`, `xterm24LevelGray` and `xtermSystem`.
+  the `SGR` type, and `xterm6LevelRGB`, `xterm24LevelGray` and `xtermSystem`.
 * Remove deprecated `getCursorPosition`. (Use `getCursorPosition0` instead.)
 * Add `hSupportsANSIColor`.
 * Add `getTerminalSize`.

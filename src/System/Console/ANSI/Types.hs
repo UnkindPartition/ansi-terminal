@@ -134,7 +134,7 @@ data SGR
   | SetPaletteColor !ConsoleLayer !Word8
   -- | Set a color to the default (implementation-defined)
   --
-  -- @since 0.9
+  -- @since 0.10
   | SetDefaultColor !ConsoleLayer
   deriving (Eq, Show, Read)
 
