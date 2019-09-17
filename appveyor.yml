@@ -1,30 +1,47 @@
 version: "{build}"
 clone_folder: "c:\\WORK"
 
+# GHCVER: "7.4.2" fails with CABALVER: "3.0.0.0", with:
+#
+# > Configuring library for mintty-0.1.2..
+# > Preprocessing library for mintty-0.1.2..
+# > src\System\Console\MinTTY\Win32.hsc:48 directive let cannot be handled in cross-compilation mode
+# > cabal.exe: Failed to build mintty-0.1.2 (which is required by ansi-terminal-0.10).
+
 environment:
   global:
     CABOPTS:  "--store-dir=C:\\SR --http-transport=plain-http"
   matrix:
     - GHCVER: "7.4.2"
+      CABALVER: "2.4.1.0"
     - GHCVER: "7.6.3.1"
+      CABALVER: "3.0.0.0"
     - GHCVER: "7.8.4.1"
+      CABALVER: "3.0.0.0"
     - GHCVER: "7.10.3.2"
+      CABALVER: "3.0.0.0"
     - GHCVER: "8.0.2"
+      CABALVER: "3.0.0.0"
     - GHCVER: "8.2.2"
+      CABALVER: "3.0.0.0"
     - GHCVER: "8.4.4"
+      CABALVER: "3.0.0.0"
     - GHCVER: "8.6.5"
+      CABALVER: "3.0.0.0"
+    - GHCVER: "8.8.1"
+      CABALVER: "3.0.0.0"
 
 cache:
  - "C:\\SR"
 
 install:
- - "choco install -y cabal"
+ - "choco install -y cabal --version %CABALVER%"
  - "choco install -y ghc --version %GHCVER%"
  - "refreshenv"
  - "set PATH=C:\\msys64\\mingw64\\bin;C:\\msys64\\usr\\bin;C:\\ghc\\ghc-%GHCVER%\\bin;%PATH%"
  - "cabal --version"
  - "ghc --version"
- - "cabal %CABOPTS% update -vverbose+nowrap"
+ - "cabal %CABOPTS% new-update -vverbose+nowrap"
 
 build: off
 
@@ -33,4 +50,3 @@ test_script:
  - "cabal %CABOPTS% new-build -j1 -vnormal+nowrap --dry all"
  - ps: Push-AppveyorArtifact dist-newstyle\cache\plan.json
  - "cabal %CABOPTS% new-build -j1 -vnormal+nowrap all"
-# - "cabal %CABOPTS% new-test  -j1 -vnormal+nowrap all"
