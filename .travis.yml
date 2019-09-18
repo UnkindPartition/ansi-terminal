@@ -21,9 +21,9 @@ cache:
   - $HOME/.cabal
   - $HOME/.stack
 
-# The different configurations we want to test. We have BUILD=cabal which uses
-# cabal-install, and BUILD=stack which uses Stack. More documentation on each
-# of those below.
+# The different configurations we want to test. We have BUILD=cabalv1 or
+# BUILD=cabalv2 which uses cabal-install, and BUILD=stack which uses Stack. More
+# documentation on each of those below.
 #
 # We set the compiler values here to tell Travis to use a different
 # cache file per set of arguments.
@@ -35,34 +35,37 @@ matrix:
   include:
   # We grab the appropriate GHC and cabal-install versions from hvr's PPA. See:
   # https://github.com/hvr/multi-ghc-travis
-  - env: BUILD=cabal GHCVER=7.4.2 CABALVER=1.16
+  - env: BUILD=cabalv1 GHCVER=7.4.2 CABALVER=1.16
     compiler: ": #GHC 7.4.2"
     addons: {apt: {packages: [cabal-install-1.16,ghc-7.4.2], sources: [hvr-ghc]}}
-  - env: BUILD=cabal GHCVER=7.6.3 CABALVER=1.16
+  - env: BUILD=cabalv1 GHCVER=7.6.3 CABALVER=1.16
     compiler: ": #GHC 7.6.3"
     addons: {apt: {packages: [cabal-install-1.16,ghc-7.6.3], sources: [hvr-ghc]}}
-  - env: BUILD=cabal GHCVER=7.8.4 CABALVER=1.18
+  - env: BUILD=cabalv1 GHCVER=7.8.4 CABALVER=1.18
     compiler: ": #GHC 7.8.4"
     addons: {apt: {packages: [cabal-install-1.18,ghc-7.8.4], sources: [hvr-ghc]}}
-  - env: BUILD=cabal GHCVER=7.10.3 CABALVER=1.22
+  - env: BUILD=cabalv1 GHCVER=7.10.3 CABALVER=1.22
     compiler: ": #GHC 7.10.3"
     addons: {apt: {packages: [cabal-install-1.22,ghc-7.10.3], sources: [hvr-ghc]}}
-  - env: BUILD=cabal GHCVER=8.0.2 CABALVER=1.24
+  - env: BUILD=cabalv1 GHCVER=8.0.2 CABALVER=1.24
     compiler: ": #GHC 8.0.2"
     addons: {apt: {packages: [cabal-install-1.24,ghc-8.0.2], sources: [hvr-ghc]}}
-  - env: BUILD=cabal GHCVER=8.2.2 CABALVER=2.0
+  - env: BUILD=cabalv1 GHCVER=8.2.2 CABALVER=2.0
     compiler: ": #GHC 8.2.2"
     addons: {apt: {packages: [cabal-install-2.0,ghc-8.2.2], sources: [hvr-ghc]}}
-  - env: BUILD=cabal GHCVER=8.4.4 CABALVER=2.2
+  - env: BUILD=cabalv1 GHCVER=8.4.4 CABALVER=2.2
     compiler: ": #GHC 8.4.4"
     addons: {apt: {packages: [cabal-install-2.2,ghc-8.4.4], sources: [hvr-ghc]}}
-  - env: BUILD=cabal GHCVER=8.6.5 CABALVER=2.4
+  - env: BUILD=cabalv1 GHCVER=8.6.5 CABALVER=2.4
     compiler: ": #GHC 8.6.5"
     addons: {apt: {packages: [cabal-install-2.4,ghc-8.6.5], sources: [hvr-ghc]}}
+  - env: BUILD=cabalv2 GHCVER=8.8.1 CABALVER=3.0
+    compiler: ": #GHC 8.8.1"
+    addons: {apt: {packages: [cabal-install-3.0,ghc-8.8.1], sources: [hvr-ghc]}}
 
   # Build with the newest GHC and cabal-install. This is an accepted failure,
   # see below.
-  - env: BUILD=cabal GHCVER=head  CABALVER=head
+  - env: BUILD=cabalv2 GHCVER=head  CABALVER=head
     compiler: ": #GHC HEAD"
     addons: {apt: {packages: [cabal-install-head,ghc-head], sources: [hvr-ghc]}}
 
@@ -96,7 +99,7 @@ matrix:
     addons: {apt: {packages: [libgmp-dev]}}
 
   allow_failures:
-  - env: BUILD=cabal GHCVER=head  CABALVER=head
+  - env: BUILD=cabalv2 GHCVER=head  CABALVER=head
   - env: BUILD=stack ARGS="--resolver nightly"
 
 before_install:
@@ -137,7 +140,7 @@ install:
     stack)
       stack --no-terminal --install-ghc $ARGS test --bench --only-dependencies
       ;;
-    cabal)
+    cabalv1)
       cabal --version
       travis_retry cabal update
 
@@ -145,6 +148,15 @@ install:
       PACKAGES=$(stack --install-ghc query locals | grep '^ *path' | sed 's@^ *path:@@')
 
       cabal install --only-dependencies --enable-tests --enable-benchmarks --force-reinstalls --ghc-options=-O0 --reorder-goals --max-backjumps=-1 $CABALARGS $PACKAGES
+      ;;
+    cabalv2)
+      cabal --version
+      travis_retry cabal update
+
+      # Get the list of packages from the stack.yaml file
+      PACKAGES=$(stack --install-ghc query locals | grep '^ *path' | sed 's@^ *path:@@')
+
+      cabal install --only-dependencies --disable-tests --disable-benchmarks --force-reinstalls --ghc-options=-O0 --reorder-goals --max-backjumps=-1 --lib $CABALARGS $PACKAGES
       ;;
   esac
   set +ex
@@ -156,7 +168,7 @@ script:
     stack)
       stack --no-terminal $ARGS test --bench --no-run-benchmarks --haddock --no-haddock-deps
       ;;
-    cabal)
+    cabalv1)
       cabal install --enable-tests --enable-benchmarks --force-reinstalls --ghc-options=-O0 --reorder-goals --max-backjumps=-1 $CABALARGS $PACKAGES
 
       ORIGDIR=$(pwd)
@@ -170,6 +182,26 @@ script:
         cd dist
         tar zxfv "$SRC_TGZ"
         cd "$PKGVER"
+        cabal configure --enable-tests
+        cabal build
+        cd $ORIGDIR
+      done
+      ;;
+    cabalv2)
+      cabal install --disable-tests --disable-benchmarks --force-reinstalls --ghc-options=-O0 --reorder-goals --max-backjumps=-1 --lib $CABALARGS $PACKAGES
+
+      ORIGDIR=$(pwd)
+      for dir in $PACKAGES
+      do
+        cd $dir
+        cabal check || [ "$CABALVER" == "1.16" ]
+        cabal sdist
+        PKGVER=$(cabal info . | awk '{print $2;exit}')
+        SRC_TGZ=$PKGVER.tar.gz
+        cd dist-newstyle/sdist
+        tar zxfv "$SRC_TGZ"
+        cd "$PKGVER"
+        travis_retry cabal update
         cabal configure --enable-tests
         cabal build
         cd $ORIGDIR
