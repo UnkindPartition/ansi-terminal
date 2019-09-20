@@ -5,12 +5,12 @@
 -- documentation.
 
 #if !MIN_VERSION_base(4,8,0)
-import Control.Applicative
+import Control.Applicative ((<*>))
+import Data.Functor ((<$>))
 #endif
 
 import Control.Monad (void)
 import Data.Char (isDigit)
-import Data.Functor ((<$>))
 import System.Environment (getEnvironment)
 import System.IO (hFlush, stdout)
 import Text.ParserCombinators.ReadP (char, many1, ReadP, satisfy)
