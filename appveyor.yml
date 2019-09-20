@@ -1,6 +1,12 @@
 version: "{build}"
 clone_folder: "c:\\WORK"
 
+# GHCVER: "7.0.4" fails because process-1.1.0.2 is a dependency (of
+# hsc2hs-0.68.3; hsc2hs is a build tool for mintty), requires
+# System.Win32.Process.getProcessId (which was first exported by Win32-2.2.1.0),
+# but specifies Win32 >= 2.2 as a lower bound. GHC 7.0.4 comes with
+# Win32-2.2.0.1 and process-1.0.1.5.
+
 # GHCVER: "7.4.2" fails with CABALVER: "3.0.0.0", with:
 #
 # > Configuring library for mintty-0.1.2..
@@ -12,6 +18,10 @@ environment:
   global:
     CABOPTS:  "--store-dir=C:\\SR --http-transport=plain-http"
   matrix:
+#   - GHCVER: "7.0.4"
+#     CABALVER: "2.4.1.0"
+    - GHCVER: "7.2.2"
+      CABALVER: "2.4.1.0"
     - GHCVER: "7.4.2"
       CABALVER: "2.4.1.0"
     - GHCVER: "7.6.3.1"
