@@ -35,6 +35,18 @@ CPP `#include` pragmas are also used to include code from files to limit code
 duplication in modules that are specific to the 'Unix' or Windows versions of
 the package. The common code is located in folder `src\includes`.
 
+Separate 'Unix' and Windows versions of the package exist because, before
+Windows 10 version 1511, the native terminal software on Windows did not support
+the control sequences and emulation was required. Microsoft has not supported
+Windows XP since 8 April 2014 (and GHC has not supported Windows XP since
+GHC 7.10.3 of December 2015); Windows Vista since 11 April 2017; Windows 7,
+service pack 1 since 13 January 2015 (mainstream; extended support ends
+14 January 2020); Windows 8.1 since 9 January 2018 (mainstream; extended support
+ends 10 January 2023); and Windows 10, version 1507 (which 1511 of December 2015
+updated) since 9 May 2017. Consequently, currently, there is no version of
+Windows that both has mainstream support by Microsoft and needs emulation. This
+may make changes to the emulation difficult to test.
+
 The package uses GHC's 'Safe Haskell' language extensions `Trustworthy`
 (introduced in GHC 7.2.1) and `Safe` (introduced in GHC 7.2.1 but not stable
 until GHC 7.4.1) to add flags explicitly to all modules. For most modules, that
