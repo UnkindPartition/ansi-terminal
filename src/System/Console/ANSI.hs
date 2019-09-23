@@ -23,6 +23,10 @@ includes:
 
  * Changing the title of the terminal
 
+A terminal that supports control character sequences acts on them when they
+are flushed from the output buffer (with a newline character @\"\\n\"@ or, for
+the standard output channel, @hFlush stdout@).
+
 The functions moving the cursor to an absolute position are 0-based (the
 top-left corner is considered to be at row 0 column 0) (see 'setCursorPosition')
 and so is 'getCursorPosition0'. The \'ANSI\' standards themselves are 1-based
@@ -88,12 +92,31 @@ Example:
 > import System.Console.ANSI
 >
 > -- Set colors and write some text in those colors.
+> main :: IO ()
 > main = do
 >   setSGR [SetColor Foreground Vivid Red]
 >   setSGR [SetColor Background Vivid Blue]
 >   putStrLn "Red-On-Blue"
 >   setSGR [Reset]  -- Reset to default colour scheme
 >   putStrLn "Default colors."
+
+Another example:
+
+> module Main where
+>
+> import System.IO (hFlush, stdout)
+> import System.Console.ANSI
+>
+> main :: IO ()
+> main = do
+>   setSGR [SetColor Foreground Dull Blue]
+>   putStr "Enter your name: "
+>   setSGR [SetColor Foreground Dull Yellow]
+>   hFlush stdout  -- flush the output buffer before getLine
+>   name <- getLine
+>   setSGR [SetColor Foreground Dull Blue]
+>   putStrLn $ "Hello, " ++ name ++ "!"
+>   setSGR [Reset]  -- reset to default colour scheme
 
 For many more examples, see the project's extensive
 <https://github.com/feuerbach/ansi-terminal/blob/master/app/Example.hs Example.hs> file.
