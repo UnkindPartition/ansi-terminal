@@ -227,10 +227,12 @@ getReportedCursorPosition :: IO String
 -- 'reportCursorPosition', 'getReportedCursorPosition' and 'cursorPosition'. Any
 -- position @(row, column)@ is translated to be 0-based (that is, the top-left
 -- corner is at @(0, 0)@), consistent with `setCursorColumn` and
--- `setCursorPosition`. (Note that the information emitted by
--- 'reportCursorPosition' is 1-based.) Returns 'Nothing' if any data emitted by
--- 'reportCursorPosition', obtained by 'getReportedCursorPosition', cannot be
--- parsed by 'cursorPosition'.
+-- `setCursorPosition`. (Note that the information emitted into the console
+-- input stream by 'reportCursorPosition' is 1-based.) Returns 'Nothing' if any
+-- data emitted by 'reportCursorPosition', obtained by
+-- 'getReportedCursorPosition', cannot be parsed by 'cursorPosition'. Uses
+-- 'stdout'. If 'stdout' will be redirected, see 'hGetCursorPosition' for a more
+-- general function.
 --
 -- On Windows operating systems, the function is not supported on consoles, such
 -- as mintty, that are not based on the Win32 console of the Windows API.
@@ -238,10 +240,30 @@ getReportedCursorPosition :: IO String
 --
 -- @since 0.8.2
 getCursorPosition0 :: IO (Maybe (Int, Int))
+getCursorPosition0 = hGetCursorPosition stdout
+
+-- | Attempts to get the reported cursor position, combining the functions
+-- 'hReportCursorPosition' (with the specified handle),
+-- 'getReportedCursorPosition' and 'cursorPosition'. Any position
+-- @(row, column)@ is translated to be 0-based (that is, the top-left corner is
+-- at @(0, 0)@), consistent with 'hSetCursorColumn' and 'hSetCursorPosition'.
+-- (Note that the information emitted into the console input stream by
+-- 'hReportCursorPosition' is 1-based.) Returns 'Nothing' if any data emitted by
+-- 'hReportCursorPosition', obtained by 'getReportedCursorPosition', cannot be
+-- parsed by 'cursorPosition'.
+--
+-- On Windows operating systems, the function is not supported on consoles, such
+-- as mintty, that are not based on the Win32 console of the Windows API.
+-- (Command Prompt and PowerShell are based on the Win32 console.)
+--
+-- @since 0.10.1
+hGetCursorPosition :: Handle -> IO (Maybe (Int, Int))
 
 -- | Attempts to get the current terminal size (height in rows, width in
--- columns), by using `getCursorPosition0` after attempting to set the cursor
--- position beyond the bottom right corner of the terminal.
+-- columns), by using 'getCursorPosition0' to query the console input stream
+-- after attempting to set the cursor position beyond the bottom right corner of
+-- the terminal. Uses 'stdout'. If 'stdout' will be redirected, see
+-- 'hGetTerminalSize' for a more general function.
 --
 -- On Windows operating systems, the function is not supported on consoles, such
 -- as mintty, that are not based on the Win32 console of the Windows API.
@@ -249,12 +271,26 @@ getCursorPosition0 :: IO (Maybe (Int, Int))
 --
 -- @since 0.9
 getTerminalSize :: IO (Maybe (Int, Int))
-getTerminalSize = do
-  saveCursor
-  setCursorPosition 999 999  -- Attempt to set the cursor position beyond the
-                             -- bottom right corner of the terminal.
-  mPos <- getCursorPosition0
-  restoreCursor
-  hFlush stdout -- ensure the restore cursor position code is sent to the
-                -- operating system
+getTerminalSize = hGetTerminalSize stdout
+
+-- | Attempts to get the current terminal size (height in rows, width in
+-- columns), by writing control character sequences to the specified handle
+-- (which will typically be 'stdout' or 'stderr') and using 'hGetCursorPosition'
+-- to query the console input stream after attempting to set the cursor position
+-- beyond the bottom right corner of the terminal.
+--
+-- On Windows operating systems, the function is not supported on consoles, such
+-- as mintty, that are not based on the Win32 console of the Windows API.
+-- (Command Prompt and PowerShell are based on the Win32 console.)
+--
+-- @since 0.10.1
+hGetTerminalSize :: Handle -> IO (Maybe (Int, Int))
+hGetTerminalSize h = do
+  hSaveCursor h
+  hSetCursorPosition h 999 999  -- Attempt to set the cursor position beyond the
+                                -- bottom right corner of the terminal.
+  mPos <- hGetCursorPosition h
+  hRestoreCursor h
+  hFlush h -- ensure the restore cursor position code is sent to the
+           -- operating system
   return $ fmap (\(r, c) -> (r + 1, c + 1)) mPos

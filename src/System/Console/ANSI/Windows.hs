@@ -191,6 +191,6 @@ hSupportsANSIWithoutEmulation = E.hSupportsANSIWithoutEmulation
 -- (See Common-Include.hs for Haddock documentation)
 getReportedCursorPosition = E.getReportedCursorPosition
 
--- getCursorPosition0 :: IO (Maybe (Int, Int))
+-- hGetCursorPosition :: Handle -> IO (Maybe (Int, Int))
 -- (See Common-Include.hs for Haddock documentation)
-getCursorPosition0 = E.getCursorPosition0
+hGetCursorPosition = E.hGetCursorPosition
