@@ -112,8 +112,10 @@
 
     -- * Getting the cursor position
   , getCursorPosition0
+  , hGetCursorPosition
   , getReportedCursorPosition
   , cursorPosition
 
     -- * Getting the terminal size
   , getTerminalSize
+  , hGetTerminalSize

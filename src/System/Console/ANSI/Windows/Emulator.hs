@@ -477,18 +477,18 @@ getReportedCursorPosition
       isKeyDown = keyEventKeyDown keyEventRecord
       isKeyDownEvent = eventType == 1 && isKeyDown
 
--- getCursorPosition0 :: IO (Maybe (Int, Int))
+-- hGetCursorPosition :: Handle -> IO (Maybe (Int, Int))
 -- (See Common-Include.hs for Haddock documentation)
-getCursorPosition0 = fmap to0base <$> getCursorPosition
+hGetCursorPosition h = fmap to0base <$> getCursorPosition
  where
   to0base (row, col) = (row - 1, col - 1)
   getCursorPosition = CE.catch getCursorPosition' getCPExceptionHandler
    where
     getCursorPosition' = do
       withHandleToHANDLE stdin flush -- Flush the console input buffer
-      reportCursorPosition
-      hFlush stdout -- ensure the report cursor position code is sent to the
-                    -- operating system
+      hReportCursorPosition h
+      hFlush h -- ensure the report cursor position code is sent to the
+               -- operating system
       input <- getReportedCursorPosition
       case readP_to_S cursorPosition input of
         [] -> return Nothing
