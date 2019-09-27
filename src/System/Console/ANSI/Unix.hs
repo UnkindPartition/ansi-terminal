@@ -9,9 +9,11 @@ module System.Console.ANSI.Unix
 #include "Exports-Include.hs"
   ) where
 
+import Data.Maybe (fromMaybe)
 import Control.Exception.Base (bracket)
 import System.IO (BufferMode (..), Handle, hGetBuffering, hGetEcho,
   hIsTerminalDevice, hIsWritable, hPutStr, hSetBuffering, hSetEcho, stdin)
+import System.Timeout (timeout)
 import Text.ParserCombinators.ReadP (readP_to_S)
 
 import System.Console.ANSI.Codes
@@ -81,7 +83,10 @@ hSupportsANSIWithoutEmulation h =
 -- (See Common-Include.hs for Haddock documentation)
 getReportedCursorPosition = bracket (hGetEcho stdin) (hSetEcho stdin) $ \_ -> do
   hSetEcho stdin False   -- Turn echo off
-  get
+  -- If, unexpectedly, no data is available on the console input stream then
+  -- the timeout will prevent the getChar blocking. For consistency with the
+  -- Windows equivalent, returns "" if the expected information is unavailable.
+  fromMaybe "" <$> timeout 500000 get -- 500 milliseconds
  where
   get = do
     c <- getChar
