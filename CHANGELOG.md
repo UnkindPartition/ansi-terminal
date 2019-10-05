@@ -1,6 +1,15 @@
 Changes
 =======
 
+Version 0.10.1
+--------------
+
+* Add `hGetCursorPosition` and `hGetTerminalSize`.
+* On Unix-like operating systems, fix a bug where `getReportedCursorPosition`
+  could block indefinitely if no information was forthcoming on the console
+  input stream.
+* Improvements to Haddock documentation.
+
 Version 0.10
 ------------
 
