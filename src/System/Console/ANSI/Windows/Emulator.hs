@@ -77,9 +77,15 @@ adjustCursorPosition :: HANDLE
 adjustCursorPosition handle change_x change_y = do
   screen_buffer_info <- getConsoleScreenBufferInfo handle
   let window = csbi_window screen_buffer_info
+      l = rect_left window
+      t = rect_top window
+      r = rect_right window
+      b = rect_bottom window
       (COORD x y) = csbi_cursor_position screen_buffer_info
-      cursor_pos'= COORD (change_x (rect_left window) x)
-                         (change_y (rect_top window) y)
+      clamp mn mx = max mn . min mx
+      x' = clamp l r (change_x l x)
+      y' = clamp t b (change_y t y)
+      cursor_pos' = COORD x' y'
   setConsoleCursorPosition handle cursor_pos'
 
 hCursorUp h n
