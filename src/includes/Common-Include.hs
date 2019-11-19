@@ -287,8 +287,8 @@ getTerminalSize = hGetTerminalSize stdout
 hGetTerminalSize :: Handle -> IO (Maybe (Int, Int))
 hGetTerminalSize h = do
   hSaveCursor h
-  hSetCursorPosition h 999 999  -- Attempt to set the cursor position beyond the
-                                -- bottom right corner of the terminal.
+  hSetCursorPosition h 9999 9999  -- Attempt to set the cursor position beyond
+                                  -- the bottom right corner of the terminal.
   mPos <- hGetCursorPosition h
   hRestoreCursor h
   hFlush h -- ensure the restore cursor position code is sent to the
