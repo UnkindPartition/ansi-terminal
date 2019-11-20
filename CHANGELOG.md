@@ -1,6 +1,14 @@
 Changes
 =======
 
+Version 0.10.2
+--------------
+
+* `hGetTerminalSize` now assumes a terminal is no bigger than 9,999 by 9,999
+  (previously, no bigger than 999 by 999).
+* On Windows, fix a bug where emulated cursor movement functions differed from
+  Windows 10 (movement bounded by the current viewport).
+
 Version 0.10.1
 --------------
 
