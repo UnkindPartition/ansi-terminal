@@ -72,7 +72,7 @@ saveCursor :: IO ()
 restoreCursor :: IO ()
 
 -- | Looking for a way to get the cursors position? See
--- 'getCursorPosition0'.
+-- 'getCursorPosition'.
 --
 -- Emit the cursor position into the console input stream, immediately after
 -- being recognised on the output stream, as:
@@ -82,7 +82,7 @@ restoreCursor :: IO ()
 -- at row 1 column 1) but 'setCursorColumn' and 'setCursorPosition' are
 -- 0-based.
 --
--- In isolation of 'getReportedCursorPosition' or 'getCursorPosition0', this
+-- In isolation of 'getReportedCursorPosition' or 'getCursorPosition', this
 -- function may be of limited use on Windows operating systems because of
 -- difficulties in obtaining the data emitted into the console input stream.
 -- The function 'hGetBufNonBlocking' in module "System.IO" does not work on
@@ -238,9 +238,16 @@ getReportedCursorPosition :: IO String
 -- as mintty, that are not based on the Win32 console of the Windows API.
 -- (Command Prompt and PowerShell are based on the Win32 console.)
 --
+-- @since 0.10.3
+getCursorPosition :: IO (Maybe (Int, Int))
+getCursorPosition = hGetCursorPosition stdout
+
+-- | A synonym for 'getCursorPosition'.
+--
 -- @since 0.8.2
+{-# DEPRECATED getCursorPosition0 "Use getCursorPosition instead." #-}
 getCursorPosition0 :: IO (Maybe (Int, Int))
-getCursorPosition0 = hGetCursorPosition stdout
+getCursorPosition0 = getCursorPosition
 
 -- | Attempts to get the reported cursor position, combining the functions
 -- 'hReportCursorPosition' (with the specified handle),
@@ -260,7 +267,7 @@ getCursorPosition0 = hGetCursorPosition stdout
 hGetCursorPosition :: Handle -> IO (Maybe (Int, Int))
 
 -- | Attempts to get the current terminal size (height in rows, width in
--- columns), by using 'getCursorPosition0' to query the console input stream
+-- columns), by using 'getCursorPosition' to query the console input stream
 -- after attempting to set the cursor position beyond the bottom right corner of
 -- the terminal. Uses 'stdout'. If 'stdout' will be redirected, see
 -- 'hGetTerminalSize' for a more general function.

@@ -105,10 +105,10 @@ getReportedCursorPosition = bracket (hGetEcho stdin) (hSetEcho stdin) $ \_ -> do
 
 -- hGetCursorPosition :: Handle -> IO (Maybe (Int, Int))
 -- (See Common-Include.hs for Haddock documentation)
-hGetCursorPosition h = fmap to0base <$> getCursorPosition
+hGetCursorPosition h = fmap to0base <$> getCursorPosition'
  where
   to0base (row, col) = (row - 1, col - 1)
-  getCursorPosition = do
+  getCursorPosition' = do
     input <- bracket (hGetBuffering stdin) (hSetBuffering stdin) $ \_ -> do
       hSetBuffering stdin NoBuffering -- set no buffering (the contents of the
                                       -- buffer will be discarded, so this needs

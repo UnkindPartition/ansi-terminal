@@ -388,7 +388,7 @@ getCursorPositionExample = do
   --          11111111112222222222
   -- 12345678901234567890123456789
   -- Report cursor position here:|
-  result <- getCursorPosition0
+  result <- getCursorPosition
   putStrLn " (3rd row, 29th column) to stdin, as CSI 3 ; 29 R.\n"
   case result of
     Just (row, col) -> putStrLn $ "The cursor was at row number " ++

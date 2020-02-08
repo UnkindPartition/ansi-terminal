@@ -485,12 +485,12 @@ getReportedCursorPosition
 
 -- hGetCursorPosition :: Handle -> IO (Maybe (Int, Int))
 -- (See Common-Include.hs for Haddock documentation)
-hGetCursorPosition h = fmap to0base <$> getCursorPosition
+hGetCursorPosition h = fmap to0base <$> getCursorPosition'
  where
   to0base (row, col) = (row - 1, col - 1)
-  getCursorPosition = CE.catch getCursorPosition' getCPExceptionHandler
+  getCursorPosition' = CE.catch getCursorPosition'' getCPExceptionHandler
    where
-    getCursorPosition' = do
+    getCursorPosition'' = do
       withHandleToHANDLE stdin flush -- Flush the console input buffer
       hReportCursorPosition h
       hFlush h -- ensure the report cursor position code is sent to the
