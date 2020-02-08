@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 0.10.3
+--------------
+* Add `getCursorPosition` as a synonym of `getCursorPosition0` and deprecate the
+  latter.
+
 Version 0.10.2
 --------------
 

@@ -165,7 +165,7 @@ restoreCursorCode = "\ESC8"
 -- Note that the information that is emitted is 1-based (the top-left corner is
 -- at row 1 column 1) but 'setCursorPositionCode' is 0-based.
 --
--- In isolation of 'getReportedCursorPosition' or 'getCursorPosition0', this
+-- In isolation of 'getReportedCursorPosition' or 'getCursorPosition', this
 -- function may be of limited use on Windows operating systems because of
 -- difficulties in obtaining the data emitted into the console input stream.
 -- The function 'hGetBufNonBlocking' in module "System.IO" does not work on

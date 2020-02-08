@@ -111,7 +111,7 @@
   , hSupportsANSIWithoutEmulation
 
     -- * Getting the cursor position
-  , getCursorPosition0
+  , getCursorPosition
   , hGetCursorPosition
   , getReportedCursorPosition
   , cursorPosition
@@ -119,3 +119,6 @@
     -- * Getting the terminal size
   , getTerminalSize
   , hGetTerminalSize
+
+    -- * Deprecated
+  , getCursorPosition0
