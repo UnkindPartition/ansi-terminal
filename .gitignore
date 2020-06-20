@@ -9,6 +9,7 @@ dist-newstyle/
 docs/
 
 # Haskell Tool Stack-related
+.stack-work/
 stack.yaml.lock
 
 # Operating system rubbish
