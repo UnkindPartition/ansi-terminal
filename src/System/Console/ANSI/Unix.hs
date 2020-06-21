@@ -81,8 +81,7 @@ hSupportsANSIWithoutEmulation h =
 
 -- getReportedCursorPosition :: IO String
 -- (See Common-Include.hs for Haddock documentation)
-getReportedCursorPosition = bracket (hGetEcho stdin) (hSetEcho stdin) $ \_ -> do
-  hSetEcho stdin False   -- Turn echo off
+getReportedCursorPosition = do
   -- If, unexpectedly, no data is available on the console input stream then
   -- the timeout will prevent the getChar blocking. For consistency with the
   -- Windows equivalent, returns "" if the expected information is unavailable.
@@ -110,14 +109,17 @@ hGetCursorPosition h = fmap to0base <$> getCursorPosition'
   to0base (row, col) = (row - 1, col - 1)
   getCursorPosition' = do
     input <- bracket (hGetBuffering stdin) (hSetBuffering stdin) $ \_ -> do
-      hSetBuffering stdin NoBuffering -- set no buffering (the contents of the
-                                      -- buffer will be discarded, so this needs
-                                      -- to be done before the cursor positon is
-                                      -- emitted)
-      hReportCursorPosition h
-      hFlush h -- ensure the report cursor position code is sent to the
-               -- operating system
-      getReportedCursorPosition
+      -- set no buffering (if 'no buffering' is not already set, the contents of
+      -- the buffer will be discarded, so this needs to be done before the
+      -- cursor positon is emitted)
+      hSetBuffering stdin NoBuffering
+      -- ensure that echoing is off
+      bracket (hGetEcho stdin) (hSetEcho stdin) $ \_ -> do
+        hSetEcho stdin False
+        hReportCursorPosition h
+        hFlush h -- ensure the report cursor position code is sent to the
+                 -- operating system
+        getReportedCursorPosition
     case readP_to_S cursorPosition input of
       [] -> return Nothing
       [((row, col),_)] -> return $ Just (row, col)

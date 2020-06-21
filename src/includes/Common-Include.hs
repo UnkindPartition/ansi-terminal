@@ -207,14 +207,17 @@ cursorPosition = do
 --
 -- For example, on a Unix-like operating system:
 --
--- > hSetBuffering stdin NoBuffering -- set no buffering (the contents of the
--- >                                 -- buffer will be discarded, so this needs
--- >                                 -- to be done before the cursor positon is
--- >                                 -- emitted)
--- > reportCursorPosition
--- > hFlush stdout -- ensure the report cursor position code is sent to the
--- >               -- operating system
--- > input <- getReportedCursorPosition
+-- > -- set no buffering (if 'no buffering' is not already set, the contents of
+-- > -- the buffer will be discarded, so this needs to be done before the cursor
+-- > -- positon is emitted)
+-- > hSetBuffering stdin NoBuffering
+-- > -- ensure that echoing is off
+-- > input <- bracket (hGetEcho stdin) (hSetEcho stdin) $ \_ -> do
+-- >   hSetEcho stdin False
+-- >   reportCursorPosition
+-- >   hFlush stdout -- ensure the report cursor position code is sent to the
+-- >                 -- operating system
+-- >   getReportedCursorPosition
 --
 -- On Windows operating systems, the function is not supported on consoles, such
 -- as mintty, that are not based on the Win32 console of the Windows API.
