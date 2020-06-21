@@ -11,8 +11,10 @@ module System.Console.ANSI.Unix
 
 import Data.Maybe (fromMaybe)
 import Control.Exception.Base (bracket)
+import Control.Monad (when)
 import System.IO (BufferMode (..), Handle, hGetBuffering, hGetEcho,
-  hIsTerminalDevice, hIsWritable, hPutStr, hSetBuffering, hSetEcho, stdin)
+  hIsTerminalDevice, hIsWritable, hPutStr, hReady, hSetBuffering, hSetEcho,
+  stdin)
 import System.Timeout (timeout)
 import Text.ParserCombinators.ReadP (readP_to_S)
 
@@ -116,6 +118,7 @@ hGetCursorPosition h = fmap to0base <$> getCursorPosition'
       -- ensure that echoing is off
       bracket (hGetEcho stdin) (hSetEcho stdin) $ \_ -> do
         hSetEcho stdin False
+        clearStdin
         hReportCursorPosition h
         hFlush h -- ensure the report cursor position code is sent to the
                  -- operating system
@@ -124,3 +127,8 @@ hGetCursorPosition h = fmap to0base <$> getCursorPosition'
       [] -> return Nothing
       [((row, col),_)] -> return $ Just (row, col)
       (_:_) -> return Nothing
+  clearStdin = do
+    isReady <- hReady stdin
+    when isReady $ do
+      _ <-getChar
+      clearStdin
