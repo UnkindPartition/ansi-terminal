@@ -260,18 +260,18 @@ sgrColorExample = do
   -- 0 0 1 1 2 2 3 3 4 4 5 5 6 6 7 7 8 8 9 9 A A B B C C D D E E F F
   forM_ [Dull .. Vivid] $ \intensity -> do
     forM_ [Black .. White] $ \color -> do
-    let i = fromEnum intensity * 8 + fromEnum color
-        eol = i == 15
-    setSGR [SetPaletteColor Background $ xtermSystem intensity color]
-    setSGR [SetPaletteColor Foreground $ xtermSystem Dull Black]
-    printf "%X " i
-    setSGR [SetPaletteColor Foreground $ xtermSystem Vivid White]
-    printf "%X" i
-    if eol
-      then putStrLn ""
-      else do
-        setSGR [Reset]
-        putStr " "
+      let i = fromEnum intensity * 8 + fromEnum color
+          eol = i == 15
+      setSGR [SetPaletteColor Background $ xtermSystem intensity color]
+      setSGR [SetPaletteColor Foreground $ xtermSystem Dull Black]
+      printf "%X " i
+      setSGR [SetPaletteColor Foreground $ xtermSystem Vivid White]
+      printf "%X" i
+      if eol
+        then putStrLn ""
+        else do
+          setSGR [Reset]
+          putStr " "
   putStrLn ""
 
   -- Next 216 colors (6 level RGB in xterm protocol), in 12 rows of 18
