@@ -1,8 +1,20 @@
 Changes
 =======
 
+Version 0.11
+------------
+
+* Remove deprecated `getCursorPosition0`. (Use `getCursorPosition` instead.)
+* On Unix-like operating systems, the temporary turning off of echoing is moved
+  from `getReportedCursorPosition` to `hGetCursorPositon`.
+* On Unix-like operating systems, fix a bug in `getCursorPosition` and
+  `hGetCursorPosition`, where the console input stream was was not always
+  clear before the cursor position was emitted into it.
+
+
 Version 0.10.3
 --------------
+
 * Add `getCursorPosition` as a synonym of `getCursorPosition0` and deprecate the
   latter.
 
