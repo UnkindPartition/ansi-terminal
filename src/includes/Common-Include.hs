@@ -245,13 +245,6 @@ getReportedCursorPosition :: IO String
 getCursorPosition :: IO (Maybe (Int, Int))
 getCursorPosition = hGetCursorPosition stdout
 
--- | A synonym for 'getCursorPosition'.
---
--- @since 0.8.2
-{-# DEPRECATED getCursorPosition0 "Use getCursorPosition instead." #-}
-getCursorPosition0 :: IO (Maybe (Int, Int))
-getCursorPosition0 = getCursorPosition
-
 -- | Attempts to get the reported cursor position, combining the functions
 -- 'hReportCursorPosition' (with the specified handle),
 -- 'getReportedCursorPosition' and 'cursorPosition'. Any position

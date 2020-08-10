@@ -119,6 +119,3 @@
     -- * Getting the terminal size
   , getTerminalSize
   , hGetTerminalSize
-
-    -- * Deprecated
-  , getCursorPosition0
