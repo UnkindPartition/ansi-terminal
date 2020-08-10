@@ -57,10 +57,11 @@ Library
                 Cpp-Options:            -DUNIX
                 Other-Modules:          System.Console.ANSI.Unix
 
-        Extensions:             CPP
+        Default-Extensions:     CPP
                                 ForeignFunctionInterface
 
-        Ghc-Options:                    -Wall
+        Ghc-Options:            -Wall
+        Default-Language:       Haskell2010
 
 Executable ansi-terminal-example
         Hs-Source-Dirs:         app
@@ -71,3 +72,4 @@ Executable ansi-terminal-example
         Ghc-Options:            -Wall
         if !flag(example)
                 Buildable:              False
+        Default-Language:       Haskell2010
