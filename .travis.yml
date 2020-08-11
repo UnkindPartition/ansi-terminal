@@ -144,6 +144,8 @@ before_install:
     echo 'jobs: $ncpus' >> $HOME/.cabal/config
   fi
 
+# Use `cabal v1-install` for cabalv2 because `cabal install` broken.
+# See https://github.com/haskell/cabal/issues/5559
 install:
 - echo "$(ghc --version) [$(ghc --print-project-git-commit-id 2> /dev/null || echo '?')]"
 - if [ -f configure.ac ]; then autoreconf -i; fi
@@ -169,11 +171,13 @@ install:
       # Get the list of packages from the stack.yaml file
       PACKAGES=$(stack --install-ghc query locals | grep '^ *path' | sed 's@^ *path:@@')
 
-      cabal install --only-dependencies --disable-tests --disable-benchmarks --force-reinstalls --ghc-options=-O0 --reorder-goals --max-backjumps=-1 --lib $CABALARGS $PACKAGES
+      cabal v1-install --only-dependencies --disable-tests --disable-benchmarks --force-reinstalls --ghc-options=-O0 --reorder-goals --max-backjumps=-1 $CABALARGS $PACKAGES
       ;;
   esac
   set +ex
 
+# Use `cabal v1-install` for cabalv2 because `cabal install` broken.
+# See https://github.com/haskell/cabal/issues/5559
 script:
 - |
   set -ex
@@ -201,7 +205,7 @@ script:
       done
       ;;
     cabalv2)
-      cabal install --disable-tests --disable-benchmarks --force-reinstalls --ghc-options=-O0 --reorder-goals --max-backjumps=-1 --lib $CABALARGS $PACKAGES
+      cabal v1-install --disable-tests --disable-benchmarks --force-reinstalls --ghc-options=-O0 --reorder-goals --max-backjumps=-1 $CABALARGS $PACKAGES
 
       ORIGDIR=$(pwd)
       for dir in $PACKAGES
