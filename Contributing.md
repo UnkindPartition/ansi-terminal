@@ -1,5 +1,5 @@
-Many other packages depend on `ansi-terminal`. As at May 2019, over 190 packages
-on [Hackage](https:https://hackage.haskell.org/) depend on it. Consider
+Many other packages depend on `ansi-terminal`. As at August 2020, over 220
+packages on [Hackage](https:https://hackage.haskell.org/) depend on it. Consider
 raising an [issue](https://github.com/feuerbach/ansi-terminal/issues) to
 discuss a proposed change before making a pull request.
 
@@ -38,11 +38,11 @@ the package. The common code is located in folder `src\includes`.
 Separate 'Unix' and Windows versions of the package exist because, before
 Windows 10 version 1511, the native terminal software on Windows did not support
 the control sequences and emulation was required. Microsoft has not supported
-Windows XP since 8 April 2014 (and GHC has not supported Windows XP since
-GHC 7.10.3 of December 2015); Windows Vista since 11 April 2017; Windows 7,
-service pack 1 since 13 January 2015 (mainstream; extended support ends
-14 January 2020); Windows 8.1 since 9 January 2018 (mainstream; extended support
-ends 10 January 2023); and Windows 10, version 1507 (which 1511 of December 2015
+Windows XP since 8 April 2014 (and GHC has not supported Windows XP from
+GHC 8.0.1 of May 2016); Windows Server 2003 since 14 July 2015; Windows Vista
+since 11 April 2017; Windows 7, service pack 1 since 14 January 2020;
+Windows 8.1 since 9 January 2018 (mainstream; extended support ends
+10 January 2023); and Windows 10, version 1507 (which 1511 of December 2015
 updated) since 9 May 2017. Consequently, currently, there is no version of
 Windows that both has mainstream support by Microsoft and needs emulation. This
 may make changes to the emulation difficult to test.
