@@ -509,5 +509,5 @@ getCPExceptionHandler :: IOException -> IO a
 getCPExceptionHandler e = error msg
  where
   msg = "Error: " ++ show e ++ "\nThis error may be avoided by using a " ++
-        "console based on the Win32 console of the Windows API, such as " ++
-        "Command Prompt or PowerShell."
+        "console based on the Windows' Console API, such as Command Prompt " ++
+        "or PowerShell."
