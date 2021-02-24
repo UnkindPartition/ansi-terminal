@@ -10,7 +10,7 @@ License:             BSD3
 License-File:        LICENSE
 Author:              Max Bolingbroke
 Maintainer:          Mike Pilgrem <public@pilgrem.com>, Roman Cheplyaka <roma@ro-che.info>
-Homepage:            https://github.com/feuerbach/ansi-terminal
+Homepage:            https://github.com/UnkindPartition/ansi-terminal
 Build-Type:          Simple
 
 Extra-Source-Files:     src/includes/Common-Include.hs
@@ -23,7 +23,7 @@ Extra-Source-Files:     src/includes/Common-Include.hs
 
 Source-repository head
   type:     git
-  location: git://github.com/feuerbach/ansi-terminal.git
+  location: git://github.com/UnkindPartition/ansi-terminal.git
 
 Flag Example
         Description:    Build the example application

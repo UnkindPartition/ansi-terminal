@@ -60,7 +60,7 @@ Example
 -------
 
 A full example is
-[available](https://github.com/feuerbach/ansi-terminal/blob/master/app/Example.hs),
+[available](https://github.com/UnkindPartition/ansi-terminal/blob/master/app/Example.hs),
 but for a taste of how the library works try the following code:
 
 ``` haskell
@@ -98,7 +98,7 @@ The library is originally written by [Max Bolingbroke](https://github.com/batter
 Maintainers
 -----------
 
-[Mike Pilgrem](https://github.com/mpilgrem) and [Roman Cheplyaka](https://github.com/feuerbach) are the primary maintainers.
+[Mike Pilgrem](https://github.com/mpilgrem) and [Roman Cheplyaka](https://github.com/UnkindPartition) are the primary maintainers.
 
 [Oliver Charles](https://github.com/ocharles) is the backup maintainer. Please
 get in touch with him if the primary maintainers cannot be reached.

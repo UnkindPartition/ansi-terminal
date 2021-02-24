@@ -327,7 +327,7 @@ instance Show ConsoleException where
     "Prompt or PowerShell). That may occur, for example, if output has\n" ++
     "been redirected to a file.\n\n" ++
     "If that is unexpected, please post an issue at:\n" ++
-    "https://github.com/feuerbach/ansi-terminal/issues\n"
+    "https://github.com/UnkindPartition/ansi-terminal/issues\n"
   show (ConsoleException errCode) = "ConsoleException " ++ show errCode
 
 instance Exception ConsoleException

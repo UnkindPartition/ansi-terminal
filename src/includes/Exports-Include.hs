@@ -26,7 +26,7 @@
     -- the same.
     --
     -- Also keep in mind that @*Line@ functions are not as portable. See
-    -- <https://github.com/feuerbach/ansi-terminal/issues/10> for the details.
+    -- <https://github.com/UnkindPartition/ansi-terminal/issues/10> for the details.
   , cursorUpLine
   , cursorDownLine
   , hCursorUpLine

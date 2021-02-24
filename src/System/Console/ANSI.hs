@@ -119,7 +119,7 @@ Another example:
 >   setSGR [Reset]  -- reset to default colour scheme
 
 For many more examples, see the project's extensive
-<https://github.com/feuerbach/ansi-terminal/blob/master/app/Example.hs Example.hs> file.
+<https://github.com/UnkindPartition/ansi-terminal/blob/master/app/Example.hs Example.hs> file.
 -}
 #if defined(WINDOWS)
 module System.Console.ANSI
