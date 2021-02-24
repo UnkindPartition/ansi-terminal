@@ -220,8 +220,8 @@ cursorPosition = do
 -- >   getReportedCursorPosition
 --
 -- On Windows operating systems, the function is not supported on consoles, such
--- as mintty, that are not based on the Win32 console of the Windows API.
--- (Command Prompt and PowerShell are based on the Win32 console.)
+-- as mintty, that are not based on the Windows' Console API. (Command Prompt
+-- and PowerShell are based on the Console API.)
 --
 -- @since 0.7.1
 getReportedCursorPosition :: IO String
@@ -238,8 +238,8 @@ getReportedCursorPosition :: IO String
 -- general function.
 --
 -- On Windows operating systems, the function is not supported on consoles, such
--- as mintty, that are not based on the Win32 console of the Windows API.
--- (Command Prompt and PowerShell are based on the Win32 console.)
+-- as mintty, that are not based on the Windows' Console API. (Command Prompt
+-- and PowerShell are based on the Console API.)
 --
 -- @since 0.10.3
 getCursorPosition :: IO (Maybe (Int, Int))
@@ -256,21 +256,29 @@ getCursorPosition = hGetCursorPosition stdout
 -- parsed by 'cursorPosition'.
 --
 -- On Windows operating systems, the function is not supported on consoles, such
--- as mintty, that are not based on the Win32 console of the Windows API.
--- (Command Prompt and PowerShell are based on the Win32 console.)
+-- as mintty, that are not based on the Windows' Console API. (Command Prompt
+-- and PowerShell are based on the Console API.)
 --
 -- @since 0.10.1
 hGetCursorPosition :: Handle -> IO (Maybe (Int, Int))
 
 -- | Attempts to get the current terminal size (height in rows, width in
--- columns), by using 'getCursorPosition' to query the console input stream
--- after attempting to set the cursor position beyond the bottom right corner of
--- the terminal. Uses 'stdout'. If 'stdout' will be redirected, see
--- 'hGetTerminalSize' for a more general function.
+-- columns).
+--
+-- There is no \'ANSI\' control character sequence that reports the terminal
+-- size. So, it attempts to set the cursor position beyond the bottom right
+-- corner of the terminal and then use 'getCursorPosition' to query the console
+-- input stream. It works only on terminals that support each step. Uses
+-- 'stdout'. If 'stdout' will be redirected, see 'hGetTerminalSize' for a more
+-- general function.
 --
 -- On Windows operating systems, the function is not supported on consoles, such
--- as mintty, that are not based on the Win32 console of the Windows API.
--- (Command Prompt and PowerShell are based on the Win32 console.)
+-- as mintty, that are not based on Windows' Console API. (Command Prompt and
+-- PowerShell are based on the Console API.)
+--
+-- For a different approach, one that does not use control character sequences,
+-- see the
+-- <https://hackage.haskell.org/package/terminal-size terminal-size> package.
 --
 -- @since 0.9
 getTerminalSize :: IO (Maybe (Int, Int))
@@ -278,13 +286,20 @@ getTerminalSize = hGetTerminalSize stdout
 
 -- | Attempts to get the current terminal size (height in rows, width in
 -- columns), by writing control character sequences to the specified handle
--- (which will typically be 'stdout' or 'stderr') and using 'hGetCursorPosition'
--- to query the console input stream after attempting to set the cursor position
--- beyond the bottom right corner of the terminal.
+-- (which will typically be 'stdout' or 'stderr').
+--
+-- There is no \'ANSI\' control character sequence that reports the terminal
+-- size. So, it attempts to set the cursor position beyond the bottom right
+-- corner of the terminal and then use 'hGetCursorPosition' to query the console
+-- input stream. It works only on terminals that support each step.
 --
 -- On Windows operating systems, the function is not supported on consoles, such
--- as mintty, that are not based on the Win32 console of the Windows API.
--- (Command Prompt and PowerShell are based on the Win32 console.)
+-- as mintty, that are not based on the Windows' Console API. (Command Prompt
+-- and PowerShell are based on the Console API.)
+--
+-- For a different approach, one that does not use control character sequences,
+-- see the
+-- <https://hackage.haskell.org/package/terminal-size terminal-size> package.
 --
 -- @since 0.10.1
 hGetTerminalSize :: Handle -> IO (Maybe (Int, Int))
