@@ -1,4 +1,4 @@
-Many other packages depend on `ansi-terminal`. As at August 2020, over 220
+Many other packages depend on `ansi-terminal`. As at March 2021, over 230
 packages on [Hackage](https:https://hackage.haskell.org/) depend on it. Consider
 raising an [issue](https://github.com/UnkindPartition/ansi-terminal/issues) to
 discuss a proposed change before making a pull request.

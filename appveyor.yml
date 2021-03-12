@@ -40,7 +40,7 @@ environment:
       CABALVER: "3.2.0.0"
     - GHCVER: "8.8.3"
       CABALVER: "3.2.0.0"
-    - GHCVER: "8.10.1"
+    - GHCVER: "8.10.4"
       CABALVER: "3.2.0.0"
 
 cache:

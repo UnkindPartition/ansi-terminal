@@ -65,12 +65,12 @@ matrix:
   - env: BUILD=cabalv1 GHCVER=8.6.5 CABALVER=2.4
     compiler: ": #GHC 8.6.5"
     addons: {apt: {packages: [cabal-install-2.4,ghc-8.6.5], sources: [hvr-ghc]}}
-  - env: BUILD=cabalv2 GHCVER=8.8.3 CABALVER=3.0
-    compiler: ": #GHC 8.8.3"
-    addons: {apt: {packages: [cabal-install-3.0,ghc-8.8.3], sources: [hvr-ghc]}}
-  - env: BUILD=cabalv2 GHCVER=8.10.1 CABALVER=3.2
-    compiler: ": #GHC 8.10.1"
-    addons: {apt: {packages: [cabal-install-3.2,ghc-8.10.1], sources: [hvr-ghc]}}
+  - env: BUILD=cabalv2 GHCVER=8.8.4 CABALVER=3.0
+    compiler: ": #GHC 8.8.4"
+    addons: {apt: {packages: [cabal-install-3.0,ghc-8.8.4], sources: [hvr-ghc]}}
+  - env: BUILD=cabalv2 GHCVER=8.10.4 CABALVER=3.2
+    compiler: ": #GHC 8.10.4"
+    addons: {apt: {packages: [cabal-install-3.2,ghc-8.10.4], sources: [hvr-ghc]}}
 
   # Build with the newest GHC and cabal-install. This is an accepted failure,
   # see below.
@@ -108,7 +108,11 @@ matrix:
     addons: {apt: {packages: [libgmp-dev]}}
 
   - env: BUILD=stack ARGS="--resolver lts-16"
-    compiler: ": #stack 8.8.3"
+    compiler: ": #stack 8.8.4"
+    addons: {apt: {packages: [libgmp-dev]}}
+
+  - env: BUILD=stack ARGS="--resolver lts-17"
+    compiler: ": #stack 8.10.4"
     addons: {apt: {packages: [libgmp-dev]}}
 
   allow_failures:
