@@ -1,4 +1,4 @@
-ansi-terminal
+ansi-terminal [![GitHub CI](https://github.com/UnkindPartition/ansi-terminal/workflows/CI/badge.svg)](https://github.com/UnkindPartition/ansi-terminal/actions)
 =============
 
 A Haskell package providing support for 'ANSI' control character sequences for
