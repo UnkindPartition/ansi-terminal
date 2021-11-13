@@ -25,10 +25,10 @@ jobs:
           - "8.4.4"
           - "8.6.5"
           - "8.8.4"
-          - "8.10.4"
+          - "8.10.7"
     steps:
       - uses: actions/checkout@v2
-      - uses: haskell/actions/setup@v1.2.1
+      - uses: haskell/actions/setup@v1.2.7
         id: setup-haskell-cabal
         with:
           ghc-version: ${{ matrix.ghc }}
@@ -61,10 +61,10 @@ jobs:
           - "8.4.4"
           - "8.6.5"
           - "8.8.4"
-          - "8.10.4"
+          - "8.10.7"
     steps:
       - uses: actions/checkout@v2
-      - uses: haskell/actions/setup@v1.2.1
+      - uses: haskell/actions/setup@v1.2.7
         id: setup-haskell-cabal
         with:
           ghc-version: ${{ matrix.ghc }}
