@@ -9,6 +9,10 @@ The ansi-terminal library makes use of functionality in Win32-2.1 and other
 functionality first added to Win32-2.5.0.0 or Win32-2.5.1.0 (from ansi-terminal
 itself).
 
+Win32-2.9.0.0 introduced support for the Windows I/O Manager, introduced with
+GHC 9.0.1. However, before Win32-2.13.2.0, this changed the behaviour of
+`withHandleFromHANDLE`.
+
 This module provides functions available in those later versions of Win32 to a
 wider range of compilers, reducing the use of CPP pragmas in other modules.
 -}
@@ -32,45 +36,88 @@ module System.Win32.Compat
   , withTString
   ) where
 
-#if !MIN_VERSION_Win32(2,5,0)
-import Foreign.C.Types (CShort (..))
-#endif
-
-#if !MIN_VERSION_Win32(2,5,1)
-import Control.Concurrent.MVar (readMVar)
-import Control.Exception (bracket)
-import Foreign.C.Types (CInt (..))
-import Foreign.StablePtr (StablePtr, freeStablePtr, newStablePtr)
-import Data.Typeable (cast)
-import GHC.IO.FD (FD(..)) -- A wrapper around an Int32
-import GHC.IO.Handle.Types (Handle (..), Handle__ (..))
-#endif
-
 import System.Win32.Types (BOOL, DWORD, ErrCode, HANDLE, LPCTSTR, LPDWORD,
   TCHAR, UINT, WORD, failIfFalse_, getLastError, iNVALID_HANDLE_VALUE,
   nullHANDLE, withTString)
 
-#if MIN_VERSION_Win32(2,5,0)
+-- Circumstances in which the patching of Win32 package is required
+#if !MIN_VERSION_Win32(2,5,1)||(defined(__IO_MANAGER_WINIO__)&&!MIN_VERSION_Win32(2,13,2))
+#define PATCHING_WIN32_PACKAGE
+#endif
+
+#if !defined(PATCHING_WIN32_PACKAGE)
+
+import System.Win32.Types (SHORT, withHandleToHANDLE)
+
+#else
+
+import Control.Concurrent.MVar (readMVar)
+import Control.Exception (bracket)
+import Data.Typeable (cast)
+import Foreign.StablePtr (StablePtr, freeStablePtr, newStablePtr)
+import GHC.IO.Handle.Types (Handle (..), Handle__ (..))
+
+#if defined(__IO_MANAGER_WINIO__)&&!MIN_VERSION_Win32(2,13,2)
+import GHC.IO.Exception (IOErrorType (InappropriateType), IOException (IOError),
+  ioException)
+import GHC.IO.SubSystem ((<!>))
+import GHC.IO.Windows.Handle (ConsoleHandle, Io, NativeHandle, toHANDLE)
+import System.Win32.Types (withHandleToHANDLEPosix)
+#endif
+
+#if !MIN_VERSION_Win32(2,5,0)
+import Foreign.C.Types (CShort (..))
+#else
 import System.Win32.Types (SHORT)
 #endif
 
-#if MIN_VERSION_Win32(2,5,1)
-import System.Win32.Types (withHandleToHANDLE)
+#if !MIN_VERSION_Win32(2,5,1)
+import Foreign.C.Types (CInt (..))
+import GHC.IO.FD (FD(..)) -- A wrapper around an Int32
 #endif
+
+#endif
+
+#if defined(PATCHING_WIN32_PACKAGE)
 
 #if !MIN_VERSION_Win32(2,5,0)
 type SHORT = CShort
 #endif
 
-#if !MIN_VERSION_Win32(2,5,1)
+withStablePtr :: a -> (StablePtr a -> IO b) -> IO b
+withStablePtr value = bracket (newStablePtr value) freeStablePtr
 
-#if defined(i386_HOST_ARCH)
-#define WINDOWS_CCONV stdcall
-#elif defined(x86_64_HOST_ARCH)
-#define WINDOWS_CCONV ccall
+#if defined(__IO_MANAGER_WINIO__)&&!MIN_VERSION_Win32(2,13,2)
+
+withHandleToHANDLE :: Handle -> (HANDLE -> IO a) -> IO a
+withHandleToHANDLE = withHandleToHANDLEPosix <!> withHandleToHANDLENative
+
+-- | `withHandleToHANDLENative` does not behave as expected for GHC option
+-- -with-rtsopts=--io-manager=native when Win32 < 2.13.2. Taken from
+-- package Win32-2.13.2.0 `System.Win32.Types.withHandleToHANDLENative`.
+
+withHandleToHANDLENative :: Handle -> (HANDLE -> IO a) -> IO a
+withHandleToHANDLENative haskell_handle action =
+  withStablePtr haskell_handle $ const $ do
+    let write_handle_mvar = case haskell_handle of
+            FileHandle _ handle_mvar     -> handle_mvar
+            DuplexHandle _ _ handle_mvar -> handle_mvar
+    windows_handle <- readMVar write_handle_mvar >>= handle_ToHANDLE
+    action windows_handle
+ where
+  handle_ToHANDLE :: Handle__ -> IO HANDLE
+  handle_ToHANDLE (Handle__{haDevice = dev}) =
+    case ( cast dev :: Maybe (Io NativeHandle)
+         , cast dev :: Maybe (Io ConsoleHandle)) of
+      (Just hwnd, Nothing) -> return $ toHANDLE hwnd
+      (Nothing, Just hwnd) -> return $ toHANDLE hwnd
+      _                    -> throwErr "not a known HANDLE"
+
+  throwErr msg = ioException $ IOError (Just haskell_handle)
+    InappropriateType "withHandleToHANDLENative" msg Nothing Nothing
+
+-- defined(__IO_MANAGER_WINIO__)&&!MIN_VERSION_Win32(2,13,2)
 #else
-#error Unknown mingw32 arch
-#endif
 
 -- | This bit is all highly dubious. The problem is that we want to output ANSI
 -- to arbitrary Handles rather than forcing people to use stdout.  However, the
@@ -101,12 +148,22 @@ withHandleToHANDLE haskell_handle action =
     -- Do what the user originally wanted
     action windows_handle
 
+#if defined(i386_HOST_ARCH)
+#define WINDOWS_CCONV stdcall
+#elif defined(x86_64_HOST_ARCH)
+#define WINDOWS_CCONV ccall
+#else
+#error Unknown mingw32 arch
+#endif
+
 -- This essential function comes from the C runtime system. It is certainly
 -- provided by msvcrt, and also seems to be provided by the mingw C library -
 -- hurrah!
 foreign import WINDOWS_CCONV unsafe "_get_osfhandle"
   cget_osfhandle :: CInt -> IO HANDLE
 
-withStablePtr :: a -> (StablePtr a -> IO b) -> IO b
-withStablePtr value = bracket (newStablePtr value) freeStablePtr
+-- defined(__IO_MANAGER_WINIO__)&&!MIN_VERSION_Win32(2,13,2)
+#endif
+
+-- defined(PATCHING_WIN32_PACKAGE)
 #endif
