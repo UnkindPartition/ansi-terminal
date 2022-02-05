@@ -474,14 +474,17 @@ getReportedCursorPosition
           return $ stringFromInputEvents es
     stringFromInputEvents = cWcharsToChars . wCharsFromInputEvents
     wCharsFromInputEvents = mapMaybe wCharFromInputEvent
-    wCharFromInputEvent e = if isKeyDownEvent
+    wCharFromInputEvent e = if isKeyEvent && isKeyDown
       then Just (unicodeAsciiChar $ keyEventChar keyEventRecord)
       else Nothing
      where
       eventType = inputEventType e
-      InputKeyEvent keyEventRecord = inputEvent e
+      eventRecord = inputEvent e
+      isKeyEvent = eventType == 1
+      keyEventRecord = case eventRecord of
+        InputKeyEvent keyEventRecord' -> keyEventRecord'
+        _ -> error "Unexpected input event, given input event type."
       isKeyDown = keyEventKeyDown keyEventRecord
-      isKeyDownEvent = eventType == 1 && isKeyDown
 
 -- hGetCursorPosition :: Handle -> IO (Maybe (Int, Int))
 -- (See Common-Include.hs for Haddock documentation)
