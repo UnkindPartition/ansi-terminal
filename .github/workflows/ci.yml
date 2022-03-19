@@ -26,7 +26,7 @@ jobs:
           - "8.6.5"
           - "8.8.4"
           - "8.10.7"
-          - "9.0.1"
+          - "9.0.2"
           - "9.2.1"
     steps:
       - uses: actions/checkout@v2
@@ -66,7 +66,7 @@ jobs:
           - "8.10.7"
         winio: [false]
         include:
-          - ghc: "9.0.1"
+          - ghc: "9.0.2"
             cabal: "3.6"
             winio: true
           - ghc: "9.2.1"
