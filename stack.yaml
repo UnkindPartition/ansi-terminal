@@ -1,5 +1,5 @@
 extra-deps: []
-resolver: lts-18.18
+resolver: lts-19.0
 flags:
   ansi-terminal:
     example: false
