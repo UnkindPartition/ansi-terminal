@@ -1,7 +1,7 @@
 -- This file contains code that is common to modules System.Console.ANSI.Unix,
 -- System.Console.ANSI.Windows and System.Console.ANSI.Windows.Emulator, such as
 -- type signatures and the definition of functions specific to stdout in terms
--- of the corresponding more general functions, inclduding the related Haddock
+-- of the corresponding more general functions, including the related Haddock
 -- documentation.
 
 #if !MIN_VERSION_base(4,8,0)
@@ -161,7 +161,7 @@ hSupportsANSIColor h = (||) <$> hSupportsANSI h <*> isEmacsTerm
 -- On Windows, what is returned will depend on what the handle is connected to
 -- and the version of the operating system. If the handle is identified as
 -- connected to a \'mintty\' terminal, @return (Just True)@ is
--- returned. If it is identifed as connected to a native terminal, then, on
+-- returned. If it is identified as connected to a native terminal, then, on
 -- Windows 10, the processing of \'ANSI\' control characters will be enabled and
 -- @return (Just True)@ returned; and, on versions of Windows before Windows 10,
 -- @return (Just False)@ is returned. Otherwise, if a @TERM@ environment
