@@ -78,7 +78,7 @@ Version 0.8.2
 Version 0.8.1
 -------------
 
-* Add `hSupportsANSIWithoutEmulation`. On Windows 10, if the handle is identifed
+* Add `hSupportsANSIWithoutEmulation`. On Windows 10, if the handle is identified
   as connected to a native terminal ('Command Prompt' or 'PowerShell'), the
   processing of 'ANSI' control characters will be enabled.
 

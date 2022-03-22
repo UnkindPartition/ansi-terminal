@@ -33,7 +33,7 @@ import System.Console.ANSI.Windows.Foreign
 -- This file contains code that is common to modules System.Console.ANSI.Unix,
 -- System.Console.ANSI.Windows and System.Console.ANSI.Windows.Emulator, such as
 -- type signatures and the definition of functions specific to stdout in terms
--- of the corresponding more general functions, inclduding the related Haddock
+-- of the corresponding more general functions, including the related Haddock
 -- documentation.
 #include "Common-Include.hs"
 -- This file contains code that is required in the case of the module
