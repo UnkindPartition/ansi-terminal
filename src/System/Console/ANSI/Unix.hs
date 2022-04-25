@@ -64,6 +64,9 @@ hSetSGR h sgrs = hPutStr h $ setSGRCode sgrs
 hHideCursor h = hPutStr h hideCursorCode
 hShowCursor h = hPutStr h showCursorCode
 
+hHyperlinkWithParams h params uri link =
+  hPutStr h $ hyperlinkWithParamsCode params uri link
+
 hSetTitle h title = hPutStr h $ setTitleCode title
 
 -- hSupportsANSI :: Handle -> IO Bool

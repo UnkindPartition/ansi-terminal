@@ -21,6 +21,8 @@ includes:
 
  * Scrolling the screen up or down
 
+ * Clickable hyperlinks to URIs
+
  * Changing the title of the terminal
 
 A terminal that supports control character sequences acts on them when they

@@ -14,7 +14,7 @@ import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Data.List (foldl', minimumBy)
 import Data.Maybe (mapMaybe)
 import qualified Data.Map.Strict as Map (Map, empty, insert, lookup)
-import System.IO (Handle, hIsTerminalDevice, stdin)
+import System.IO (Handle, hIsTerminalDevice, hPutStr, stdin)
 import System.IO.Unsafe (unsafePerformIO)
 import Text.ParserCombinators.ReadP (readP_to_S)
 
@@ -348,6 +348,8 @@ hHideCursor h
 hShowCursor h
   = emulatorFallback (Unix.hShowCursor h) $ withHandle h $
       \handle -> hChangeCursorVisibility handle True
+
+hHyperlinkWithParams h _ _ = hPutStr h
 
 -- Windows only supports setting the terminal title on a process-wide basis, so
 -- for now we will assume that that is what the user intended. This will fail if

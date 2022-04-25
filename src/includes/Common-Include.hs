@@ -103,6 +103,74 @@ hideCursor, showCursor :: IO ()
 hideCursor = hHideCursor stdout
 showCursor = hShowCursor stdout
 
+-- | Introduce a hyperlink with (key, value) parameters. Some terminals support
+-- an @id@ parameter key, so that hyperlinks with the same @id@ value are
+-- treated as connected.
+--
+-- @since 0.11.3
+hHyperlinkWithParams
+ :: Handle
+ -> [(String, String)]  -- ^ Parameters
+ -> String              -- ^ URI
+ -> String              -- ^ Link text
+ -> IO ()
+
+-- | Introduce a hyperlink with (key, value) parameters. Some terminals support
+-- an @id@ parameter key, so that hyperlinks with the same @id@ value are
+-- treated as connected.
+--
+-- @since 0.11.3
+hyperlinkWithParams
+ :: [(String, String)]  -- ^ Parameters
+ -> String              -- ^ URI
+ -> String              -- ^ Link text
+ -> IO ()
+hyperlinkWithParams = hHyperlinkWithParams stdout
+
+-- | Introduce a hyperlink.
+--
+-- @since 0.11.3
+hHyperlink
+ :: Handle
+ -> String  -- ^ URI
+ -> String  -- ^ Link text
+ -> IO ()
+hHyperlink h = hHyperlinkWithParams h []
+
+-- | Introduce a hyperlink.
+--
+-- @since 0.11.3
+hyperlink
+ :: String  -- ^ URI
+ -> String  -- ^ Link text
+ -> IO ()
+hyperlink = hHyperlink stdout
+
+-- | Introduce a hyperlink with an identifier for the link. Some terminals
+-- support an identifier, so that hyperlinks with the same identifier are
+-- treated as connected.
+--
+-- @since 0.11.3
+hHyperlinkWithId
+ :: Handle
+ -> String  -- ^ Identifier for the link
+ -> String  -- ^ URI
+ -> String  -- ^ Link text
+ -> IO ()
+hHyperlinkWithId h linkId = hHyperlinkWithParams h [("id", linkId)]
+
+-- | Introduce a hyperlink with an identifier for the link. Some terminals
+-- support an identifier, so that hyperlinks with the same identifier are
+-- treated as connected.
+--
+-- @since 0.11.3
+hyperlinkWithId
+ :: String  -- ^ Identifier for the link
+ -> String  -- ^ URI
+ -> String  -- ^ Link text
+ -> IO ()
+hyperlinkWithId = hHyperlinkWithId stdout
+
 -- | Set the terminal window title and icon name (that is, the text for the
 -- window in the Start bar, or similar).
 hSetTitle :: Handle

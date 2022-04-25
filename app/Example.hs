@@ -22,6 +22,7 @@ examples = [ cursorMovementExample
            , sgrColorExample
            , sgrOtherExample
            , cursorVisibilityExample
+           , hyperlinkExample
            , titleExample
            , getCursorPositionExample
            , getTerminalSizeExample
@@ -364,6 +365,22 @@ cursorVisibilityExample = do
   showCursor
   pause
   -- Cursor Demo|
+
+hyperlinkExample :: IO ()
+hyperlinkExample = do
+  putStr "Hyperlink demo: "
+  hyperlink "https://example.com" "Example hyperlink\n"
+  putStrLn ""
+  putStrLn "Linked hyperlinks demo:"
+  hyperlinkWithId "ref" "https://example.com" "Example linked hyperlink one\n"
+  hyperlinkWithId "ref" "https://example.com" "Example linked hyperlink two\n"
+
+  replicateM_ 5 pause
+  -- Hyperlink demo: Example hyperlink
+  --
+  -- Linked hyperlinks demo:
+  -- Example linked hyperlink one
+  -- Example linked hyperlink two
 
 titleExample :: IO ()
 titleExample = do
