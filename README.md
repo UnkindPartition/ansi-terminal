@@ -16,6 +16,7 @@ support for Haskell, which allows:
 -   Moving the cursor around
 -   Reporting the position of the cursor
 -   Scrolling the screen up or down
+-   Clickable hyperlinks to URIs
 -   Changing the title of the terminal
 
 By using emulation, it is compatible with versions of 'Command Prompt' and

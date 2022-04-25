@@ -47,6 +47,11 @@ module System.Console.ANSI.Codes
     -- * Cursor visibilty changes
   , hideCursorCode, showCursorCode
 
+    -- * Hyperlinks
+    -- | Some, but not all, terminals support hyperlinks - that is, clickable
+    -- text that points to a URI.
+  , hyperlinkCode, hyperlinkWithIdCode, hyperlinkWithParamsCode
+
     -- * Changing the title
   , setTitleCode
 
@@ -199,6 +204,50 @@ setSGRCode sgrs = csi (concatMap sgrToCode sgrs) "m"
 hideCursorCode, showCursorCode :: String
 hideCursorCode = csi [] "?25l"
 showCursorCode = csi [] "?25h"
+
+-- | Code to introduce a hyperlink with (key, value) parameters. Some terminals
+-- support an @id@ parameter key, so that hyperlinks with the same @id@ value
+-- are treated as connected.
+--
+-- @since 0.11.3
+hyperlinkWithParamsCode
+  :: [(String, String)]
+  -- ^ Parameters
+  -> String
+  -- ^ URI
+  -> String
+  -- ^ Link text
+  -> String
+hyperlinkWithParamsCode ps uri link =
+  "\ESC]8;" ++ ps' ++ ";" ++ uri ++ "\ESC\\" ++ link ++ "\ESC]8;;\ESC\\"
+ where
+  ps' = intercalate ":" $ map (\(k, v) -> k ++ "=" ++ v) ps
+
+-- | Code to introduce a hyperlink.
+--
+-- @since 0.11.3
+hyperlinkCode
+  :: String
+  -- ^ URI
+  -> String
+  -- ^ Link text
+  -> String
+hyperlinkCode = hyperlinkWithParamsCode []
+
+-- | Code to introduce a hyperlink with an identifier for the link. Some
+-- terminals support an identifier, so that hyperlinks with the same identifier
+-- are treated as connected.
+--
+-- @since 0.11.3
+hyperlinkWithIdCode
+  :: String
+  -- ^ Identifier for the link
+  -> String
+  -- ^ URI
+  -> String
+  -- ^ Link text
+  -> String
+hyperlinkWithIdCode linkId = hyperlinkWithParamsCode [("id", linkId)]
 
 -- | Code to set the terminal window title and the icon name (that is, the text
 -- for the window in the Start bar, or similar).

@@ -173,6 +173,32 @@ hideCursorCode = nativeOrEmulated U.hideCursorCode E.hideCursorCode
 showCursorCode :: String
 showCursorCode = nativeOrEmulated U.showCursorCode E.showCursorCode
 
+-- * Hyperlinks
+hHyperlinkWithParams =
+  nativeOrEmulated U.hHyperlinkWithParams E.hHyperlinkWithParams
+
+hyperlinkWithParamsCode
+  :: [(String, String)]
+  -> String
+  -> String
+  -> String
+hyperlinkWithParamsCode =
+  nativeOrEmulated U.hyperlinkWithParamsCode E.hyperlinkWithParamsCode
+
+hyperlinkCode
+  :: String
+  -> String
+  -> String
+hyperlinkCode = nativeOrEmulated U.hyperlinkCode E.hyperlinkCode
+
+hyperlinkWithIdCode
+  :: String
+  -> String
+  -> String
+  -> String
+hyperlinkWithIdCode =
+  nativeOrEmulated U.hyperlinkWithIdCode E.hyperlinkWithIdCode
+
 -- * Changing the title
 hSetTitle = nativeOrEmulated U.hSetTitle E.hSetTitle
 

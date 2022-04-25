@@ -29,6 +29,9 @@ module System.Console.ANSI.Windows.Emulator.Codes
     -- * Cursor visibilty changes
   , hideCursorCode, showCursorCode
 
+    -- * Hyperlinks
+  , hyperlinkCode, hyperlinkWithIdCode, hyperlinkWithParamsCode
+
     -- * Changing the title
   , setTitleCode
   ) where
@@ -89,6 +92,26 @@ setSGRCode _ = ""
 hideCursorCode, showCursorCode :: String
 hideCursorCode = ""
 showCursorCode = ""
+
+hyperlinkWithParamsCode
+  :: ([(String, String)])
+  -> String
+  -> String
+  -> String
+hyperlinkWithParamsCode _ _ _ = ""
+
+hyperlinkCode
+  :: String
+  -> String
+  -> String
+hyperlinkCode _ _ = ""
+
+hyperlinkWithIdCode
+  :: String
+  -> String
+  -> String
+  -> String
+hyperlinkWithIdCode _ _ _ = ""
 
 setTitleCode :: String -- ^ New title
              -> String

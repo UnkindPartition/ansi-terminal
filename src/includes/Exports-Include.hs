@@ -100,6 +100,20 @@
   , hideCursorCode
   , showCursorCode
 
+    -- * Hyperlinks
+    -- | Some, but not all, terminals support hyperlinks - that is, clickable
+    -- text that points to a URI. On Windows, if emulation is required,
+    -- hyperlinks are not emulated.
+  , hyperlink
+  , hHyperlink
+  , hyperlinkCode
+  , hyperlinkWithId
+  , hHyperlinkWithId
+  , hyperlinkWithIdCode
+  , hyperlinkWithParams
+  , hHyperlinkWithParams
+  , hyperlinkWithParamsCode
+
     -- * Changing the title
   , setTitle
   , hSetTitle
