@@ -28,7 +28,7 @@ examples = [ cursorMovementExample
            ]
 
 main :: IO ()
-main = mapM_ (\example -> resetScreen >> example) examples
+main = mapM_ (resetScreen >>) examples
 
 -- Annex D to Standard ECMA-48 (5th Ed, 1991) identifies that the representation
 -- of an erased state is implementation-dependent. There may or may not be a
@@ -229,7 +229,7 @@ sgrColorExample = do
       forM_ colors $ \color -> do
         setSGR [Reset]
         setSGR [SetColor layer intensity color]
-        putStrLn (show color)
+        print color
       pause
   -- The ANSI eight standard colors, 4 times in sequence (two layers and two
   -- intensities)

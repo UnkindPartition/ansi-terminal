@@ -60,7 +60,7 @@ module System.Console.ANSI.Codes
   , colorToCode, csi, sgrToCode
   ) where
 
-import Data.List (intersperse)
+import Data.List (intercalate)
 
 import Data.Colour.SRGB (toSRGB24, RGB (..))
 
@@ -74,7 +74,7 @@ import System.Console.ANSI.Types
 csi :: [Int]  -- ^ List of parameters for the control sequence
     -> String -- ^ Character(s) that identify the control function
     -> String
-csi args code = "\ESC[" ++ concat (intersperse ";" (map show args)) ++ code
+csi args code = "\ESC[" ++ intercalate ";" (map show args) ++ code
 
 -- | 'colorToCode' @color@ returns the 0-based index of the color (one of the
 -- eight colors in the ANSI standard).
