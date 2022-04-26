@@ -48,12 +48,6 @@ module System.Console.ANSI.Codes
   , hideCursorCode, showCursorCode
 
     -- * Changing the title
-    -- | Thanks to Brandon S. Allbery and Curt Sampson for pointing me in the
-    -- right direction on xterm title setting on haskell-cafe. The "0"
-    -- signifies that both the title and "icon" text should be set: i.e. the
-    -- text for the window in the Start bar (or similar) as well as that in
-    -- the actual window title. This is chosen for consistent behaviour
-    -- between Unixes and Windows.
   , setTitleCode
 
     -- * Utilities
@@ -206,8 +200,13 @@ hideCursorCode, showCursorCode :: String
 hideCursorCode = csi [] "?25l"
 showCursorCode = csi [] "?25h"
 
+-- | Code to set the terminal window title and the icon name (that is, the text
+-- for the window in the Start bar, or similar).
 
--- | XTerm control sequence to set the Icon Name and Window Title.
-setTitleCode :: String -- ^ New Icon Name and Window Title
+-- Thanks to Brandon S. Allbery and Curt Sampson for pointing me in the right
+-- direction on xterm title setting on haskell-cafe. The "0" signifies that both
+-- the title and "icon" text should be set. This is chosen for consistent
+-- behaviour between Unixes and Windows.
+setTitleCode :: String -- ^ New window title and icon name
              -> String
 setTitleCode title = "\ESC]0;" ++ filter (/= '\007') title ++ "\007"

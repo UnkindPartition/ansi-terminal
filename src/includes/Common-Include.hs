@@ -103,12 +103,14 @@ hideCursor, showCursor :: IO ()
 hideCursor = hHideCursor stdout
 showCursor = hShowCursor stdout
 
--- | Set the terminal window title
+-- | Set the terminal window title and icon name (that is, the text for the
+-- window in the Start bar, or similar).
 hSetTitle :: Handle
-          -> String -- ^ New title
+          -> String -- ^ New window title and icon name
           -> IO ()
--- | Set the terminal window title
-setTitle :: String -- ^ New title
+-- | Set the terminal window title and icon name (that is, the text for the
+-- window in the Start bar, or similar).
+setTitle :: String -- ^ New window title and icon name
          -> IO ()
 setTitle = hSetTitle stdout
 
