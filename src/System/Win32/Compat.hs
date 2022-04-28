@@ -40,8 +40,14 @@ import System.Win32.Types (BOOL, DWORD, ErrCode, HANDLE, LPCTSTR, LPDWORD,
   TCHAR, UINT, WORD, failIfFalse_, getLastError, iNVALID_HANDLE_VALUE,
   nullHANDLE, withTString)
 
+-- Circumstancees in which the patching of Win32 package for the Windows I/O
+-- Manager is required
+#if defined(__IO_MANAGER_WINIO__)&&MIN_VERSION_Win32(2,9,0)&&!MIN_VERSION_Win32(2,13,2)
+#define PATCHING_WIN32_PACKAGE_FOR_WINIO
+#endif
+
 -- Circumstances in which the patching of Win32 package is required
-#if !MIN_VERSION_Win32(2,5,1)||(defined(__IO_MANAGER_WINIO__)&&!MIN_VERSION_Win32(2,13,2))
+#if !MIN_VERSION_Win32(2,5,1)||defined(PATCHING_WIN32_PACKAGE_FOR_WINIO)
 #define PATCHING_WIN32_PACKAGE
 #endif
 
@@ -57,7 +63,7 @@ import Data.Typeable (cast)
 import Foreign.StablePtr (StablePtr, freeStablePtr, newStablePtr)
 import GHC.IO.Handle.Types (Handle (..), Handle__ (..))
 
-#if defined(__IO_MANAGER_WINIO__)&&!MIN_VERSION_Win32(2,13,2)
+#if defined(PATCHING_WIN32_PACKAGE_FOR_WINIO)
 import GHC.IO.Exception (IOErrorType (InappropriateType), IOException (IOError),
   ioException)
 import GHC.IO.SubSystem ((<!>))
@@ -87,7 +93,7 @@ type SHORT = CShort
 withStablePtr :: a -> (StablePtr a -> IO b) -> IO b
 withStablePtr value = bracket (newStablePtr value) freeStablePtr
 
-#if defined(__IO_MANAGER_WINIO__)&&!MIN_VERSION_Win32(2,13,2)
+#if defined(PATCHING_WIN32_PACKAGE_FOR_WINIO)
 
 withHandleToHANDLE :: Handle -> (HANDLE -> IO a) -> IO a
 withHandleToHANDLE = withHandleToHANDLEPosix <!> withHandleToHANDLENative
@@ -162,7 +168,7 @@ withHandleToHANDLE haskell_handle action =
 foreign import WINDOWS_CCONV unsafe "_get_osfhandle"
   cget_osfhandle :: CInt -> IO HANDLE
 
--- defined(__IO_MANAGER_WINIO__)&&!MIN_VERSION_Win32(2,13,2)
+-- defined(PATCHING_WIN32_PACKAGE_FOR_WINIO)
 #endif
 
 -- defined(PATCHING_WIN32_PACKAGE)
