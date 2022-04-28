@@ -1,6 +1,13 @@
 Changes
 =======
 
+Version 0.11.2
+--------------
+
+* On Windows, fix compatability with the Windows I/O Manager (WinIO) when
+  GHC >= 9.0.1 but `Win32` < 2.9.0.0.
+* Improvements to Haddock documentation.
+
 Version 0.11.1
 --------------
 
@@ -78,9 +85,9 @@ Version 0.8.2
 Version 0.8.1
 -------------
 
-* Add `hSupportsANSIWithoutEmulation`. On Windows 10, if the handle is identified
-  as connected to a native terminal ('Command Prompt' or 'PowerShell'), the
-  processing of 'ANSI' control characters will be enabled.
+* Add `hSupportsANSIWithoutEmulation`. On Windows 10, if the handle is
+  identified as connected to a native terminal ('Command Prompt' or
+  'PowerShell'), the processing of 'ANSI' control characters will be enabled.
 
 Version 0.8.0.4
 ---------------
