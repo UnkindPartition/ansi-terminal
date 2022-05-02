@@ -5,7 +5,7 @@ Version 0.11.3
 --------------
 
 * Add `hyperlink`, `hyperlinkWithId` and `hyperlinkWithParams`, and support for
-  clicable hyperlinks.
+  clickable hyperlinks.
 
 Version 0.11.2
 --------------
