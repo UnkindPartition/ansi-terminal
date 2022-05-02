@@ -59,6 +59,7 @@ module System.Console.ANSI.Codes
   , colorToCode, csi, sgrToCode
   ) where
 
+import Data.Char (isPrint)
 import Data.List (intercalate)
 
 import Data.Colour.SRGB (toSRGB24, RGB (..))
@@ -258,4 +259,4 @@ hyperlinkWithIdCode linkId = hyperlinkWithParamsCode [("id", linkId)]
 -- behaviour between Unixes and Windows.
 setTitleCode :: String -- ^ New window title and icon name
              -> String
-setTitleCode title = "\ESC]0;" ++ filter (/= '\007') title ++ "\007"
+setTitleCode title = "\ESC]0;" ++ filter isPrint title ++ "\ESC\\"
