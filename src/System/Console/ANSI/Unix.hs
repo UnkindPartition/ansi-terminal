@@ -86,7 +86,11 @@ hSupportsANSIWithoutEmulation h =
 
 -- getReportedCursorPosition :: IO String
 -- (See Common-Include.hs for Haddock documentation)
-getReportedCursorPosition = do
+getReportedCursorPosition = getReport "R"
+
+getReport :: String -> IO String
+getReport [] = error "getReport requires a sequence of terminating characters."
+getReport (e:es) = do
   -- If, unexpectedly, no data is available on the console input stream then
   -- the timeout will prevent the getChar blocking. For consistency with the
   -- Windows equivalent, returns "" if the expected information is unavailable.
@@ -101,11 +105,20 @@ getReportedCursorPosition = do
                       -- unexpected data in the input stream.
   get' s = do
     c <- getChar
-    if c /= 'R'
-      then get' (c:s) -- Continue building the list, until the expected 'R'
-                      -- character is obtained. Build the list in reverse order,
-                      -- in order to avoid O(n^2) complexity.
-      else return $ reverse (c:s) -- Reverse the order of the built list.
+    if c /= e
+      then get' (c:s) -- Continue building the list, until the first of
+                      -- the end characters is obtained. Build the list in
+                      -- reverse order, in order to avoid O(n^2) complexity.
+      else get'' es (c:s)
+
+  get'' [] s = return $ reverse s -- Reverse the order of the built list.
+  get'' (e':es') s = do
+    c <- getChar
+    if c /= e'
+      then get' (c:s) -- Continue building the list, with the original end
+                      -- characters
+      else get'' es' (c:s)  -- Continue building the list, checking against the
+                            -- remaining end characters
 
 -- hGetCursorPosition :: Handle -> IO (Maybe (Int, Int))
 -- (See Common-Include.hs for Haddock documentation)
