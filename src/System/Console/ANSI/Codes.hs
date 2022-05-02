@@ -56,7 +56,7 @@ module System.Console.ANSI.Codes
   , setTitleCode
 
     -- * Utilities
-  , colorToCode, csi, sgrToCode
+  , colorToCode, csi, osc, sgrToCode
   ) where
 
 import Data.Char (isPrint)
@@ -75,6 +75,18 @@ csi :: [Int]  -- ^ List of parameters for the control sequence
     -> String -- ^ Character(s) that identify the control function
     -> String
 csi args code = "\ESC[" ++ intercalate ";" (map show args) ++ code
+
+-- | 'osc' @parameterS parametersT@, where @parameterS@ specifies the type of
+-- operation to perform and @parametersT@ is the other parameter(s) (if any),
+-- returns the control sequence comprising the control function OPERATING SYSTEM
+-- COMMAND (OSC) followed by the parameters (separated by \';\') and ending with
+-- the STRING TERMINATOR (ST) @\"\\ESC\\\\\"@.
+--
+-- @since 0.11.4
+osc :: String -- ^ Ps parameter
+    -> String -- ^ Pt parameter(s)
+    -> String
+osc pS pT = "\ESC]" ++ pS ++ ";" ++ pT ++ "\ESC\\"
 
 -- | 'colorToCode' @color@ returns the 0-based index of the color (one of the
 -- eight colors in the ANSI standard).
@@ -219,10 +231,11 @@ hyperlinkWithParamsCode
   -> String
   -- ^ Link text
   -> String
-hyperlinkWithParamsCode ps uri link =
-  "\ESC]8;" ++ ps' ++ ";" ++ uri ++ "\ESC\\" ++ link ++ "\ESC]8;;\ESC\\"
+hyperlinkWithParamsCode params uri link =
+  osc "8" pT ++ link ++ osc "8" ";"
  where
-  ps' = intercalate ":" $ map (\(k, v) -> k ++ "=" ++ v) ps
+  pT = params' ++ ";" ++ uri
+  params' = intercalate ":" $ map (\(k, v) -> k ++ "=" ++ v) params
 
 -- | Code to introduce a hyperlink.
 --
@@ -259,4 +272,4 @@ hyperlinkWithIdCode linkId = hyperlinkWithParamsCode [("id", linkId)]
 -- behaviour between Unixes and Windows.
 setTitleCode :: String -- ^ New window title and icon name
              -> String
-setTitleCode title = "\ESC]0;" ++ filter isPrint title ++ "\ESC\\"
+setTitleCode title = osc "0" (filter isPrint title)
