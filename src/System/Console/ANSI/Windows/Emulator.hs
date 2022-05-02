@@ -10,6 +10,7 @@ import Control.Exception (catchJust, IOException)
 import qualified Control.Exception as CE (catch)
 import Control.Monad (unless)
 import Data.Bits ((.&.), (.|.), complement, shiftL, shiftR)
+import Data.Char (isPrint)
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Data.List (foldl', minimumBy)
 import Data.Maybe (mapMaybe)
@@ -357,7 +358,7 @@ hHyperlinkWithParams h _ _ = hPutStr h
 -- really what I'm designing for.
 hSetTitle h title
   = emulatorFallback (Unix.hSetTitle h title) $
-      withTString title $ setConsoleTitle
+      withTString (filter isPrint title) setConsoleTitle
 
 cursorPositionRef :: IORef (Map.Map HANDLE COORD)
 {-# NOINLINE cursorPositionRef #-}
