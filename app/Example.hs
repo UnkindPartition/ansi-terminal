@@ -27,6 +27,7 @@ examples = [ cursorMovementExample
            , titleExample
            , getCursorPositionExample
            , getTerminalSizeExample
+           , getLayerColorExample
            ]
 
 main :: IO ()
@@ -439,3 +440,16 @@ getTerminalSizeExample = do
     Nothing -> putStrLn "Error: unable to get the terminal size\n"
   pause
   -- The size of the terminal is 25 rows by 80 columns.
+
+getLayerColorExample :: IO ()
+getLayerColorExample = do
+  fgResult <- getLayerColor Foreground
+  case fgResult of
+    Just fgCol -> putStrLn $ "The reported foreground color is:\n" ++
+      show fgCol ++ "\n"
+    Nothing -> putStrLn "Error: unable to get the foreground color\n"
+  bgResult <- getLayerColor Background
+  case bgResult of
+    Just bgCol -> putStrLn $ "The reported background color is:\n" ++
+      show bgCol ++ "\n"
+    Nothing -> putStrLn "Error: unable to get the background color\n"

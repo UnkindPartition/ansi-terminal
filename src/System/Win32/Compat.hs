@@ -27,6 +27,7 @@ module System.Win32.Compat
   , SHORT                -- from Win32-2.5.0.0
   , TCHAR
   , UINT
+  , ULONG                -- from Win32-2.5.0.0
   , WORD
   , failIfFalse_
   , getLastError
@@ -53,7 +54,7 @@ import System.Win32.Types (BOOL, DWORD, ErrCode, HANDLE, LPCTSTR, LPDWORD,
 
 #if !defined(PATCHING_WIN32_PACKAGE)
 
-import System.Win32.Types (SHORT, withHandleToHANDLE)
+import System.Win32.Types (SHORT, ULONG, withHandleToHANDLE)
 
 #else
 
@@ -73,8 +74,9 @@ import System.Win32.Types (withHandleToHANDLEPosix)
 
 #if !MIN_VERSION_Win32(2,5,0)
 import Foreign.C.Types (CShort (..))
+import Data.Word (Word32)
 #else
-import System.Win32.Types (SHORT)
+import System.Win32.Types (SHORT, ULONG)
 #endif
 
 #if !MIN_VERSION_Win32(2,5,1)
@@ -88,6 +90,7 @@ import GHC.IO.FD (FD(..)) -- A wrapper around an Int32
 
 #if !MIN_VERSION_Win32(2,5,0)
 type SHORT = CShort
+type ULONG = Word32
 #endif
 
 withStablePtr :: a -> (StablePtr a -> IO b) -> IO b

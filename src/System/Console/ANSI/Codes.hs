@@ -56,6 +56,9 @@ module System.Console.ANSI.Codes
     -- * Using screen buffers
   , useAlternateScreenBufferCode, useNormalScreenBufferCode
 
+    -- * Reporting background or foreground colors
+  , reportLayerColorCode
+
     -- * Select Graphic Rendition mode: colors and other whizzy stuff
   , setSGRCode
 
@@ -200,6 +203,25 @@ restoreCursorCode = "\ESC8"
 -- @since 0.7.1
 reportCursorPositionCode :: String
 reportCursorPositionCode = csi [] "6n"
+
+-- | Code to emit the layer color into the console input stream, immediately
+-- after being recognised on the output stream, as:
+-- @ESC ] \<Ps> ; rgb: \<red> ; \<green> ; \<blue> \<ST>@
+-- where @\<Ps>@ is @10@ for 'Foreground' and @11@ for 'Background'; @\<red>@,
+-- @\<green>@ and @\<blue>@ are the color channel values in hexadecimal (4, 8,
+-- 12 and 16 bit values are possible, although 16 bit values are most common);
+-- and @\<ST>@ is the STRING TERMINATOR (ST). ST depends on the terminal
+-- software and may be the @BEL@ character or @ESC \\@ characters.
+--
+-- This function may be of limited, or no, use on Windows operating systems
+-- because (1) the control character sequence is not supported on native
+-- terminals (2) of difficulties in obtaining the data emitted into the
+-- console input stream. See 'System.Console.ANSI.getReportedLayerColor'.
+--
+-- @since 0.11.4
+reportLayerColorCode :: ConsoleLayer -> String
+reportLayerColorCode Foreground = osc "10" "?"
+reportLayerColorCode Background = osc "11" "?"
 
 clearFromCursorToScreenEndCode, clearFromCursorToScreenBeginningCode,
   clearScreenCode :: String

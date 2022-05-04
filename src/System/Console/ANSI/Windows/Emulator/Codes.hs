@@ -26,6 +26,9 @@ module System.Console.ANSI.Windows.Emulator.Codes
     -- * Using screen buffers
   , useAlternateScreenBufferCode, useNormalScreenBufferCode
 
+    -- * Reporting background and foreground colors
+  , reportLayerColorCode
+
     -- * Select Graphic Rendition mode: colors and other whizzy stuff
   , setSGRCode
 
@@ -88,6 +91,9 @@ scrollPageDownCode _ = ""
 useAlternateScreenBufferCode, useNormalScreenBufferCode :: String
 useAlternateScreenBufferCode = ""
 useNormalScreenBufferCode      = ""
+
+reportLayerColorCode :: ConsoleLayer -> String
+reportLayerColorCode _ = ""
 
 setSGRCode :: [SGR] -- ^ Commands: these will typically be applied on top of the
                     -- current console SGR mode. An empty list of commands is

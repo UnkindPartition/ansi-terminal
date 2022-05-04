@@ -22,7 +22,6 @@ import System.Timeout (timeout)
 import Text.ParserCombinators.ReadP (readP_to_S)
 
 import System.Console.ANSI.Codes
-import System.Console.ANSI.Types
 
 -- This file contains code that is common to modules System.Console.ANSI.Unix,
 -- System.Console.ANSI.Windows and System.Console.ANSI.Windows.Emulator, such as
@@ -65,6 +64,8 @@ hScrollPageDown h n = hPutStr h $ scrollPageDownCode n
 hUseAlternateScreenBuffer h = hPutStr h useAlternateScreenBufferCode
 hUseNormalScreenBuffer h = hPutStr h useNormalScreenBufferCode
 
+hReportLayerColor h layer = hPutStr h $ reportLayerColorCode layer
+
 hSetSGR h sgrs = hPutStr h $ setSGRCode sgrs
 
 hHideCursor h = hPutStr h hideCursorCode
@@ -93,6 +94,15 @@ hSupportsANSIWithoutEmulation h =
 -- getReportedCursorPosition :: IO String
 -- (See Common-Include.hs for Haddock documentation)
 getReportedCursorPosition = getReport "\ESC[" ["R"]
+
+-- getReportedLayerColor :: ConsoleLayer -> IO String
+-- (See Common-Include.hs for Haddock documentation)
+getReportedLayerColor layer =
+  getReport ("\ESC]" ++ pS ++ ";rgb:") ["\BEL", "\ESC\\"]
+ where
+   pS = case layer of
+          Foreground -> "10"
+          Background -> "11"
 
 getReport :: String -> [String] -> IO String
 getReport _ [] = error "getReport requires a list of terminating sequences."
@@ -164,6 +174,33 @@ hGetCursorPosition h = fmap to0base <$> getCursorPosition'
       [] -> return Nothing
       [((row, col),_)] -> return $ Just (row, col)
       (_:_) -> return Nothing
+  clearStdin = do
+    isReady <- hReady stdin
+    when isReady $ do
+      _ <-getChar
+      clearStdin
+
+-- hGetLayerColor :: Handle -> IO (Maybe (Colour Word16))
+-- (See Common-Include.hs for Haddock documentation)
+hGetLayerColor h layer = do
+  input <- bracket (hGetBuffering stdin) (hSetBuffering stdin) $ \_ -> do
+    -- set no buffering (if 'no buffering' is not already set, the contents of
+    -- the buffer will be discarded, so this needs to be done before the
+    -- cursor positon is emitted)
+    hSetBuffering stdin NoBuffering
+    -- ensure that echoing is off
+    bracket (hGetEcho stdin) (hSetEcho stdin) $ \_ -> do
+      hSetEcho stdin False
+      clearStdin
+      hReportLayerColor h layer
+      hFlush h -- ensure the report cursor position code is sent to the
+               -- operating system
+      getReportedLayerColor layer
+  case readP_to_S (layerColor layer) input of
+      [] -> return Nothing
+      [(col, _)] -> return $ Just col
+      (_:_) -> return Nothing
+ where
   clearStdin = do
     isReady <- hReady stdin
     when isReady $ do
