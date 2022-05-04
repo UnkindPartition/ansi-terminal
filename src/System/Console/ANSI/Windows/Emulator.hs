@@ -18,6 +18,7 @@ import qualified Data.Map.Strict as Map (Map, empty, insert, lookup)
 import System.IO (Handle, hIsTerminalDevice, hPutStr, stdin)
 import System.IO.Unsafe (unsafePerformIO)
 import Text.ParserCombinators.ReadP (readP_to_S)
+import Text.Printf(printf)
 
 import Data.Colour (Colour)
 import Data.Colour.Names (black, blue, cyan, green, grey, lime, magenta, maroon,
@@ -29,7 +30,6 @@ import System.Console.MinTTY (isMinTTYHandle)
 import System.Win32.MinTTY (isMinTTYHandle)
 #endif
 
-import System.Console.ANSI.Types
 import qualified System.Console.ANSI.Unix as Unix
 import System.Console.ANSI.Windows.Detect
 import System.Console.ANSI.Windows.Emulator.Codes
@@ -397,6 +397,45 @@ hReportCursorPosition h
             "\ESC[" ++ show y ++ ";" ++ show x ++ "R"
         return ()
 
+hReportLayerColor h layer
+  = emulatorFallback (Unix.hReportLayerColor h layer) $ withHandle h $
+      \handle -> do
+        result <- getConsoleScreenBufferInfoEx handle
+        let attributes = csbix_attributes result
+            ct = csbix_color_table result
+            colorTable = map (\f -> f ct)
+              [ ct_color0
+              , ct_color1
+              , ct_color2
+              , ct_color3
+              , ct_color4
+              , ct_color5
+              , ct_color6
+              , ct_color7
+              , ct_color8
+              , ct_color9
+              , ct_colorA
+              , ct_colorB
+              , ct_colorC
+              , ct_colorD
+              , ct_colorE
+              , ct_colorF
+              ]
+            fgRef = attributes .&. fOREGROUND_INTENSE_WHITE
+            bgRef = shiftR (attributes .&. bACKGROUND_INTENSE_WHITE) 4
+            fgColor = colorTable !! fromIntegral fgRef
+            bgColor = colorTable !! fromIntegral bgRef
+            (oscCode, color) = case layer of
+              Foreground -> ("10", fgColor)
+              Background -> ("11", bgColor)
+            r = shiftL (color .&. 0xFF) 8
+            g = color .&. 0xFF00
+            b = shiftR (color .&. 0xFF0000) 8
+            report = printf "\ESC]%s;rgb:%04x/%04x/%04x\ESC\\" oscCode r g b
+        hIn <- getStdHandle sTD_INPUT_HANDLE
+        _ <- writeConsoleInput hIn $ keyPresses report
+        return ()
+
 keyPress :: Char -> [INPUT_RECORD]
 keyPress c = [keyDown, keyUp]
  where
@@ -470,10 +509,12 @@ isNotDumb = (/= Just "dumb") . lookup "TERM" <$> getEnvironment
 
 -- getReportedCursorPosition :: IO String
 -- (See Common-Include.hs for Haddock documentation)
-getReportedCursorPosition
-  = CE.catch getReportedCursorPosition' getCPExceptionHandler
+getReportedCursorPosition = getReported
+
+getReported :: IO String
+getReported = CE.catch getReported' getReportedExceptionHandler
  where
-  getReportedCursorPosition' = withHandleToHANDLE stdin action
+  getReported' = withHandleToHANDLE stdin action
    where
     action hdl = do
       n <- getNumberOfConsoleInputEvents hdl
@@ -501,25 +542,40 @@ getReportedCursorPosition
 hGetCursorPosition h = fmap to0base <$> getCursorPosition'
  where
   to0base (row, col) = (row - 1, col - 1)
-  getCursorPosition' = CE.catch getCursorPosition'' getCPExceptionHandler
+  getCursorPosition' =
+    hGetReport h hReportCursorPosition getReportedCursorPosition cursorPosition
+
+hGetReport :: Handle
+           -> (Handle -> IO ())
+           -> IO String -> ReadP a -> IO (Maybe a)
+hGetReport h report get parse =
+  CE.catch getReport getReportedExceptionHandler
    where
-    getCursorPosition'' = do
+    getReport = do
       withHandleToHANDLE stdin flush -- Flush the console input buffer
-      hReportCursorPosition h
+      report h
       hFlush h -- ensure the report cursor position code is sent to the
                -- operating system
-      input <- getReportedCursorPosition
-      case readP_to_S cursorPosition input of
+      input <- get
+      case readP_to_S parse input of
         [] -> return Nothing
-        [((row, col),_)] -> return $ Just (row, col)
+        [(value,_)] -> return $ Just value
         (_:_) -> return Nothing
      where
       flush hdl = do
         n <- getNumberOfConsoleInputEvents hdl
         unless (n == 0) (void $ readConsoleInput hdl n)
 
-getCPExceptionHandler :: IOException -> IO a
-getCPExceptionHandler e = error msg
+
+-- getReportedLayerColor :: ConsoleLayer -> IO String
+--(See Common-Include.hs for Haddock documentation)
+getReportedLayerColor _ = getReported
+
+hGetLayerColor h layer = hGetReport h
+  (`hReportLayerColor` layer) (getReportedLayerColor layer) (layerColor layer)
+
+getReportedExceptionHandler :: IOException -> IO a
+getReportedExceptionHandler e = error msg
  where
   msg = "Error: " ++ show e ++ "\nThis error may be avoided by using a " ++
         "console based on the Windows' Console API, such as Command Prompt " ++

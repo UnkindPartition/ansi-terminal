@@ -11,7 +11,6 @@ module System.Console.ANSI.Windows
 
 import System.IO (Handle)
 
-import System.Console.ANSI.Types
 import qualified System.Console.ANSI.Unix as U
 import System.Console.ANSI.Windows.Detect (ANSISupport (..),
   ConsoleDefaultState (..), aNSISupport)
@@ -159,6 +158,13 @@ useNormalScreenBufferCode :: String
 useNormalScreenBufferCode = nativeOrEmulated
   U.useNormalScreenBufferCode E.useNormalScreenBufferCode
 
+-- * Reporting the background or foreground colors
+hReportLayerColor = E.hReportLayerColor
+
+reportLayerColorCode :: ConsoleLayer -> String
+reportLayerColorCode = nativeOrEmulated
+  U.reportLayerColorCode E.reportLayerColorCode
+
 -- * Select Graphic Rendition mode: colors and other whizzy stuff
 --
 -- The following SGR codes are NOT implemented by Windows 10 Threshold 2:
@@ -234,3 +240,11 @@ getReportedCursorPosition = E.getReportedCursorPosition
 -- hGetCursorPosition :: Handle -> IO (Maybe (Int, Int))
 -- (See Common-Include.hs for Haddock documentation)
 hGetCursorPosition = E.hGetCursorPosition
+
+-- getReportedLayerColor :: ConsoleLayer -> IO String
+-- (See Common-Include.hs for Haddock documentation)
+getReportedLayerColor = E.getReportedLayerColor
+
+-- hGetLayerColor :: ConsoleLayer -> IO (Maybe (RGB Word16))
+-- (See Common-Include.hs for Haddock documentation)
+hGetLayerColor = E.hGetLayerColor

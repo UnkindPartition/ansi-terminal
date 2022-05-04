@@ -105,6 +105,11 @@
   , useAlternateScreenBufferCode
   , useNormalScreenBufferCode
 
+    -- * Reporting the background or foreground colors
+  , reportLayerColor
+  , hReportLayerColor
+  , reportLayerColorCode
+
     -- * Select Graphic Rendition mode: colors and other whizzy stuff
   , setSGR
   , hSetSGR
@@ -155,3 +160,9 @@
     -- * Getting the terminal size
   , getTerminalSize
   , hGetTerminalSize
+
+    -- * Getting the background or foreground colors
+  , getLayerColor
+  , hGetLayerColor
+  , getReportedLayerColor
+  , layerColor

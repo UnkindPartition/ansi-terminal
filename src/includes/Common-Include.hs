@@ -10,10 +10,15 @@ import Data.Functor ((<$>))
 #endif
 
 import Control.Monad (void)
-import Data.Char (isDigit)
+import Data.Char (digitToInt, isDigit, isHexDigit)
+import Data.Word (Word16)
 import System.Environment (getEnvironment)
 import System.IO (hFlush, stdout)
-import Text.ParserCombinators.ReadP (char, many1, ReadP, satisfy)
+import Text.ParserCombinators.ReadP (ReadP, (<++), char, many1, satisfy, string)
+
+import Data.Colour.SRGB (RGB (..))
+
+import System.Console.ANSI.Types
 
 hCursorUp, hCursorDown, hCursorForward, hCursorBackward
   :: Handle
@@ -360,6 +365,132 @@ getCursorPosition = hGetCursorPosition stdout
 --
 -- @since 0.10.1
 hGetCursorPosition :: Handle -> IO (Maybe (Int, Int))
+
+-- | Looking for a way to get layer colors? See 'getLayerColor'.
+--
+-- Emit the layerColor into the console input stream, immediately after
+-- being recognised on the output stream, as:
+-- @ESC ] \<Ps> ; rgb: \<red> ; \<green> ; \<blue> \<ST>@
+-- where @\<Ps>@ is @10@ for 'Foreground' and @11@ for 'Background'; @\<red>@,
+-- @\<green>@ and @\<blue>@ are the color channel values in hexadecimal (4, 8,
+-- 12 and 16 bit values are possible, although 16 bit values are most common);
+-- and @\<ST>@ is the STRING TERMINATOR (ST). ST depends on the terminal
+-- software and may be the @BEL@ character or @ESC \\@ characters.
+--
+-- This function may be of limited, or no, use on Windows operating systems
+-- because (1) the function is not supported on native terminals and is
+-- emulated, but the emulation does not work on Windows Terminal and (2) of
+-- difficulties in obtaining the data emitted into the console input stream.
+--
+-- @since 0.11.4
+reportLayerColor :: ConsoleLayer -> IO ()
+reportLayerColor = hReportLayerColor stdout
+
+-- @since 0.11.4
+hReportLayerColor :: Handle -> ConsoleLayer -> IO ()
+
+-- | Attempts to get the reported layer color data from the console input
+-- stream. The function is intended to be called immediately after
+-- 'reportLayerColor' (or related functions) have caused characters to be
+-- emitted into the stream.
+--
+-- For example, on a Unix-like operating system:
+--
+-- > -- set no buffering (if 'no buffering' is not already set, the contents of
+-- > -- the buffer will be discarded, so this needs to be done before the cursor
+-- > -- positon is emitted)
+-- > hSetBuffering stdin NoBuffering
+-- > -- ensure that echoing is off
+-- > input <- bracket (hGetEcho stdin) (hSetEcho stdin) $ \_ -> do
+-- >   hSetEcho stdin False
+-- >   reportLayerColor Foreground
+-- >   hFlush stdout -- ensure the report cursor position code is sent to the
+-- >                 -- operating system
+-- >   getReportedLayerColor Foreground
+--
+-- On Windows operating systems, the function is not supported on consoles, such
+-- as mintty, that are not based on the Windows' Console API. (Command Prompt
+-- and PowerShell are based on the Console API.)
+--
+-- @since 0.11.4
+getReportedLayerColor :: ConsoleLayer -> IO String
+
+-- | Attempts to get the reported layer color, combining the functions
+-- 'reportLayerColor', 'getReportedLayerColor' and 'layerColor'. Any RGB color
+-- is scaled to be 16 bits per channel, the most common format reported by
+-- terminal software. Returns 'Nothing' if any data emitted by
+-- 'reportLayerColor', obtained by 'getReportedLayerColor', cannot be parsed by
+-- 'layerColor'. Uses 'stdout'. If 'stdout' will be redirected, see
+-- 'hGetLayerColor' for a more general function.
+--
+-- On Windows operating systems, the function is not supported on consoles, such
+-- as mintty, that are not based on the Windows' Console API. (Command Prompt
+-- and PowerShell are based on the Console API.) This function also relies on
+-- emulation that does not work on Windows Terminal.
+--
+-- @since 0.11.4
+getLayerColor :: ConsoleLayer -> IO (Maybe(RGB Word16))
+getLayerColor = hGetLayerColor stdout
+
+-- | Attempts to get the reported layer color, combining the functions
+-- 'hReportLayerColor', 'getReportedLayerColor' and 'layerColor'. Any RGB color
+-- is scaled to be 16 bits per channel, the most common format reported by
+-- terminal software. Returns 'Nothing' if any data emitted by
+-- 'hReportLayerColor', obtained by 'getReportedLayerColor', cannot be parsed by
+-- 'layerColor'.
+--
+-- On Windows operating systems, the function is not supported on consoles, such
+-- as mintty, that are not based on the Windows' Console API. (Command Prompt
+-- and PowerShell are based on the Console API.) This function also relies on
+-- emulation that does not work on Windows Terminal.
+--
+-- @since 0.11.4
+hGetLayerColor :: Handle -> ConsoleLayer -> IO (Maybe (RGB Word16))
+
+-- | Parses the characters emitted by 'reportLayerColor' into the console input
+-- stream.
+--
+-- For example, if the characters emitted by 'reportLayerColor' are in 'String'
+-- @input@ then the parser could be applied like this:
+--
+-- > let result = readP_to_S (layerColor layer) input
+-- > case result of
+-- >     [] -> putStrLn $ "Error: could not parse " ++ show input
+-- >     [(col, _)] -> putStrLn $ "The color was " ++ show col ++ "."
+-- >     (_:_) -> putStrLn $ "Error: parse not unique"
+--
+-- @since 0.11.4
+layerColor :: ConsoleLayer -> ReadP (RGB Word16)
+layerColor layer = do
+  void $ string "\ESC]"
+  void $ string $ case layer of
+    Foreground -> "10"
+    Background -> "11"
+  void $ string ";rgb:"
+  redHex <- hexadecimal -- A non-negative whole hexadecimal number
+  void $ char '/'
+  greenHex <- hexadecimal -- A non-negative whole hexadecimal number
+  void $ char '/'
+  blueHex <- hexadecimal -- A non-negative whole hexadecimal number
+  void $ string "\BEL" <++ string "\ESC\\"
+  let lenRed = length redHex
+      lenGreen = length greenHex
+      lenBlue = length blueHex
+  if lenRed == lenGreen && lenGreen == lenBlue
+    then
+      if lenRed == 0 || lenRed > 4
+        then fail "Color format not recognised"
+        else
+          let m = 16 ^ (4 - lenRed)
+              r = fromIntegral $ m * hexToInt redHex
+              g = fromIntegral $ m * hexToInt greenHex
+              b = fromIntegral $ m * hexToInt blueHex
+          in  return $ RGB r g b
+    else fail "Color format not recognised"
+ where
+  hexDigit = satisfy isHexDigit
+  hexadecimal = many1 hexDigit
+  hexToInt hex = foldl (\d a -> d * 16 + a) 0 (map digitToInt hex)
 
 -- | Attempts to get the current terminal size (height in rows, width in
 -- columns).
