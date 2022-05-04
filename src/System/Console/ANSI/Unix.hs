@@ -9,9 +9,12 @@ module System.Console.ANSI.Unix
 #include "Exports-Include.hs"
   ) where
 
-import Data.Maybe (fromMaybe)
 import Control.Exception.Base (bracket)
 import Control.Monad (when)
+#if MIN_VERSION_base(4,8,0)
+import Data.List (uncons)
+#endif
+import Data.Maybe (fromMaybe, mapMaybe)
 import System.IO (BufferMode (..), Handle, hGetBuffering, hGetEcho,
   hIsTerminalDevice, hIsWritable, hPutStr, hReady, hSetBuffering, hSetEcho,
   stdin)
@@ -86,39 +89,54 @@ hSupportsANSIWithoutEmulation h =
 
 -- getReportedCursorPosition :: IO String
 -- (See Common-Include.hs for Haddock documentation)
-getReportedCursorPosition = getReport "R"
+getReportedCursorPosition = getReport "\ESC[" ["R"]
 
-getReport :: String -> IO String
-getReport [] = error "getReport requires a sequence of terminating characters."
-getReport (e:es) = do
+getReport :: String -> [String] -> IO String
+getReport _ [] = error "getReport requires a list of terminating sequences."
+getReport startChars endChars = do
   -- If, unexpectedly, no data is available on the console input stream then
   -- the timeout will prevent the getChar blocking. For consistency with the
   -- Windows equivalent, returns "" if the expected information is unavailable.
-  fromMaybe "" <$> timeout 500000 get -- 500 milliseconds
+  fromMaybe "" <$> timeout 500000 (getStart startChars "") -- 500 milliseconds
  where
-  get = do
+  endChars' = mapMaybe uncons endChars
+#if !MIN_VERSION_base(4,8,0)
+   where
+     uncons :: [a] -> Maybe (a, [a])
+     uncons []     = Nothing
+     uncons (x:xs) = Just (x, xs)
+#endif
+
+  -- The list is built in reverse order, in order to avoid O(n^2) complexity.
+  -- So, getReport yields the reversed built list.
+
+  getStart :: String -> String -> IO String
+  getStart "" r = getRest r
+  getStart (h:hs) r = do
     c <- getChar
-    if c == '\ESC'
-      then get' [c]
-      else return [c] -- If the first character is not the expected \ESC then
-                      -- give up. This provides a modicom of protection against
-                      -- unexpected data in the input stream.
-  get' s = do
+    if c == h
+      then getStart hs (c:r) -- Try to get the rest of the start characters
+      else return $ reverse (c:r) -- If the first character(s) are not the
+                                  -- expected start then give up. This provides
+                                  -- a modicom of protection against unexpected
+                                  -- data in the input stream.
+  getRest :: String -> IO String
+  getRest r = do
+    c <- getChar
+    case lookup c endChars' of
+      Nothing -> getRest (c:r) -- Continue building the list, until the first of
+                               -- the end characters is obtained. 
+      Just es -> getEnd es (c:r) -- Try to get the rest of the end characters.
+
+  getEnd :: String -> String -> IO String
+  getEnd "" r = return $ reverse r
+  getEnd (e:es) r = do
     c <- getChar
     if c /= e
-      then get' (c:s) -- Continue building the list, until the first of
-                      -- the end characters is obtained. Build the list in
-                      -- reverse order, in order to avoid O(n^2) complexity.
-      else get'' es (c:s)
-
-  get'' [] s = return $ reverse s -- Reverse the order of the built list.
-  get'' (e':es') s = do
-    c <- getChar
-    if c /= e'
-      then get' (c:s) -- Continue building the list, with the original end
-                      -- characters
-      else get'' es' (c:s)  -- Continue building the list, checking against the
-                            -- remaining end characters
+      then getRest (c:r) -- Continue building the list, with the original end
+                         -- characters.
+      else getEnd es (c:r) -- Continue building the list, checking against the
+                           -- remaining end characters.
 
 -- hGetCursorPosition :: Handle -> IO (Maybe (Int, Int))
 -- (See Common-Include.hs for Haddock documentation)
