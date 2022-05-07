@@ -10,10 +10,12 @@
   , cursorDown
   , cursorForward
   , cursorBackward
+    -- ** \'h...\' variants
   , hCursorUp
   , hCursorDown
   , hCursorForward
   , hCursorBackward
+    -- ** \'...Code\' variants
   , cursorUpCode
   , cursorDownCode
   , cursorForwardCode
@@ -29,52 +31,57 @@
     -- <https://github.com/UnkindPartition/ansi-terminal/issues/10> for the details.
   , cursorUpLine
   , cursorDownLine
+    -- ** \'h...\' variants
   , hCursorUpLine
   , hCursorDownLine
+    -- ** \'...Code\' variants
   , cursorUpLineCode
   , cursorDownLineCode
 
     -- * Directly changing cursor position
   , setCursorColumn
-  , hSetCursorColumn
-  , setCursorColumnCode
-
   , setCursorPosition
+    -- ** \'h...\' variants
+  , hSetCursorColumn
   , hSetCursorPosition
+    -- ** \'...Code\' variants
+  , setCursorColumnCode
   , setCursorPositionCode
 
     -- * Saving, restoring and reporting cursor position
   , saveCursor
-  , hSaveCursor
-  , saveCursorCode
-
   , restoreCursor
-  , hRestoreCursor
-  , restoreCursorCode
-
   , reportCursorPosition
+    -- ** \'h...\' variants
+  , hSaveCursor
+  , hRestoreCursor
   , hReportCursorPosition
+    -- ** \'...Code\' variants
+  , saveCursorCode
+  , restoreCursorCode
   , reportCursorPositionCode
 
     -- * Clearing parts of the screen
-    -- | Note that these functions only clear parts of the screen. They do not move the
-    -- cursor.
+    -- | Note that these functions only clear parts of the screen. They do not
+    -- move the cursor. Some functions are based on the whole screen and others
+    -- are based on the line in which the cursor is located.
   , clearFromCursorToScreenEnd
   , clearFromCursorToScreenBeginning
   , clearScreen
-  , hClearFromCursorToScreenEnd
-  , hClearFromCursorToScreenBeginning
-  , hClearScreen
-  , clearFromCursorToScreenEndCode
-  , clearFromCursorToScreenBeginningCode
-  , clearScreenCode
-
   , clearFromCursorToLineEnd
   , clearFromCursorToLineBeginning
   , clearLine
+    -- ** \'h...\' variants
+  , hClearFromCursorToScreenEnd
+  , hClearFromCursorToScreenBeginning
+  , hClearScreen
   , hClearFromCursorToLineEnd
   , hClearFromCursorToLineBeginning
-  , hClearLine
+  , hClearLine  
+    -- ** \'...Code\' variants
+  , clearFromCursorToScreenEndCode
+  , clearFromCursorToScreenBeginningCode
+  , clearScreenCode  
   , clearFromCursorToLineEndCode
   , clearFromCursorToLineBeginningCode
   , clearLineCode
@@ -82,8 +89,10 @@
     -- * Scrolling the screen
   , scrollPageUp
   , scrollPageDown
+    -- ** \'h...\' variants
   , hScrollPageUp
   , hScrollPageDown
+    -- ** \'...Code\' variants
   , scrollPageUpCode
   , scrollPageDownCode
 
@@ -95,8 +104,10 @@
     -- * Cursor visibilty changes
   , hideCursor
   , showCursor
+    -- ** \'h...\' variants
   , hHideCursor
   , hShowCursor
+    -- ** \'...Code\' variants
   , hideCursorCode
   , showCursorCode
 
@@ -105,13 +116,15 @@
     -- text that points to a URI. On Windows, if emulation is required,
     -- hyperlinks are not emulated.
   , hyperlink
-  , hHyperlink
-  , hyperlinkCode
   , hyperlinkWithId
-  , hHyperlinkWithId
-  , hyperlinkWithIdCode
   , hyperlinkWithParams
+    -- ** \'h...\' variants
+  , hHyperlink
+  , hHyperlinkWithId
   , hHyperlinkWithParams
+    -- ** \'...Code\' variants
+  , hyperlinkCode
+  , hyperlinkWithIdCode
   , hyperlinkWithParamsCode
 
     -- * Changing the title
@@ -133,3 +146,4 @@
     -- * Getting the terminal size
   , getTerminalSize
   , hGetTerminalSize
+  
