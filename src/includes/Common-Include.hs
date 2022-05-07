@@ -17,7 +17,7 @@ import Text.ParserCombinators.ReadP (char, many1, ReadP, satisfy)
 
 hCursorUp, hCursorDown, hCursorForward, hCursorBackward
   :: Handle
-  -> Int -- ^ Number of lines or characters to move
+  -> Int -- Number of lines or characters to move
   -> IO ()
 cursorUp, cursorDown, cursorForward, cursorBackward
   :: Int -- ^ Number of lines or characters to move
@@ -28,7 +28,7 @@ cursorForward = hCursorForward stdout
 cursorBackward = hCursorBackward stdout
 
 hCursorDownLine, hCursorUpLine :: Handle
-                               -> Int -- ^ Number of lines to move
+                               -> Int -- Number of lines to move
                                -> IO ()
 cursorDownLine, cursorUpLine :: Int -- ^ Number of lines to move
                              -> IO ()
@@ -36,7 +36,7 @@ cursorDownLine = hCursorDownLine stdout
 cursorUpLine = hCursorUpLine stdout
 
 hSetCursorColumn :: Handle
-                 -> Int -- ^ 0-based column to move to
+                 -> Int -- 0-based column to move to
                  -> IO ()
 
 -- | Move the cursor to the specified column. The column numbering is 0-based
@@ -46,8 +46,8 @@ setCursorColumn :: Int -- ^ 0-based column to move to
 setCursorColumn = hSetCursorColumn stdout
 
 hSetCursorPosition :: Handle
-                   -> Int -- ^ 0-based row to move to
-                   -> Int -- ^ 0-based column to move to
+                   -> Int -- 0-based row to move to
+                   -> Int -- 0-based column to move to
                    -> IO ()
 
 -- | Move the cursor to the specified position (row and column). The position is
@@ -85,10 +85,6 @@ restoreCursor :: IO ()
 -- In isolation of 'getReportedCursorPosition' or 'getCursorPosition', this
 -- function may be of limited use on Windows operating systems because of
 -- difficulties in obtaining the data emitted into the console input stream.
--- The function 'hGetBufNonBlocking' in module "System.IO" does not work on
--- Windows. This has been attributed to the lack of non-blocking primatives in
--- the operating system (see the GHC bug report #806 at
--- <https://ghc.haskell.org/trac/ghc/ticket/806>).
 --
 -- @since 0.7.1
 reportCursorPosition :: IO ()
@@ -103,16 +99,16 @@ hideCursor, showCursor :: IO ()
 hideCursor = hHideCursor stdout
 showCursor = hShowCursor stdout
 
--- | Introduce a hyperlink with (key, value) parameters. Some terminals support
+-- Introduce a hyperlink with (key, value) parameters. Some terminals support
 -- an @id@ parameter key, so that hyperlinks with the same @id@ value are
 -- treated as connected.
 --
 -- @since 0.11.3
 hHyperlinkWithParams
  :: Handle
- -> [(String, String)]  -- ^ Parameters
- -> String              -- ^ URI
- -> String              -- ^ Link text
+ -> [(String, String)]  -- Parameters
+ -> String              -- URI
+ -> String              -- Link text
  -> IO ()
 
 -- | Introduce a hyperlink with (key, value) parameters. Some terminals support
@@ -127,13 +123,13 @@ hyperlinkWithParams
  -> IO ()
 hyperlinkWithParams = hHyperlinkWithParams stdout
 
--- | Introduce a hyperlink.
+-- Introduce a hyperlink.
 --
 -- @since 0.11.3
 hHyperlink
  :: Handle
- -> String  -- ^ URI
- -> String  -- ^ Link text
+ -> String  -- URI
+ -> String  -- Link text
  -> IO ()
 hHyperlink h = hHyperlinkWithParams h []
 
@@ -146,16 +142,16 @@ hyperlink
  -> IO ()
 hyperlink = hHyperlink stdout
 
--- | Introduce a hyperlink with an identifier for the link. Some terminals
+-- Introduce a hyperlink with an identifier for the link. Some terminals
 -- support an identifier, so that hyperlinks with the same identifier are
 -- treated as connected.
 --
 -- @since 0.11.3
 hHyperlinkWithId
  :: Handle
- -> String  -- ^ Identifier for the link
- -> String  -- ^ URI
- -> String  -- ^ Link text
+ -> String  -- Identifier for the link
+ -> String  -- URI
+ -> String  -- Link text
  -> IO ()
 hHyperlinkWithId h linkId = hHyperlinkWithParams h [("id", linkId)]
 
@@ -171,10 +167,10 @@ hyperlinkWithId
  -> IO ()
 hyperlinkWithId = hHyperlinkWithId stdout
 
--- | Set the terminal window title and icon name (that is, the text for the
+-- Set the terminal window title and icon name (that is, the text for the
 -- window in the Start bar, or similar).
 hSetTitle :: Handle
-          -> String -- ^ New window title and icon name
+          -> String -- New window title and icon name
           -> IO ()
 -- | Set the terminal window title and icon name (that is, the text for the
 -- window in the Start bar, or similar).

@@ -177,17 +177,13 @@ restoreCursorCode = "\ESC8"
 -- Note that the information that is emitted is 1-based (the top-left corner is
 -- at row 1 column 1) but 'setCursorPositionCode' is 0-based.
 --
--- In isolation of 'getReportedCursorPosition' or 'getCursorPosition', this
--- function may be of limited use on Windows operating systems because of
--- difficulties in obtaining the data emitted into the console input stream.
--- The function 'hGetBufNonBlocking' in module "System.IO" does not work on
--- Windows. This has been attributed to the lack of non-blocking primatives in
--- the operating system (see the GHC bug report #806 at
--- <https://ghc.haskell.org/trac/ghc/ticket/806>).
+-- In isolation of 'System.Console.ANSI.getReportedCursorPosition' or
+-- 'System.Console.ANSI.getCursorPosition', this function may be of limited use
+-- on Windows operating systems because of difficulties in obtaining the data
+-- emitted into the console input stream.
 --
 -- @since 0.7.1
 reportCursorPositionCode :: String
-
 reportCursorPositionCode = csi [] "6n"
 
 clearFromCursorToScreenEndCode, clearFromCursorToScreenBeginningCode,
