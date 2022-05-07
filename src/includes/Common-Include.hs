@@ -334,9 +334,10 @@ hGetCursorPosition :: Handle -> IO (Maybe (Int, Int))
 -- There is no \'ANSI\' control character sequence that reports the terminal
 -- size. So, it attempts to set the cursor position beyond the bottom right
 -- corner of the terminal and then use 'getCursorPosition' to query the console
--- input stream. It works only on terminals that support each step. Uses
--- 'stdout'. If 'stdout' will be redirected, see 'hGetTerminalSize' for a more
--- general function.
+-- input stream. It works only on terminals that support each step and if data
+-- can be emitted to 'stdin'. (Use 'System.IO.hIsTerminalDevice' to test if
+-- 'stdin' is connected to a terminal.) Uses 'stdout'. If 'stdout' will be
+-- redirected, see 'System.IO.hGetTerminalSize' for a more general function.
 --
 -- On Windows operating systems, the function is not supported on consoles, such
 -- as mintty, that are not based on Windows' Console API. (Command Prompt and
@@ -357,7 +358,9 @@ getTerminalSize = hGetTerminalSize stdout
 -- There is no \'ANSI\' control character sequence that reports the terminal
 -- size. So, it attempts to set the cursor position beyond the bottom right
 -- corner of the terminal and then use 'hGetCursorPosition' to query the console
--- input stream. It works only on terminals that support each step.
+-- input stream. It works only on terminals that support each step and if data
+-- can be emitted to 'stdin'. (Use 'System.IO.hIsTerminalDevice' to test if
+-- 'stdin' is connected to a terminal.)
 --
 -- On Windows operating systems, the function is not supported on consoles, such
 -- as mintty, that are not based on the Windows' Console API. (Command Prompt
