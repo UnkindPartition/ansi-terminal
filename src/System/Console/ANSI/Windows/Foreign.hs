@@ -18,8 +18,8 @@ module System.Console.ANSI.Windows.Foreign
 
     charToWCHAR, cWcharsToChars,
 
-    COLORTABLE(..), COLORREF, COORD(..), SMALL_RECT(..), rect_top, rect_bottom,
-    rect_left, rect_right, rect_width, rect_height, CONSOLE_CURSOR_INFO(..),
+    COLORREF, COORD(..), SMALL_RECT(..), rect_top, rect_bottom, rect_left,
+    rect_right, rect_width, rect_height, CONSOLE_CURSOR_INFO(..),
     CONSOLE_SCREEN_BUFFER_INFO(..), CONSOLE_SCREEN_BUFFER_INFOEX(..),
     CHAR_INFO(..),
 
@@ -64,7 +64,7 @@ import Data.Typeable (Typeable)
 import Data.Word (Word32)
 import Foreign.C.Types (CInt (..), CWchar (..))
 import Foreign.Marshal.Alloc (alloca)
-import Foreign.Marshal.Array (allocaArray, peekArray, withArrayLen)
+import Foreign.Marshal.Array (allocaArray, peekArray, pokeArray, withArrayLen)
 import Foreign.Marshal.Utils (maybeWith, with)
 import Foreign.Ptr (Ptr, castPtr, plusPtr)
 import Foreign.Storable (Storable (..))
@@ -217,78 +217,8 @@ data CONSOLE_SCREEN_BUFFER_INFOEX = CONSOLE_SCREEN_BUFFER_INFOEX
   , csbix_maximum_window_size  :: COORD
   , csbix_popup_attributes     :: WORD
   , csbix_fullscreen_supported :: BOOL
-  , csbix_color_table          :: COLORTABLE
+  , csbix_color_table          :: [COLORREF]
   } deriving (Show)
-
-data COLORTABLE = COLORTABLE
-  { ct_color0 :: COLORREF
-  , ct_color1 :: COLORREF
-  , ct_color2 :: COLORREF
-  , ct_color3 :: COLORREF
-  , ct_color4 :: COLORREF
-  , ct_color5 :: COLORREF
-  , ct_color6 :: COLORREF
-  , ct_color7 :: COLORREF
-  , ct_color8 :: COLORREF
-  , ct_color9 :: COLORREF
-  , ct_colorA :: COLORREF
-  , ct_colorB :: COLORREF
-  , ct_colorC :: COLORREF
-  , ct_colorD :: COLORREF
-  , ct_colorE :: COLORREF
-  , ct_colorF :: COLORREF
-  } deriving (Show)
-
-instance Storable COLORTABLE where
-  sizeOf ~(COLORTABLE
-    color0 color1 color2 color3 color4 color5 color6 color7 color8 color9 colorA
-      colorB colorC colorD colorE colorF)
-    = sizeOf color0 + sizeOf color1 + sizeOf color2 + sizeOf color3
-        + sizeOf color4 + sizeOf color5 + sizeOf color6 + sizeOf color7
-        + sizeOf color8 + sizeOf color9 + sizeOf colorA + sizeOf colorB
-        + sizeOf colorC + sizeOf colorD + sizeOf colorE + sizeOf colorF
-  alignment ~(COLORTABLE color0 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _) =
-    alignment color0
-  peek ptr = do
-    (color0, ptr1) <- peekAndOffset (castPtr ptr)
-    (color1, ptr2) <- peekAndOffset ptr1
-    (color2, ptr3) <- peekAndOffset ptr2
-    (color3, ptr4) <- peekAndOffset ptr3
-    (color4, ptr5) <- peekAndOffset ptr4
-    (color5, ptr6) <- peekAndOffset ptr5
-    (color6, ptr7) <- peekAndOffset ptr6
-    (color7, ptr8) <- peekAndOffset ptr7
-    (color8, ptr9) <- peekAndOffset ptr8
-    (color9, ptr10) <- peekAndOffset ptr9
-    (colorA, ptr11) <- peekAndOffset ptr10
-    (colorB, ptr12) <- peekAndOffset ptr11
-    (colorC, ptr13) <- peekAndOffset ptr12
-    (colorD, ptr14) <- peekAndOffset ptr13
-    (colorE, ptr15) <- peekAndOffset ptr14
-    colorF <- peek ptr15
-    return (COLORTABLE
-      color0 color1 color2 color3 color4 color5 color6 color7 color8 color9
-      colorA colorB colorC colorD colorE colorF)
-  poke ptr (COLORTABLE
-    color0 color1 color2 color3 color4 color5 color6 color7 color8 color9 colorA
-    colorB colorC colorD colorE colorF)
-    = do
-      ptr1 <- pokeAndOffset (castPtr ptr) color0
-      ptr2 <- pokeAndOffset ptr1 color1
-      ptr3 <- pokeAndOffset ptr2 color2
-      ptr4 <- pokeAndOffset ptr3 color3
-      ptr5 <- pokeAndOffset ptr4 color4
-      ptr6 <- pokeAndOffset ptr5 color5
-      ptr7 <- pokeAndOffset ptr6 color6
-      ptr8 <- pokeAndOffset ptr7 color7
-      ptr9 <- pokeAndOffset ptr8 color8
-      ptr10 <- pokeAndOffset ptr9 color9
-      ptr11 <- pokeAndOffset ptr10 colorA
-      ptr12 <- pokeAndOffset ptr11 colorB
-      ptr13 <- pokeAndOffset ptr12 colorC
-      ptr14 <- pokeAndOffset ptr13 colorD
-      ptr15 <- pokeAndOffset ptr14 colorE
-      poke ptr15 colorF
 
 -- When specifying an explicit RGB color, the COLORREF value has the following
 -- hexadecimal form:
@@ -302,10 +232,10 @@ type COLORREF = Word32
 instance Storable CONSOLE_SCREEN_BUFFER_INFOEX where
   sizeOf ~(CONSOLE_SCREEN_BUFFER_INFOEX
     size cursor_position attributes window maximum_window_size popup_attributes
-      fullscreen_supported color_table)
+      fullscreen_supported _)
     = sizeOf sizeCsbix + sizeOf size + sizeOf cursor_position + sizeOf attributes + sizeOf window
         + sizeOf maximum_window_size + sizeOf popup_attributes
-        + sizeOf fullscreen_supported + sizeOf color_table
+        + sizeOf fullscreen_supported + 16 * sizeOf (undefined :: COLORREF)
   alignment ~(CONSOLE_SCREEN_BUFFER_INFOEX _ _ _ _ _ _ _ _) = alignment sizeCsbix
   peek ptr = do
     let ptr0 = castPtr ptr `plusPtr` sizeOf sizeCsbix
@@ -316,7 +246,7 @@ instance Storable CONSOLE_SCREEN_BUFFER_INFOEX where
     (maximum_window_size, ptr5) <- peekAndOffset ptr4
     (popup_attributes, ptr6) <- peekAndOffset ptr5
     (fullscreen_supported, ptr7) <- peekAndOffset ptr6
-    color_table <- peek ptr7
+    color_table <- peekArray 16 ptr7
     return (CONSOLE_SCREEN_BUFFER_INFOEX
       size cursor_position attributes window maximum_window_size
       popup_attributes fullscreen_supported color_table)
@@ -332,7 +262,9 @@ instance Storable CONSOLE_SCREEN_BUFFER_INFOEX where
       ptr5 <- pokeAndOffset ptr4 maximum_window_size
       ptr6 <- pokeAndOffset ptr5 popup_attributes
       ptr7 <- pokeAndOffset ptr6 fullscreen_supported
-      poke ptr7 color_table
+      pokeArray ptr7 color_table'
+   where
+    color_table' = take 16 $ color_table ++ repeat 0
 
 sizeCsbix :: ULONG
 sizeCsbix = fromIntegral $

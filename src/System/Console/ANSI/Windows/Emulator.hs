@@ -402,25 +402,7 @@ hReportLayerColor h layer
       \handle -> do
         result <- getConsoleScreenBufferInfoEx handle
         let attributes = csbix_attributes result
-            ct = csbix_color_table result
-            colorTable = map (\f -> f ct)
-              [ ct_color0
-              , ct_color1
-              , ct_color2
-              , ct_color3
-              , ct_color4
-              , ct_color5
-              , ct_color6
-              , ct_color7
-              , ct_color8
-              , ct_color9
-              , ct_colorA
-              , ct_colorB
-              , ct_colorC
-              , ct_colorD
-              , ct_colorE
-              , ct_colorF
-              ]
+            colorTable = csbix_color_table result
             fgRef = attributes .&. fOREGROUND_INTENSE_WHITE
             bgRef = shiftR (attributes .&. bACKGROUND_INTENSE_WHITE) 4
             fgColor = colorTable !! fromIntegral fgRef
