@@ -343,8 +343,8 @@ hGetCursorPosition :: Handle -> IO (Maybe (Int, Int))
 -- as mintty, that are not based on Windows' Console API. (Command Prompt and
 -- PowerShell are based on the Console API.)
 --
--- For a different approach, one that does not use control character sequences,
--- see the
+-- For a different approach, one that does not use control character sequences
+-- and works when 'stdin' is redirected, see the
 -- <https://hackage.haskell.org/package/terminal-size terminal-size> package.
 --
 -- @since 0.9
@@ -366,8 +366,8 @@ getTerminalSize = hGetTerminalSize stdout
 -- as mintty, that are not based on the Windows' Console API. (Command Prompt
 -- and PowerShell are based on the Console API.)
 --
--- For a different approach, one that does not use control character sequences,
--- see the
+-- For a different approach, one that does not use control character sequences
+-- and works when 'stdin' is redirected, see the
 -- <https://hackage.haskell.org/package/terminal-size terminal-size> package.
 --
 -- @since 0.10.1
