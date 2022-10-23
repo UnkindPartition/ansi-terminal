@@ -22,9 +22,17 @@ module System.Console.ANSI.Codes
     module System.Console.ANSI.Types
 
     -- * Cursor movement by character
+    --
+    -- | These functions yield @\"\"@ when the number is @0@ as, on some
+    -- terminals, a @0@ parameter for the underlying \'ANSI\' code specifies a
+    -- default parameter of @1@.
   , cursorUpCode, cursorDownCode, cursorForwardCode, cursorBackwardCode
 
     -- * Cursor movement by line
+    --
+    -- | These functions yield the equivalent of @setCursorColumnCode 0@ when
+    -- the number is @0@ as, on some terminals, a @0@ parameter for the
+    -- underlying \'ANSI\' code specifies a default parameter of @1@.
   , cursorUpLineCode, cursorDownLineCode
 
     -- * Directly changing cursor position
@@ -39,6 +47,10 @@ module System.Console.ANSI.Codes
   , clearFromCursorToLineBeginningCode, clearLineCode
 
     -- * Scrolling the screen
+    --
+    -- | These functions yield @\"\"@ when the number is @0@ as, on some
+    -- terminals, a @0@ parameter for the underlying \'ANSI\' code specifies a
+    -- default parameter of @1@.
   , scrollPageUpCode, scrollPageDownCode
 
     -- * Select Graphic Rendition mode: colors and other whizzy stuff
@@ -142,15 +154,15 @@ sgrToCode sgr = case sgr of
 cursorUpCode, cursorDownCode, cursorForwardCode, cursorBackwardCode
   :: Int -- ^ Number of lines or characters to move
   -> String
-cursorUpCode n = csi [n] "A"
-cursorDownCode n = csi [n] "B"
-cursorForwardCode n = csi [n] "C"
-cursorBackwardCode n = csi [n] "D"
+cursorUpCode n = if n == 0 then "" else csi [n] "A"
+cursorDownCode n = if n == 0 then "" else csi [n] "B"
+cursorForwardCode n = if n == 0 then "" else csi [n] "C"
+cursorBackwardCode n = if n == 0 then "" else csi [n] "D"
 
 cursorDownLineCode, cursorUpLineCode :: Int -- ^ Number of lines to move
                                      -> String
-cursorDownLineCode n = csi [n] "E"
-cursorUpLineCode n = csi [n] "F"
+cursorDownLineCode n = if n == 0 then csi [1] "G" else csi [n] "E"
+cursorUpLineCode n = if n == 0 then csi [1] "G" else csi [n] "F"
 
 -- | Code to move the cursor to the specified column. The column numbering is
 -- 0-based (that is, the left-most column is numbered 0).
@@ -200,8 +212,8 @@ clearLineCode = csi [2] "K"
 
 scrollPageUpCode, scrollPageDownCode :: Int -- ^ Number of lines to scroll by
                                      -> String
-scrollPageUpCode n = csi [n] "S"
-scrollPageDownCode n = csi [n] "T"
+scrollPageUpCode n = if n == 0 then "" else csi [n] "S"
+scrollPageDownCode n = if n == 0 then "" else csi [n] "T"
 
 setSGRCode :: [SGR] -- ^ Commands: these will typically be applied on top of the
                     -- current console SGR mode. An empty list of commands is
