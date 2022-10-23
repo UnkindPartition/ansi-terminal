@@ -29,6 +29,11 @@ Flag Example
         Description:    Build the example application
         Default:        False
 
+Flag Win32-2-13-1
+        Description:    Use Win32-2-13.1.0 or later. If used, there is
+                        no dependency on the mintty package.
+        Default:        True
+
 Library
         Hs-Source-Dirs:         src
         Exposed-Modules:        System.Console.ANSI
@@ -41,8 +46,10 @@ Library
                               , colour >=2.1.0
         if os(windows)
                 Build-Depends:          containers >= 0.5.0.0
-                                      , mintty
-                                      , Win32 >= 2.0
+                if flag(Win32-2-13-1)
+                      Build-Depends:   Win32 >= 2.13.1
+                else
+                      Build-Depends:   Win32 < 2.13.1, mintty
                 Cpp-Options:            -DWINDOWS
                 Other-Modules:          System.Console.ANSI.Windows
                                         System.Console.ANSI.Windows.Detect

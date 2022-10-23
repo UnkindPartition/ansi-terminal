@@ -23,7 +23,11 @@ import Data.Colour (Colour)
 import Data.Colour.Names (black, blue, cyan, green, grey, lime, magenta, maroon,
   navy, olive, purple, red, silver, teal, white, yellow)
 import Data.Colour.SRGB (RGB (..), toSRGB)
+#ifdef MIN_VERSION_mintty
 import System.Console.MinTTY (isMinTTYHandle)
+#else
+import System.Win32.MinTTY (isMinTTYHandle)
+#endif
 
 import System.Console.ANSI.Types
 import qualified System.Console.ANSI.Unix as Unix
