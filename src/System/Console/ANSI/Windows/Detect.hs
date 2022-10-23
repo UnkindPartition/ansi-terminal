@@ -15,7 +15,11 @@ import Control.Applicative ((<$>))
 
 import Control.Exception (SomeException(..), throwIO, try)
 import Data.Bits ((.&.), (.|.))
+#ifdef MIN_VERSION_mintty
 import System.Console.MinTTY (isMinTTYHandle)
+#else
+import System.Win32.MinTTY (isMinTTYHandle)
+#endif
 import System.IO (Handle, hIsWritable, stdout)
 import System.IO.Unsafe (unsafePerformIO)
 
