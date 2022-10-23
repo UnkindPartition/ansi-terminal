@@ -65,6 +65,7 @@ jobs:
           - "8.8.4"
           - "8.10.7"
         winio: [false]
+        win32-2_13_1: [false]
         include:
           - ghc: "9.0.2"
             cabal: "3.6"
@@ -72,6 +73,9 @@ jobs:
           - ghc: "9.2.2"
             cabal: "3.6"
             winio: true
+          - ghc: "9.4.2"
+            cabal: "3.6"
+            win32-2_13_1: true
     steps:
       - uses: actions/checkout@v2
       - uses: haskell/actions/setup@v2
@@ -92,3 +96,8 @@ jobs:
       - run: cabal v2-build
       - if: matrix.winio
         run: cabal v2-build --ghc-option=-with-rtsopts=--io-manager=native
+      - if: matrix.win32-2_13_1
+        run: |
+          # need to unfreeze Win32
+          rm cabal.project.freeze
+          cabal v2-build --constraint 'Win32 >= 2.13.1' --constraint 'ansi-terminal +Win32-2-13-1'
