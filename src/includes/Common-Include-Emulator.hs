@@ -47,12 +47,16 @@ clearFromCursorToLineEnd def = hClearFromCursorToLineEnd def stdout
 clearFromCursorToLineBeginning def = hClearFromCursorToLineBeginning def stdout
 clearLine def = hClearLine def stdout
 
+-- | Scroll the displayed information up or down the terminal: not widely
+-- supported
 hScrollPageUp, hScrollPageDown
   :: ConsoleDefaultState -- ^ The default console state
   -> Handle
   -> Int -- ^ Number of lines to scroll by
   -> IO ()
 
+-- | Scroll the displayed information up or down the terminal: not widely
+-- supported
 scrollPageUp, scrollPageDown
   :: ConsoleDefaultState -- ^ The default console state
   -> Int -- ^ Number of lines to scroll by

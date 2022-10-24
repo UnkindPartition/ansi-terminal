@@ -31,9 +31,8 @@ are flushed from the output buffer (with a newline character @\"\\n\"@ or, for
 the standard output channel, @hFlush stdout@).
 
 == \'ANSI\' standards
-The \'ANSI\' standards refer to (1) standard
-<https://www.ecma-international.org/wp-content/uploads/ECMA-48_5th_edition_june_1991.pdf ECMA-48>
-\`Control Functions for Coded Character Sets\' (5th edition, 1991); (2) extensions in ITU-T
+The \'ANSI\' standards refer to (1) standard ECMA-48 \`Control Functions for
+Coded Character Sets\' (5th edition, 1991); (2) extensions in ITU-T
 Recommendation (previously CCITT Recommendation) T.416 (03/93) \'Information
 Technology – Open Document Architecture (ODA) and Interchange Format: Character
 Content Architectures\` (also published as ISO/IEC International Standard
