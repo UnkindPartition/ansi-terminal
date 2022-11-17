@@ -145,6 +145,20 @@ scrollPageUpCode = nativeOrEmulated U.scrollPageUpCode E.scrollPageUpCode
 scrollPageDownCode :: Int -> String
 scrollPageDownCode = nativeOrEmulated U.scrollPageDownCode E.scrollPageDownCode
 
+-- * Using screen buffers
+hUseAlternateScreenBuffer = nativeOrEmulated
+  U.hUseAlternateScreenBuffer E.hUseAlternateScreenBuffer
+hUseNormalScreenBuffer = nativeOrEmulated
+  U.hUseNormalScreenBuffer E.hUseNormalScreenBuffer
+
+useAlternateScreenBufferCode :: String
+useAlternateScreenBufferCode = nativeOrEmulated
+  U.useAlternateScreenBufferCode E.useAlternateScreenBufferCode
+
+useNormalScreenBufferCode :: String
+useNormalScreenBufferCode = nativeOrEmulated
+  U.useNormalScreenBufferCode E.useNormalScreenBufferCode
+
 -- * Select Graphic Rendition mode: colors and other whizzy stuff
 --
 -- The following SGR codes are NOT implemented by Windows 10 Threshold 2:

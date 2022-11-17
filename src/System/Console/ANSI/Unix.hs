@@ -62,6 +62,9 @@ hClearLine h = hPutStr h clearLineCode
 hScrollPageUp h n = hPutStr h $ scrollPageUpCode n
 hScrollPageDown h n = hPutStr h $ scrollPageDownCode n
 
+hUseAlternateScreenBuffer h = hPutStr h useAlternateScreenBufferCode
+hUseNormalScreenBuffer h = hPutStr h useNormalScreenBufferCode
+
 hSetSGR h sgrs = hPutStr h $ setSGRCode sgrs
 
 hHideCursor h = hPutStr h hideCursorCode
@@ -125,7 +128,7 @@ getReport startChars endChars = do
     c <- getChar
     case lookup c endChars' of
       Nothing -> getRest (c:r) -- Continue building the list, until the first of
-                               -- the end characters is obtained. 
+                               -- the end characters is obtained.
       Just es -> getEnd es (c:r) -- Try to get the rest of the end characters.
 
   getEnd :: String -> String -> IO String

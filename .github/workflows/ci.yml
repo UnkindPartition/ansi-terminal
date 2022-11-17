@@ -13,12 +13,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        cabal: ["3.6"]
-        # no ghc-7.6.3 or ghc-7.8.4 available
+        cabal: ["3.8"]
+        # no ghc-7.2.2, ghc-7.4.2, ghc-7.6.3 or ghc-7.8.4 available
         ghc:
           - "7.0.4"
-          - "7.2.2"
-          - "7.4.2"
           - "7.10.3"
           - "8.0.2"
           - "8.2.2"
@@ -27,7 +25,8 @@ jobs:
           - "8.8.4"
           - "8.10.7"
           - "9.0.2"
-          - "9.2.2"
+          - "9.2.4"
+          - "9.4.1"
     steps:
       - uses: actions/checkout@v2
       - uses: haskell/actions/setup@v2
@@ -51,7 +50,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        cabal: ["3.6"]
+        cabal: ["3.8"]
         # haskell/actions/setup does not recognise ghc-7.0.4, -7.2.2 or -7.4.2
         # choco install ghc --version 7.10.3 is broken
         ghc:
@@ -68,13 +67,13 @@ jobs:
         win32-2_13_1: [false]
         include:
           - ghc: "9.0.2"
-            cabal: "3.6"
+            cabal: "3.8"
             winio: true
-          - ghc: "9.2.2"
-            cabal: "3.6"
+          - ghc: "9.2.4"
+            cabal: "3.8"
             winio: true
           - ghc: "9.4.2"
-            cabal: "3.6"
+            cabal: "3.8"
             win32-2_13_1: true
     steps:
       - uses: actions/checkout@v2

@@ -23,6 +23,9 @@ module System.Console.ANSI.Windows.Emulator.Codes
     -- * Scrolling the screen
   , scrollPageUpCode, scrollPageDownCode
 
+    -- * Using screen buffers
+  , useAlternateScreenBufferCode, useNormalScreenBufferCode
+
     -- * Select Graphic Rendition mode: colors and other whizzy stuff
   , setSGRCode
 
@@ -81,6 +84,10 @@ scrollPageUpCode, scrollPageDownCode :: Int -- ^ Number of lines to scroll by
                                      -> String
 scrollPageUpCode _   = ""
 scrollPageDownCode _ = ""
+
+useAlternateScreenBufferCode, useNormalScreenBufferCode :: String
+useAlternateScreenBufferCode = ""
+useNormalScreenBufferCode      = ""
 
 setSGRCode :: [SGR] -- ^ Commands: these will typically be applied on top of the
                     -- current console SGR mode. An empty list of commands is

@@ -77,11 +77,11 @@
   , hClearScreen
   , hClearFromCursorToLineEnd
   , hClearFromCursorToLineBeginning
-  , hClearLine  
+  , hClearLine
     -- ** \'...Code\' variants
   , clearFromCursorToScreenEndCode
   , clearFromCursorToScreenBeginningCode
-  , clearScreenCode  
+  , clearScreenCode
   , clearFromCursorToLineEndCode
   , clearFromCursorToLineBeginningCode
   , clearLineCode
@@ -95,6 +95,18 @@
     -- ** \'...Code\' variants
   , scrollPageUpCode
   , scrollPageDownCode
+
+    -- * Using screen buffers
+    -- | On Windows, if emulation is required, switching between alternate and
+    -- normal screen buffers is not emulated.
+  , useAlternateScreenBuffer
+  , useNormalScreenBuffer
+    -- ** \'h...\' variants
+  , hUseAlternateScreenBuffer
+  , hUseNormalScreenBuffer
+    -- ** \'...Code\' variants
+  , useAlternateScreenBufferCode
+  , useNormalScreenBufferCode
 
     -- * Select Graphic Rendition mode: colors and other whizzy stuff
   , setSGR
@@ -146,4 +158,3 @@
     -- * Getting the terminal size
   , getTerminalSize
   , hGetTerminalSize
-  
