@@ -19,6 +19,7 @@ examples = [ cursorMovementExample
            , saveRestoreCursorExample
            , clearExample
            , scrollExample
+           , screenBuffersExample
            , sgrColorExample
            , sgrOtherExample
            , cursorVisibilityExample
@@ -220,6 +221,17 @@ scrollExample = do
   pause
   -- Line Two
   -- Line Three
+
+screenBuffersExample :: IO ()
+screenBuffersExample = do
+  replicateM_ 5 $ putStrLn "This message is on the Normal Screen Bufffer"
+  replicateM_ 5 pause
+  useAlternateScreenBuffer
+  replicateM_ 5 $ putStrLn "This message is on the Alternate Screen Bufffer"
+  replicateM_ 5 pause
+  useNormalScreenBuffer
+  replicateM_ 5 $ putStrLn "This message is continuing where we left off"
+  replicateM_ 5 pause
 
 sgrColorExample :: IO ()
 sgrColorExample = do

@@ -1,7 +1,9 @@
-extra-deps: []
-resolver: lts-19.5
+resolver: lts-20.0
 flags:
   ansi-terminal:
     example: false
 packages:
 - '.'
+extra-deps:
+- filepath-1.4.100.0@sha256:45a49fc8c379b33fdba3c8cc96dcf22b15c50995d0f4b8638e9b6b9423d1b877,5875
+- Win32-2.13.4.0@sha256:9b8a82743985f8a95c03b2bc64be33ad1cd603e2493cb8b48d3cb923556dbb61,5585

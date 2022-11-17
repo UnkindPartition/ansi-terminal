@@ -236,6 +236,9 @@ hScrollPageDown cds h n
   = emulatorFallback (Unix.hScrollPageDown h n) $ withHandle h $
       \handle -> hScrollPage cds handle n
 
+hUseAlternateScreenBuffer _ = return ()
+hUseNormalScreenBuffer _ = return ()
+
 {-# INLINE applyANSIColorToAttribute #-}
 applyANSIColorToAttribute :: WORD -> WORD -> WORD -> Color -> WORD -> WORD
 applyANSIColorToAttribute rED gREEN bLUE color attribute = case color of

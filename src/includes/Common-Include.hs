@@ -99,6 +99,39 @@ hideCursor, showCursor :: IO ()
 hideCursor = hHideCursor stdout
 showCursor = hShowCursor stdout
 
+hUseAlternateScreenBuffer
+  :: Handle
+  -> IO ()
+
+hUseNormalScreenBuffer
+  :: Handle
+  -> IO ()
+
+-- | Use the Alternate Screen Buffer. If currently using the Normal Screen
+-- Buffer, it will save the cursor position and switch to the Alternate Screen
+-- Buffer. It will always clear the Alternate Screen Buffer. The Alternate
+-- Screen Buffer has no scroll back facility.
+--
+-- It is an application's responsibility to ensure that it switches back to the
+-- Normal Screen Buffer if an exception is raised while the Alternate Screen
+-- Buffer is being used. For example, by using 'Control.Exception.bracket_':
+--
+-- > bracket_ useAlternateScreenBuffer useNormalScreenBuffer action
+--
+-- @since 0.11.4
+useAlternateScreenBuffer
+  :: IO ()
+useAlternateScreenBuffer = hUseAlternateScreenBuffer stdout
+
+-- | Use the Normal Screen Buffer. If currently using the Alternate Screen
+-- Buffer, it will clear the Alternate Screen Buffer, and switch to the Normal
+-- Screen Buffer. It will always restore the saved cursor position.
+--
+-- @since 0.11.4
+useNormalScreenBuffer
+  :: IO ()
+useNormalScreenBuffer = hUseNormalScreenBuffer stdout
+
 -- Introduce a hyperlink with (key, value) parameters. Some terminals support
 -- an @id@ parameter key, so that hyperlinks with the same @id@ value are
 -- treated as connected.

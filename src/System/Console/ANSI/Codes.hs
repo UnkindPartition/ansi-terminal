@@ -53,6 +53,9 @@ module System.Console.ANSI.Codes
     -- default parameter of @1@.
   , scrollPageUpCode, scrollPageDownCode
 
+    -- * Using screen buffers
+  , useAlternateScreenBufferCode, useNormalScreenBufferCode
+
     -- * Select Graphic Rendition mode: colors and other whizzy stuff
   , setSGRCode
 
@@ -214,6 +217,10 @@ scrollPageUpCode, scrollPageDownCode :: Int -- ^ Number of lines to scroll by
                                      -> String
 scrollPageUpCode n = if n == 0 then "" else csi [n] "S"
 scrollPageDownCode n = if n == 0 then "" else csi [n] "T"
+
+useAlternateScreenBufferCode, useNormalScreenBufferCode :: String
+useAlternateScreenBufferCode = csi [] "?1049h"
+useNormalScreenBufferCode = csi [] "?1049l"
 
 setSGRCode :: [SGR] -- ^ Commands: these will typically be applied on top of the
                     -- current console SGR mode. An empty list of commands is
