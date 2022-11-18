@@ -46,6 +46,15 @@
   , setCursorPositionCode
 
     -- * Saving, restoring and reporting cursor position
+    -- | These code sequences are not part of ECMA-48 standard; they are popular,
+    -- but non-portable extensions. E. g., Terminal.app on MacOS
+    -- <https://stackoverflow.com/questions/25879183 does not support them>.
+    -- A more portable way would be to query @terminfo@ database
+    -- for @rc@ and @sc@ capabilities.
+    --
+    -- Cursor positions
+    -- <https://unix.stackexchange.com/questions/565597 are relative to the viewport, not to its content>.
+    --
   , saveCursor
   , restoreCursor
   , reportCursorPosition
@@ -94,7 +103,10 @@
   , scrollPageDownCode
 
     -- * Using screen buffers
-    -- | On Windows, if emulation is required, switching between alternate and
+    -- | These code sequences are not part of ECMA-48 standard; they are popular,
+    -- but non-portable extensions, corresponding to @smcup@ and @rmcup@ capabilities
+    -- in @terminfo@ database.
+    -- On Windows, if emulation is required, switching between alternate and
     -- normal screen buffers is not emulated.
   , useAlternateScreenBuffer
   , useNormalScreenBuffer
@@ -111,6 +123,9 @@
   , setSGRCode
 
     -- * Cursor visibilty changes
+    -- | Strictly speaking, these code sequences are not part of ECMA-48 standard;
+    -- they are popular, but non-portable extensions. However, in practice they seem
+    -- to work pretty much everywhere.
   , hideCursor
   , showCursor
     -- ** \'h...\' variants
@@ -121,8 +136,10 @@
   , showCursorCode
 
     -- * Hyperlinks
-    -- | Some, but not all, terminals support hyperlinks - that is, clickable
-    -- text that points to a URI. On Windows, if emulation is required,
+    -- | These code sequences are not part of ECMA-48 standard and not even an
+    -- @xterm@ extension. Nevertheless
+    -- <https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda many terminals>
+    -- support them. On Windows, if emulation is required,
     -- hyperlinks are not emulated.
   , hyperlink
   , hyperlinkWithId
