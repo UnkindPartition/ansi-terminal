@@ -22,6 +22,8 @@ includes:
 
  * Scrolling the screen up or down
 
+ * Switching between the Alternate and Normal Screen Buffers
+
  * Clickable hyperlinks to URIs
 
  * Changing the title of the terminal

@@ -1,6 +1,25 @@
 Changes
 =======
 
+Version 0.11.4
+--------------
+
+* Add `reportLayerColor`, `getReportedLayerColor` and `getLayerColor` for
+  querying the layer color on terminals that support the functionality.
+* Add `useAlternateScreenBuffer` and `useNormalScreenBuffer`, and support for
+  switching between the Alternate and Normal Screen Buffers.
+* When the argument is `0`, `cursorUpCode`, `cursorDownCode`,
+  `cursorForwardCode`, `cursorBackwardCode`,`scrollPageUpCode` and
+  `scrollPageDownCode` now yield `""`, and `cursorUpLineCode` and
+  `cursorDownLineCode` now yield the equivalent of `setCursorColumnCode 0`. This
+  is because, on some terminals, a `0` parameter for the underlying 'ANSI' code
+  specifies a default parameter of `1`.
+* Add `osc` as a utility function, for OSC sequences.
+* `setTitle` now uses the recommended STRING TERMINATOR (ST) of `\ESC\\`, rather
+  than the legacy `\BEL` (`\007`), and filters the title of all non-printable
+  characters, not just `\BEL`.
+* Improvements to Haddock documentation.
+
 Version 0.11.3
 --------------
 

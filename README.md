@@ -16,6 +16,7 @@ support for Haskell, which allows:
 -   Moving the cursor around
 -   Reporting the position of the cursor
 -   Scrolling the screen up or down
+-   Switching between the Alternate and Normal Screen Buffers
 -   Clickable hyperlinks to URIs
 -   Changing the title of the terminal
 
