@@ -1,8 +1,8 @@
-ansi-terminal [![GitHub CI](https://github.com/UnkindPartition/ansi-terminal/workflows/CI/badge.svg)](https://github.com/UnkindPartition/ansi-terminal/actions)
-=============
+ansi-terminal and ansi-terminal-types [![GitHub CI](https://github.com/UnkindPartition/ansi-terminal/workflows/CI/badge.svg)](https://github.com/UnkindPartition/ansi-terminal/actions)
+=====================================
 
-A Haskell package providing support for 'ANSI' control character sequences for
-terminals on Unix-like operating systems and Windows
+Haskell packages together providing support for 'ANSI' control character
+sequences for terminals on Unix-like operating systems and Windows
 
 Description
 -----------
@@ -89,13 +89,15 @@ main = do
 Documentation
 -------------
 
-Haddock documentation is [available at
-Hackage](http://hackage.haskell.org/packages/archive/ansi-terminal/latest/doc/html/System-Console-ANSI.html).
+Haddock documentation is available at Hackage
+([`ansi-terminal`](http://hackage.haskell.org/packages/archive/ansi-terminal/latest/doc/html/System-Console-ANSI.html))
+and
+([`ansi-terminal-types`](http://hackage.haskell.org/packages/archive/ansi-terminal-types/latest/doc/html/System-Console-ANSI-Types.html)).
 
 Credits
 -------
 
-The library is originally written by [Max Bolingbroke](https://github.com/batterseapower)
+The library was originally written by [Max Bolingbroke](https://github.com/batterseapower)
 
 Maintainers
 -----------
