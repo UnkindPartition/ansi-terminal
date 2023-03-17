@@ -24,8 +24,11 @@ jobs:
           - "8.8.4"
           - "8.10.7"
           - "9.0.2"
-          - "9.2.4"
-          - "9.4.1"
+          - "9.2.7"
+          - "9.4.4"
+        include:
+        - ghc: "9.6.1"
+          cabal: "3.10"
     steps:
       - uses: actions/checkout@v2
       - uses: haskell/actions/setup@v2
@@ -68,11 +71,14 @@ jobs:
           - ghc: "9.0.2"
             cabal: "3.8"
             winio: true
-          - ghc: "9.2.4"
+          - ghc: "9.2.7"
             cabal: "3.8"
             winio: true
-          - ghc: "9.4.2"
+          - ghc: "9.4.4"
             cabal: "3.8"
+            win32-2_13_1: true
+          - ghc: "9.6.1"
+            cabal: "3.10"
             win32-2_13_1: true
     steps:
       - uses: actions/checkout@v2
