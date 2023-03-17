@@ -13,7 +13,7 @@ rendition for subsequent text are referred to as SELECT GRAPHIC RENDITION (SGR).
 
 This module exports types and functions used to represent SGR aspects. See also
 'System.Console.ANSI.setSGR' and related functions provided by the
-[@ansi-terminal@](https://hackage.haskell.org/package/ansi-terminal) package.
+@ansi-terminal@ package.
 -}
 module System.Console.ANSI.Types
   (
