@@ -1,0 +1,33 @@
+Name:                ansi-terminal-types
+Version:             0.11.5
+Cabal-Version:       >= 1.10
+Category:            User Interfaces
+Synopsis:            Types and functions used to represent SGR aspects
+Description:         The 'ANSI' standards refer to the visual style of
+                     displaying characters as their 'graphic rendition'. The
+                     'ANSI' codes to establish the graphic rendition for
+                     subsequent text are referred to as SELECT GRAPHIC RENDITION
+                     (SGR). This package exposes modules that export types and
+                     functions used to represent SGR aspects.
+License:             BSD3
+License-File:        LICENSE
+Author:              Max Bolingbroke
+Maintainer:          Mike Pilgrem <public@pilgrem.com>, Roman Cheplyaka <roma@ro-che.info>
+Homepage:            https://github.com/UnkindPartition/ansi-terminal
+Build-Type:          Simple
+
+Extra-Source-Files:     CHANGELOG.md
+                        README.md
+
+Source-repository head
+  type:     git
+  location: git://github.com/UnkindPartition/ansi-terminal.git
+
+Library
+        Hs-Source-Dirs:         src
+        Exposed-Modules:        System.Console.ANSI.Types
+        Build-Depends:          base >= 4.3.0.0 && < 5
+                              , colour >=2.1.0
+        Default-Extensions:     CPP
+        Ghc-Options:            -Wall
+        Default-Language:       Haskell2010
