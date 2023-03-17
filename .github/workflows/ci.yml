@@ -14,10 +14,9 @@ jobs:
       fail-fast: false
       matrix:
         cabal: ["3.8"]
-        # no ghc-7.2.2, ghc-7.4.2, ghc-7.6.3 or ghc-7.8.4 available
+        # no ghc-7.0.4, ghc-7.2.2, ghc-7.4.2, ghc-7.6.3, ghc-7.8.4 or ghc-7.10.3
+        # available
         ghc:
-          - "7.0.4"
-          - "7.10.3"
           - "8.0.2"
           - "8.2.2"
           - "8.4.4"
