@@ -1,6 +1,13 @@
 Changes
 =======
 
+Version 0.11.5
+--------------
+
+* Module `System.Console.ANSI.Types` spun out to new dependency package
+  `ansi-terminal-types-0.11.5`.
+* Drop support for GHC versions before GHC 7.10.1 (released March 2015).
+
 Version 0.11.4
 --------------
 
