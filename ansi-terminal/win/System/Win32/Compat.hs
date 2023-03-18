@@ -1,5 +1,4 @@
-#include "Common-Safe-Haskell.hs"
-{-# OPTIONS_HADDOCK hide #-}
+{-# LANGUAGE Safe #-}
 
 {-| The Win32 library ships with GHC. Win32-2.3.1.0 first shipped with
 GHC 7.10.1 (released March 2015). Win32-2.5.4.1 first shipped with GHC 8.2.1
@@ -22,24 +21,17 @@ module System.Win32.Compat
   , DWORD
   , ErrCode
   , HANDLE
-  , LPCTSTR
   , LPDWORD
   , SHORT                -- from Win32-2.5.0.0
-  , TCHAR
   , UINT
   , ULONG                -- from Win32-2.5.0.0
   , WORD
   , failIfFalse_
-  , getLastError
-  , iNVALID_HANDLE_VALUE
-  , nullHANDLE
   , withHandleToHANDLE   -- from Win32-2.5.1.0
-  , withTString
   ) where
 
-import System.Win32.Types (BOOL, DWORD, ErrCode, HANDLE, LPCTSTR, LPDWORD,
-  TCHAR, UINT, WORD, failIfFalse_, getLastError, iNVALID_HANDLE_VALUE,
-  nullHANDLE, withTString)
+import System.Win32.Types
+         ( BOOL, DWORD, ErrCode, HANDLE, LPDWORD, UINT, WORD, failIfFalse_ )
 
 -- Circumstancees in which the patching of Win32 package for the Windows I/O
 -- Manager is required
@@ -54,34 +46,34 @@ import System.Win32.Types (BOOL, DWORD, ErrCode, HANDLE, LPCTSTR, LPDWORD,
 
 #if !defined(PATCHING_WIN32_PACKAGE)
 
-import System.Win32.Types (SHORT, ULONG, withHandleToHANDLE)
+import System.Win32.Types ( SHORT, ULONG, withHandleToHANDLE )
 
 #else
 
-import Control.Concurrent.MVar (readMVar)
-import Control.Exception (bracket)
-import Data.Typeable (cast)
-import Foreign.StablePtr (StablePtr, freeStablePtr, newStablePtr)
-import GHC.IO.Handle.Types (Handle (..), Handle__ (..))
+import Control.Concurrent.MVar ( readMVar )
+import Control.Exception ( bracket )
+import Data.Typeable ( cast )
+import Foreign.StablePtr ( StablePtr, freeStablePtr, newStablePtr )
+import GHC.IO.Handle.Types ( Handle (..), Handle__ (..) )
 
 #if defined(PATCHING_WIN32_PACKAGE_FOR_WINIO)
-import GHC.IO.Exception (IOErrorType (InappropriateType), IOException (IOError),
-  ioException)
-import GHC.IO.SubSystem ((<!>))
-import GHC.IO.Windows.Handle (ConsoleHandle, Io, NativeHandle, toHANDLE)
-import System.Win32.Types (withHandleToHANDLEPosix)
+import GHC.IO.Exception
+         ( IOErrorType (InappropriateType), IOException (IOError), ioException )
+import GHC.IO.SubSystem ( (<!>) )
+import GHC.IO.Windows.Handle ( ConsoleHandle, Io, NativeHandle, toHANDLE )
+import System.Win32.Types ( withHandleToHANDLEPosix )
 #endif
 
 #if !MIN_VERSION_Win32(2,5,0)
-import Foreign.C.Types (CShort (..))
-import Data.Word (Word32)
+import Foreign.C.Types ( CShort (..) )
+import Data.Word ( Word32 )
 #else
-import System.Win32.Types (SHORT, ULONG)
+import System.Win32.Types ( SHORT, ULONG )
 #endif
 
 #if !MIN_VERSION_Win32(2,5,1)
-import Foreign.C.Types (CInt (..))
-import GHC.IO.FD (FD(..)) -- A wrapper around an Int32
+import Foreign.C.Types ( CInt (..) )
+import GHC.IO.FD ( FD(..) ) -- A wrapper around an Int32
 #endif
 
 #endif

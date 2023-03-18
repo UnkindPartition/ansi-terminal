@@ -1,6 +1,12 @@
 Changes
 =======
 
+Version 1.0
+-----------
+
+* Drop support for legacy Windows requiring emulation.
+* `hSupportsANSI` no longer assumes that the given handle is writeable.
+
 Version 0.11.5
 --------------
 

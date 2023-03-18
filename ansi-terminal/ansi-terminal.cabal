@@ -1,8 +1,8 @@
 Cabal-Version:       1.22
 Name:                ansi-terminal
-Version:             0.11.5
+Version:             1.0
 Category:            User Interfaces
-Synopsis:            Simple ANSI terminal support, with Windows compatibility
+Synopsis:            Simple ANSI terminal support
 Description:         ANSI terminal support for Haskell: allows cursor movement,
                      screen clearing, color output, showing or hiding the
                      cursor, and changing the title. Works on UNIX and Windows.
@@ -13,12 +13,7 @@ Maintainer:          Mike Pilgrem <public@pilgrem.com>, Roman Cheplyaka <roma@ro
 Homepage:            https://github.com/UnkindPartition/ansi-terminal
 Build-Type:          Simple
 
-Extra-Source-Files:     src/includes/Common-Include.hs
-                        src/includes/Common-Include-Emulator.hs
-                        src/includes/Common-Include-Enabled.hs
-                        src/includes/Common-Safe-Haskell.hs
-                        src/includes/Exports-Include.hs
-                        CHANGELOG.md
+Extra-Source-Files:     CHANGELOG.md
                         README.md
 
 Source-repository head
@@ -43,33 +38,24 @@ Library
         -- downstream users.
         Reexported-Modules:     System.Console.ANSI.Types
 
-        Include-Dirs:           src/includes
+        Other-Modules:          System.Console.ANSI.Internal
 
         Build-Depends:          base >= 4.8.0.0 && < 5
                               , ansi-terminal-types ==0.11.5
                               , colour >=2.1.0
         if os(windows)
-                Build-Depends:          containers >= 0.5.0.0
-                if flag(Win32-2-13-1)
-                      Build-Depends:   Win32 >= 2.13.1
-                else
-                      Build-Depends:   Win32 < 2.13.1, mintty
-                Cpp-Options:            -DWINDOWS
-                Other-Modules:          System.Console.ANSI.Windows
-                                        System.Console.ANSI.Windows.Detect
-                                        System.Console.ANSI.Windows.Emulator
-                                        System.Console.ANSI.Windows.Emulator.Codes
-                                        System.Console.ANSI.Windows.Foreign
-                                        -- NB: used for fallback by the emulator
-                                        System.Console.ANSI.Unix
-                                        System.Win32.Compat
+            Hs-Source-Dirs:     win
+            Other-Modules:      System.Console.ANSI.Windows.Foreign
+                                System.Win32.Compat
+            if flag(Win32-2-13-1)
+                Build-Depends:   Win32 >= 2.13.1
+            else
+                Build-Depends:   Win32 < 2.13.1
+                               , mintty
         else
-                -- We assume any non-Windows platform is Unix
-                Cpp-Options:            -DUNIX
-                Other-Modules:          System.Console.ANSI.Unix
+            Hs-Source-Dirs:     unix
 
         Default-Extensions:     CPP
-                                ForeignFunctionInterface
 
         Ghc-Options:            -Wall
         Default-Language:       Haskell2010

@@ -1,20 +1,8 @@
-#include "Common-Safe-Haskell.hs"
+{-# LANGUAGE Safe #-}
 
 {-| This module exports functions that return 'String' values containing codes
 in accordance with the \'ANSI\' standards for control character sequences
 described in the documentation of module "System.Console.ANSI".
-
-The module "System.Console.ANSI" exports functions with the same names as those
-in this module. On some versions of Windows, the terminal in use may not be
-ANSI-capable. When that is the case, the same-named functions exported by module
-"System.Console.ANSI" return \"\", for the reasons set out in the documentation
-of that module.
-
-Consequently, if module "System.Console.ANSI" is also imported, this module is
-intended to be imported qualified, to avoid name clashes with those functions.
-For example:
-
-> import qualified System.Console.ANSI.Codes as ANSI
 -}
 module System.Console.ANSI.Codes
   (
@@ -89,9 +77,10 @@ import System.Console.ANSI.Types
 -- SEQUENCE INTRODUCER (CSI) followed by the parameter(s) (separated by \';\')
 -- and ending with the @controlFunction@ character(s) that identifies the
 -- control function.
-csi :: [Int]  -- ^ List of parameters for the control sequence
-    -> String -- ^ Character(s) that identify the control function
-    -> String
+csi ::
+     [Int]  -- ^ List of parameters for the control sequence
+  -> String -- ^ Character(s) that identify the control function
+  -> String
 csi args code = "\ESC[" ++ intercalate ";" (map show args) ++ code
 
 -- | 'osc' @parameterS parametersT@, where @parameterS@ specifies the type of
@@ -101,9 +90,10 @@ csi args code = "\ESC[" ++ intercalate ";" (map show args) ++ code
 -- the STRING TERMINATOR (ST) @\"\\ESC\\\\\"@.
 --
 -- @since 0.11.4
-osc :: String -- ^ Ps parameter
-    -> String -- ^ Pt parameter(s)
-    -> String
+osc ::
+     String -- ^ Ps parameter
+  -> String -- ^ Pt parameter(s)
+  -> String
 osc pS pT = "\ESC]" ++ pS ++ ";" ++ pT ++ "\ESC\\"
 
 -- | 'colorToCode' @color@ returns the 0-based index of the color (one of the
@@ -121,8 +111,9 @@ colorToCode color = case color of
 
 -- | 'sgrToCode' @sgr@ returns the parameter of the SELECT GRAPHIC RENDITION
 -- (SGR) aspect identified by @sgr@.
-sgrToCode :: SGR -- ^ The SGR aspect
-          -> [Int]
+sgrToCode ::
+     SGR -- ^ The SGR aspect
+  -> [Int]
 sgrToCode sgr = case sgr of
   Reset -> [0]
   SetConsoleIntensity intensity -> case intensity of
@@ -157,30 +148,33 @@ sgrToCode sgr = case sgr of
   toRGB color = let RGB r g b = toSRGB24 color
                 in  map fromIntegral [r, g, b]
 
-cursorUpCode, cursorDownCode, cursorForwardCode, cursorBackwardCode
-  :: Int -- ^ Number of lines or characters to move
+cursorUpCode, cursorDownCode, cursorForwardCode, cursorBackwardCode ::
+     Int -- ^ Number of lines or characters to move
   -> String
 cursorUpCode n = if n == 0 then "" else csi [n] "A"
 cursorDownCode n = if n == 0 then "" else csi [n] "B"
 cursorForwardCode n = if n == 0 then "" else csi [n] "C"
 cursorBackwardCode n = if n == 0 then "" else csi [n] "D"
 
-cursorDownLineCode, cursorUpLineCode :: Int -- ^ Number of lines to move
-                                     -> String
+cursorDownLineCode, cursorUpLineCode ::
+     Int -- ^ Number of lines to move
+  -> String
 cursorDownLineCode n = if n == 0 then csi [1] "G" else csi [n] "E"
 cursorUpLineCode n = if n == 0 then csi [1] "G" else csi [n] "F"
 
 -- | Code to move the cursor to the specified column. The column numbering is
 -- 0-based (that is, the left-most column is numbered 0).
-setCursorColumnCode :: Int -- ^ 0-based column to move to
-                    -> String
+setCursorColumnCode ::
+     Int -- ^ 0-based column to move to
+  -> String
 setCursorColumnCode n = csi [n + 1] "G"
 
 -- | Code to move the cursor to the specified position (row and column). The
 -- position is 0-based (that is, the top-left corner is at row 0 column 0).
-setCursorPositionCode :: Int -- ^ 0-based row to move to
-                      -> Int -- ^ 0-based column to move to
-                      -> String
+setCursorPositionCode ::
+     Int -- ^ 0-based row to move to
+  -> Int -- ^ 0-based column to move to
+  -> String
 setCursorPositionCode n m = csi [n + 1, m + 1] "H"
 
 -- | @since 0.7.1
@@ -235,8 +229,9 @@ clearFromCursorToLineEndCode = csi [0] "K"
 clearFromCursorToLineBeginningCode = csi [1] "K"
 clearLineCode = csi [2] "K"
 
-scrollPageUpCode, scrollPageDownCode :: Int -- ^ Number of lines to scroll by
-                                     -> String
+scrollPageUpCode, scrollPageDownCode ::
+     Int -- ^ Number of lines to scroll by
+  -> String
 scrollPageUpCode n = if n == 0 then "" else csi [n] "S"
 scrollPageDownCode n = if n == 0 then "" else csi [n] "T"
 
@@ -244,11 +239,12 @@ useAlternateScreenBufferCode, useNormalScreenBufferCode :: String
 useAlternateScreenBufferCode = csi [] "?1049h"
 useNormalScreenBufferCode = csi [] "?1049l"
 
-setSGRCode :: [SGR] -- ^ Commands: these will typically be applied on top of the
-                    -- current console SGR mode. An empty list of commands is
-                    -- equivalent to the list @[Reset]@. Commands are applied
-                    -- left to right.
-           -> String
+setSGRCode ::
+     [SGR]
+     -- ^ Commands: these will typically be applied on top of the current
+     -- console SGR mode. An empty list of commands is equivalent to the list
+     -- @[Reset]@. Commands are applied left to right.
+  -> String
 setSGRCode sgrs = csi (concatMap sgrToCode sgrs) "m"
 
 hideCursorCode, showCursorCode :: String
@@ -260,13 +256,13 @@ showCursorCode = csi [] "?25h"
 -- are treated as connected.
 --
 -- @since 0.11.3
-hyperlinkWithParamsCode
-  :: [(String, String)]
-  -- ^ Parameters
+hyperlinkWithParamsCode ::
+     [(String, String)]
+     -- ^ Parameters
   -> String
-  -- ^ URI
+     -- ^ URI
   -> String
-  -- ^ Link text
+     -- ^ Link text
   -> String
 hyperlinkWithParamsCode params uri link =
   osc "8" pT ++ link ++ osc "8" ";"
@@ -277,11 +273,11 @@ hyperlinkWithParamsCode params uri link =
 -- | Code to introduce a hyperlink.
 --
 -- @since 0.11.3
-hyperlinkCode
-  :: String
-  -- ^ URI
+hyperlinkCode ::
+     String
+     -- ^ URI
   -> String
-  -- ^ Link text
+     -- ^ Link text
   -> String
 hyperlinkCode = hyperlinkWithParamsCode []
 
@@ -290,13 +286,13 @@ hyperlinkCode = hyperlinkWithParamsCode []
 -- are treated as connected.
 --
 -- @since 0.11.3
-hyperlinkWithIdCode
-  :: String
-  -- ^ Identifier for the link
+hyperlinkWithIdCode ::
+     String
+     -- ^ Identifier for the link
   -> String
-  -- ^ URI
+     -- ^ URI
   -> String
-  -- ^ Link text
+     -- ^ Link text
   -> String
 hyperlinkWithIdCode linkId = hyperlinkWithParamsCode [("id", linkId)]
 
@@ -307,6 +303,8 @@ hyperlinkWithIdCode linkId = hyperlinkWithParamsCode [("id", linkId)]
 -- direction on xterm title setting on haskell-cafe. The "0" signifies that both
 -- the title and "icon" text should be set. This is chosen for consistent
 -- behaviour between Unixes and Windows.
-setTitleCode :: String -- ^ New window title and icon name
-             -> String
+setTitleCode ::
+     String
+     -- ^ New window title and icon name
+  -> String
 setTitleCode title = osc "0" (filter isPrint title)
