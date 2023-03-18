@@ -26,7 +26,7 @@ Source-repository head
 Library
         Hs-Source-Dirs:         src
         Exposed-Modules:        System.Console.ANSI.Types
-        Build-Depends:          base >= 4.3.0.0 && < 5
+        Build-Depends:          base >= 4.8.0.0 && < 5
                               , colour >=2.1.0
         Default-Extensions:     CPP
         Ghc-Options:            -Wall
