@@ -20,10 +20,6 @@ support for Haskell, which allows:
 -   Clickable hyperlinks to URIs
 -   Changing the title of the terminal
 
-By using emulation, it is compatible with versions of 'Command Prompt' and
-'PowerShell' on Windows that did not recognise 'ANSI' escape codes before
-Windows 10 version 1511 was released in November 2015.
-
 If you like this, you may be interested in
 [ansi-wl-pprint](http://github.com/batterseapower/ansi-wl-pprint), which
 provides a pretty-printer that can construct strings containing 'ANSI'
@@ -55,8 +51,7 @@ function that comes in three variants:
 -   An `IO` variant similar to above, but which takes a `Handle` to which the
     escape code should be applied
 -   A `String` variant that returns a literal string that should be
-    included to get the effect of the code. However, on Windows systems where
-    emulation has been necessary, these strings will always be blank!
+    included to get the effect of the code.
 
 Example
 -------
