@@ -9,10 +9,6 @@ module System.Console.ANSI.Windows.Detect
   , detectHandleSupportsANSI
   ) where
 
-#if !MIN_VERSION_base(4,8,0)
-import Control.Applicative ((<$>))
-#endif
-
 import Control.Exception (SomeException(..), throwIO, try)
 import Data.Bits ((.&.), (.|.))
 #ifdef MIN_VERSION_mintty

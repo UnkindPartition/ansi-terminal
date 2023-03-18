@@ -1,5 +1,5 @@
 Name:                ansi-terminal
-Version:             0.11.4
+Version:             0.11.5
 Cabal-Version:       >= 1.10
 Category:            User Interfaces
 Synopsis:            Simple ANSI terminal support, with Windows compatibility
@@ -37,12 +37,16 @@ Flag Win32-2-13-1
 Library
         Hs-Source-Dirs:         src
         Exposed-Modules:        System.Console.ANSI
-                                System.Console.ANSI.Types
                                 System.Console.ANSI.Codes
+
+        -- We re-export all of ansi-terminal-types to aid compatibility for
+        -- downstream users.
+        Reexported-Modules:     System.Console.ANSI.Types
 
         Include-Dirs:           src/includes
 
-        Build-Depends:          base >= 4.3.0.0 && < 5
+        Build-Depends:          base >= 4.8.0.0 && < 5
+                              , ansi-terminal-types ==0.11.5
                               , colour >=2.1.0
         if os(windows)
                 Build-Depends:          containers >= 0.5.0.0
@@ -73,7 +77,7 @@ Library
 Executable ansi-terminal-example
         Hs-Source-Dirs:         app
         Main-Is:                Example.hs
-        Build-Depends:          base >= 4.3.0.0 && < 5
+        Build-Depends:          base >= 4.8.0.0 && < 5
                               , ansi-terminal
                               , colour
         Ghc-Options:            -Wall

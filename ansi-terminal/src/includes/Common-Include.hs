@@ -4,11 +4,6 @@
 -- of the corresponding more general functions, including the related Haddock
 -- documentation.
 
-#if !MIN_VERSION_base(4,8,0)
-import Control.Applicative ((<*>))
-import Data.Functor ((<$>))
-#endif
-
 import Control.Monad (void)
 import Data.Char (digitToInt, isDigit, isHexDigit)
 import Data.Word (Word16)
