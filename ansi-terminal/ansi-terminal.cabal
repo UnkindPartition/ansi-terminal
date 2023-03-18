@@ -1,6 +1,6 @@
+Cabal-Version:       1.22
 Name:                ansi-terminal
 Version:             0.11.5
-Cabal-Version:       >= 1.10
 Category:            User Interfaces
 Synopsis:            Simple ANSI terminal support, with Windows compatibility
 Description:         ANSI terminal support for Haskell: allows cursor movement,
