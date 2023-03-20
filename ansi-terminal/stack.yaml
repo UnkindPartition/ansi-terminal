@@ -1,4 +1,4 @@
-resolver: lts-20.14
+resolver: lts-20.15
 flags:
   ansi-terminal:
     example: false
@@ -6,5 +6,5 @@ packages:
 - .
 extra-deps:
 - ansi-terminal-types-0.11.5@sha256:f78440dfd95c4509e88855ac7cc2d9566ddf956a92c1290404cac93ad1a1b00a,1482
-- filepath-1.4.100.0@sha256:45a49fc8c379b33fdba3c8cc96dcf22b15c50995d0f4b8638e9b6b9423d1b877,5875
+- filepath-1.4.100.3@sha256:ab6e3330c42817b0effb14cae9c60d5cdc41d61f7354d04bc529ed031113f27c,5623
 - Win32-2.13.4.0@sha256:9b8a82743985f8a95c03b2bc64be33ad1cd603e2493cb8b48d3cb923556dbb61,5585
