@@ -11,9 +11,7 @@ module System.Console.ANSI.Unix
 
 import Control.Exception.Base (bracket)
 import Control.Monad (when)
-#if MIN_VERSION_base(4,8,0)
 import Data.List (uncons)
-#endif
 import Data.Maybe (fromMaybe, mapMaybe)
 import System.IO (BufferMode (..), Handle, hGetBuffering, hGetEcho,
   hIsTerminalDevice, hIsWritable, hPutStr, hReady, hSetBuffering, hSetEcho,
@@ -113,12 +111,6 @@ getReport startChars endChars = do
   fromMaybe "" <$> timeout 500000 (getStart startChars "") -- 500 milliseconds
  where
   endChars' = mapMaybe uncons endChars
-#if !MIN_VERSION_base(4,8,0)
-   where
-     uncons :: [a] -> Maybe (a, [a])
-     uncons []     = Nothing
-     uncons (x:xs) = Just (x, xs)
-#endif
 
   -- The list is built in reverse order, in order to avoid O(n^2) complexity.
   -- So, getReport yields the reversed built list.
@@ -129,7 +121,7 @@ getReport startChars endChars = do
     c <- getChar
     if c == h
       then getStart hs (c:r) -- Try to get the rest of the start characters
-      else return $ reverse (c:r) -- If the first character(s) are not the
+      else pure $ reverse (c:r) -- If the first character(s) are not the
                                   -- expected start then give up. This provides
                                   -- a modicom of protection against unexpected
                                   -- data in the input stream.
@@ -142,7 +134,7 @@ getReport startChars endChars = do
       Just es -> getEnd es (c:r) -- Try to get the rest of the end characters.
 
   getEnd :: String -> String -> IO String
-  getEnd "" r = return $ reverse r
+  getEnd "" r = pure $ reverse r
   getEnd (e:es) r = do
     c <- getChar
     if c /= e
@@ -171,9 +163,9 @@ hGetCursorPosition h = fmap to0base <$> getCursorPosition'
                  -- operating system
         getReportedCursorPosition
     case readP_to_S cursorPosition input of
-      [] -> return Nothing
-      [((row, col),_)] -> return $ Just (row, col)
-      (_:_) -> return Nothing
+      [] -> pure Nothing
+      [((row, col),_)] -> pure $ Just (row, col)
+      (_:_) -> pure Nothing
   clearStdin = do
     isReady <- hReady stdin
     when isReady $ do
@@ -197,9 +189,9 @@ hGetLayerColor h layer = do
                -- operating system
       getReportedLayerColor layer
   case readP_to_S (layerColor layer) input of
-      [] -> return Nothing
-      [(col, _)] -> return $ Just col
-      (_:_) -> return Nothing
+      [] -> pure Nothing
+      [(col, _)] -> pure $ Just col
+      (_:_) -> pure Nothing
  where
   clearStdin = do
     isReady <- hReady stdin

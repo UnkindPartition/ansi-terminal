@@ -1,11 +1,11 @@
 #include "Common-Safe-Haskell.hs"
 {-# OPTIONS_HADDOCK hide #-}
 
-{-| The Win32 library ships with GHC. Win32-2.1 first shipped with GHC 6.6
-(released October 2006). Win32-2.5.4.1 first shipped with GHC 8.2.1 (released
-July 2017), replacing Win32-2.3.1.1.
+{-| The Win32 library ships with GHC. Win32-2.3.1.0 first shipped with
+GHC 7.10.1 (released March 2015). Win32-2.5.4.1 first shipped with GHC 8.2.1
+(released July 2017), replacing Win32-2.3.1.1.
 
-The ansi-terminal library makes use of functionality in Win32-2.1 and other
+The ansi-terminal library makes use of functionality in Win32-2.3.1.0 and other
 functionality first added to Win32-2.5.0.0 or Win32-2.5.1.0 (from ansi-terminal
 itself).
 
@@ -118,8 +118,8 @@ withHandleToHANDLENative haskell_handle action =
   handle_ToHANDLE (Handle__{haDevice = dev}) =
     case ( cast dev :: Maybe (Io NativeHandle)
          , cast dev :: Maybe (Io ConsoleHandle)) of
-      (Just hwnd, Nothing) -> return $ toHANDLE hwnd
-      (Nothing, Just hwnd) -> return $ toHANDLE hwnd
+      (Just hwnd, Nothing) -> pure $ toHANDLE hwnd
+      (Nothing, Just hwnd) -> pure $ toHANDLE hwnd
       _                    -> throwErr "not a known HANDLE"
 
   throwErr msg = ioException $ IOError (Just haskell_handle)

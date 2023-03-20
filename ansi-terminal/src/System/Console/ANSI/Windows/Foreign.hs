@@ -100,12 +100,12 @@ unpackCOORD (COORD x y)
 peekAndOffset :: Storable a => Ptr a -> IO (a, Ptr b)
 peekAndOffset ptr = do
   item <- peek ptr
-  return (item, ptr `plusPtr` sizeOf item)
+  pure (item, ptr `plusPtr` sizeOf item)
 
 pokeAndOffset :: Storable a => Ptr a -> a -> IO (Ptr b)
 pokeAndOffset ptr item = do
   poke ptr item
-  return (ptr `plusPtr` sizeOf item)
+  pure (ptr `plusPtr` sizeOf item)
 
 data COORD = COORD
   { coord_x :: SHORT
@@ -122,7 +122,7 @@ instance Storable COORD where
     let ptr' = castPtr ptr :: Ptr SHORT
     x <- peekElemOff ptr' 0
     y <- peekElemOff ptr' 1
-    return (COORD x y)
+    pure (COORD x y)
   poke ptr (COORD x y) = do
     let ptr' = castPtr ptr :: Ptr SHORT
     pokeElemOff ptr' 0 x
@@ -153,7 +153,7 @@ instance Storable SMALL_RECT where
     let ptr' = castPtr ptr :: Ptr COORD
     tl <- peekElemOff ptr' 0
     br <- peekElemOff ptr' 1
-    return (SMALL_RECT tl br)
+    pure (SMALL_RECT tl br)
   poke ptr (SMALL_RECT tl br) = do
     let ptr' = castPtr ptr :: Ptr COORD
     pokeElemOff ptr' 0 tl
@@ -170,7 +170,7 @@ instance Storable CONSOLE_CURSOR_INFO where
   peek ptr = do
     (size, ptr') <- peekAndOffset (castPtr ptr)
     visible <- peek ptr'
-    return (CONSOLE_CURSOR_INFO size visible)
+    pure (CONSOLE_CURSOR_INFO size visible)
   poke ptr (CONSOLE_CURSOR_INFO size visible) = do
     ptr' <- pokeAndOffset (castPtr ptr) size
     poke ptr' visible
@@ -195,7 +195,7 @@ instance Storable CONSOLE_SCREEN_BUFFER_INFO where
     (attributes, ptr3) <- peekAndOffset ptr2
     (window, ptr4) <- peekAndOffset ptr3
     maximum_window_size <- peek ptr4
-    return (CONSOLE_SCREEN_BUFFER_INFO
+    pure (CONSOLE_SCREEN_BUFFER_INFO
       size cursor_position attributes window maximum_window_size)
   poke ptr (CONSOLE_SCREEN_BUFFER_INFO
     size cursor_position attributes window maximum_window_size)
@@ -244,7 +244,7 @@ instance Storable CONSOLE_SCREEN_BUFFER_INFOEX where
     (popup_attributes, ptr6) <- peekAndOffset ptr5
     (fullscreen_supported, ptr7) <- peekAndOffset ptr6
     color_table <- peekArray 16 ptr7
-    return (CONSOLE_SCREEN_BUFFER_INFOEX
+    pure (CONSOLE_SCREEN_BUFFER_INFOEX
       size cursor_position attributes window maximum_window_size
       popup_attributes fullscreen_supported color_table)
   poke ptr (CONSOLE_SCREEN_BUFFER_INFOEX
@@ -279,7 +279,7 @@ instance Storable CHAR_INFO where
   peek ptr = do
     (char, ptr') <- peekAndOffset (castPtr ptr)
     attributes <- peek ptr'
-    return (CHAR_INFO char attributes)
+    pure (CHAR_INFO char attributes)
   poke ptr (CHAR_INFO char attributes) = do
     ptr' <- pokeAndOffset (castPtr ptr) char
     poke ptr' attributes
@@ -404,7 +404,7 @@ throwIfFalse action = do
   if not succeeded
     then getLastError >>= throw . ConsoleException -- TODO: Check if last error
     -- is zero for some instructable reason (?)
-    else return ()
+    else pure ()
 
 getConsoleScreenBufferInfo :: HANDLE -> IO CONSOLE_SCREEN_BUFFER_INFO
 getConsoleScreenBufferInfo handle
@@ -680,7 +680,7 @@ instance Storable INPUT_RECORD where
           -> InputFocusEvent            <$> (`peekByteOff` 4) ptr
       _ -> error $ "peek (INPUT_RECORD): Unknown event type " ++
              show evType
-    return $ INPUT_RECORD evType event
+    pure $ INPUT_RECORD evType event
   poke ptr val = do
     (`pokeByteOff` 0) ptr $ inputEventType val
     case inputEvent val of

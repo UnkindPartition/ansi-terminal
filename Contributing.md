@@ -30,9 +30,6 @@ directives. The `CPP` GHC extension is specified for the libraries in the Cabal
 files. The `Win32` package has developed over time and module
 `System.Win32.Compat` is used to reduce the use of CPP pragmas in other modules.
 
-Of particular note is that, before GHC 7.10.1 and `base-4.8.0.0`, `<$>` was not
-exported by the `Prelude`.
-
 CPP `#include` pragmas are also used to include code from files to limit code
 duplication in modules that are specific to the 'Unix' or Windows versions of
 the package. The common code is located in folder `src\includes`.

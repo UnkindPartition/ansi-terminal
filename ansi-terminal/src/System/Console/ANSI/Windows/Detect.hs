@@ -58,32 +58,32 @@ aNSISupport = unsafePerformIO $ withHandleToHANDLE stdout $ withHANDLE
     terminal <- handleToTerminal h
     case terminal of
       NativeANSIIncapable -> Emulated <$> consoleDefaultState h
-      _                   -> return Native)
+      _                   -> pure Native)
  where
   consoleDefaultState h = do
     info <- getConsoleScreenBufferInfo h
     let attributes = csbi_attributes info
         fgAttributes = attributes .&. fOREGROUND_INTENSE_WHITE
         bgAttributes = attributes .&. bACKGROUND_INTENSE_WHITE
-    return ConsoleDefaultState
+    pure ConsoleDefaultState
       { defaultForegroundAttributes = fgAttributes
       , defaultBackgroundAttributes = bgAttributes }
 
 -- | This function tests that the handle is writable. If what is attached to the
--- handle is not recognised as a known terminal, it returns @return Nothing@.
+-- handle is not recognised as a known terminal, it returns @pure Nothing@.
 detectHandleSupportsANSI :: Handle -> IO (Maybe Bool)
 detectHandleSupportsANSI handle = do
   isWritable <- hIsWritable handle
   if isWritable
     then withHandleToHANDLE handle $ withHANDLE
-      (return $ Just False)  -- Invalid handle or no handle
+      (pure $ Just False)  -- Invalid handle or no handle
       (\h -> do
         terminal <- handleToTerminal h
         case terminal of
-          NativeANSIIncapable -> return (Just False)
-          UnknownTerminal     -> return Nothing  -- Not sure!
-          _                   -> return (Just True))
-    else return (Just False)  -- Not an output handle
+          NativeANSIIncapable -> pure (Just False)
+          UnknownTerminal     -> pure Nothing  -- Not sure!
+          _                   -> pure (Just True))
+    else pure (Just False)  -- Not an output handle
 
 -- | This function assumes that the Windows handle is writable.
 handleToTerminal :: HANDLE -> IO Terminal
@@ -93,17 +93,17 @@ handleToTerminal h = do
     Left _     -> do  -- No ConHost mode
       isMinTTY <- isMinTTYHandle h
       if isMinTTY
-        then return Mintty  -- 'mintty' terminal emulator
-        else return UnknownTerminal  -- Not sure!
+        then pure Mintty  -- 'mintty' terminal emulator
+        else pure UnknownTerminal  -- Not sure!
     Right mode -> if mode .&. eNABLE_VIRTUAL_TERMINAL_PROCESSING /= 0
-      then return NativeANSIEnabled  -- VT processing already enabled
+      then pure NativeANSIEnabled  -- VT processing already enabled
       else do
         let mode' = mode .|. eNABLE_VIRTUAL_TERMINAL_PROCESSING
         trySetMode <- try (setConsoleMode h mode')
           :: IO (Either SomeException ())
         case trySetMode of
-          Left _   -> return NativeANSIIncapable  -- Can't enable VT processing
-          Right () -> return NativeANSIEnabled  -- VT processing enabled
+          Left _   -> pure NativeANSIIncapable  -- Can't enable VT processing
+          Right () -> pure NativeANSIEnabled  -- VT processing enabled
 
 -- | This function applies another to the Windows handle, if the handle is
 -- valid. If it is invalid, the specified default action is returned.

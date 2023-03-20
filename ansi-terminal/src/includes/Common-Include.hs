@@ -251,7 +251,7 @@ hSupportsANSIColor h = (||) <$> hSupportsANSI h <*> isEmacsTerm
 -- means \'support without emulation\'.)
 --
 -- If the handle is not writable (that is, it cannot manage output - see
--- 'hIsWritable'), then @return (Just False)@ is returned.
+-- 'hIsWritable'), then @pure (Just False)@ is returned.
 --
 -- On Unix-like operating systems, with one exception, the function is
 -- consistent with 'hSupportsANSI'. The exception is if the handle is not
@@ -259,13 +259,13 @@ hSupportsANSIColor h = (||) <$> hSupportsANSI h <*> isEmacsTerm
 --
 -- On Windows, what is returned will depend on what the handle is connected to
 -- and the version of the operating system. If the handle is identified as
--- connected to a \'mintty\' terminal, @return (Just True)@ is
+-- connected to a \'mintty\' terminal, @pure (Just True)@ is
 -- returned. If it is identified as connected to a native terminal, then, on
 -- Windows 10, the processing of \'ANSI\' control characters will be enabled and
--- @return (Just True)@ returned; and, on versions of Windows before Windows 10,
--- @return (Just False)@ is returned. Otherwise, if a @TERM@ environment
--- variable is set to @dumb@, @return (Just False)@ is returned. In all other
--- cases of a writable handle, @return Nothing@ is returned; this indicates that
+-- @pure (Just True)@ returned; and, on versions of Windows before Windows 10,
+-- @pure (Just False)@ is returned. Otherwise, if a @TERM@ environment
+-- variable is set to @dumb@, @pure (Just False)@ is returned. In all other
+-- cases of a writable handle, @pure Nothing@ is returned; this indicates that
 -- the heuristics cannot assist - the handle may be connected to a file or
 -- to another type of terminal.
 --
@@ -294,7 +294,7 @@ cursorPosition = do
   void $ char ';'
   col <- decimal -- A non-negative whole decimal number
   void $ char 'R'
-  return (read row, read col)
+  pure (read row, read col)
  where
   digit = satisfy isDigit
   decimal = many1 digit
@@ -480,7 +480,7 @@ layerColor layer = do
               r = fromIntegral $ m * hexToInt redHex
               g = fromIntegral $ m * hexToInt greenHex
               b = fromIntegral $ m * hexToInt blueHex
-          in  return $ RGB r g b
+          in  pure $ RGB r g b
     else fail "Color format not recognised"
  where
   hexDigit = satisfy isHexDigit
@@ -539,4 +539,4 @@ hGetTerminalSize h = do
   hRestoreCursor h
   hFlush h -- ensure the restore cursor position code is sent to the
            -- operating system
-  return $ fmap (\(r, c) -> (r + 1, c + 1)) mPos
+  pure $ fmap (\(r, c) -> (r + 1, c + 1)) mPos

@@ -1,8 +1,4 @@
-#if __GLASGOW_HASKELL__ >= 704
 {-# LANGUAGE Safe #-}
-#elif __GLASGOW_HASKELL__ >= 702
-{-# LANGUAGE Trustworthy #-}
-#endif
 
 {-| The \'ANSI\' standards refer to the visual style of displaying characters as
 their \'graphic rendition\'. The style includes the color of a character or its

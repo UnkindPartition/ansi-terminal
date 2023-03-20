@@ -236,8 +236,8 @@ hScrollPageDown cds h n
   = emulatorFallback (Unix.hScrollPageDown h n) $ withHandle h $
       \handle -> hScrollPage cds handle n
 
-hUseAlternateScreenBuffer _ = return ()
-hUseNormalScreenBuffer _ = return ()
+hUseAlternateScreenBuffer _ = pure ()
+hUseNormalScreenBuffer _ = pure ()
 
 {-# INLINE applyANSIColorToAttribute #-}
 applyANSIColorToAttribute :: WORD -> WORD -> WORD -> Color -> WORD -> WORD
@@ -382,7 +382,7 @@ hRestoreCursor h
   = emulatorFallback (Unix.hRestoreCursor h) $ withHandle h $ \handle -> do
       m <- readIORef cursorPositionRef
       let result = Map.lookup handle m
-      maybe (return ()) (setConsoleCursorPosition handle) result
+      maybe (pure ()) (setConsoleCursorPosition handle) result
 
 hReportCursorPosition h
   = emulatorFallback (Unix.hReportCursorPosition h) $ withHandle h $
@@ -395,7 +395,7 @@ hReportCursorPosition h
         hIn <- getStdHandle sTD_INPUT_HANDLE
         _ <- writeConsoleInput hIn $ keyPresses $
             "\ESC[" ++ show y ++ ";" ++ show x ++ "R"
-        return ()
+        pure ()
 
 hReportLayerColor h layer
   = emulatorFallback (Unix.hReportLayerColor h layer) $ withHandle h $
@@ -416,7 +416,7 @@ hReportLayerColor h layer
             report = printf "\ESC]%s;rgb:%04x/%04x/%04x\ESC\\" oscCode r g b
         hIn <- getStdHandle sTD_INPUT_HANDLE
         _ <- writeConsoleInput hIn $ keyPresses report
-        return ()
+        pure ()
 
 keyPress :: Char -> [INPUT_RECORD]
 keyPress c = [keyDown, keyUp]
@@ -471,12 +471,12 @@ hSupportsANSIWithoutEmulation handle = do
   supportsANSI <- detectHandleSupportsANSI handle  -- Without reference to the
                                                    -- environment
   case supportsANSI of
-    Just isSupported -> return (Just isSupported)
+    Just isSupported -> pure (Just isSupported)
     Nothing -> do  -- Not sure, based on the handle alone
       notDumb <- isNotDumb  -- Test the environment
       if notDumb
-        then return Nothing  -- Still not sure!
-        else return (Just False) -- A dumb terminal
+        then pure Nothing  -- Still not sure!
+        else pure (Just False) -- A dumb terminal
 
 -- Borrowed from an HSpec patch by Simon Hengel
 -- (https://github.com/hspec/hspec/commit/d932f03317e0e2bd08c85b23903fb8616ae642bd)
@@ -501,10 +501,10 @@ getReported = CE.catch getReported' getReportedExceptionHandler
     action hdl = do
       n <- getNumberOfConsoleInputEvents hdl
       if n == 0
-        then return ""
+        then pure ""
         else do
           es <- readConsoleInput hdl n
-          return $ stringFromInputEvents es
+          pure $ stringFromInputEvents es
     stringFromInputEvents = cWcharsToChars . wCharsFromInputEvents
     wCharsFromInputEvents = mapMaybe wCharFromInputEvent
     wCharFromInputEvent e = if isKeyEvent && isKeyDown
@@ -540,9 +540,9 @@ hGetReport h report get parse =
                -- operating system
       input <- get
       case readP_to_S parse input of
-        [] -> return Nothing
-        [(value,_)] -> return $ Just value
-        (_:_) -> return Nothing
+        [] -> pure Nothing
+        [(value,_)] -> pure $ Just value
+        (_:_) -> pure Nothing
      where
       flush hdl = do
         n <- getNumberOfConsoleInputEvents hdl
