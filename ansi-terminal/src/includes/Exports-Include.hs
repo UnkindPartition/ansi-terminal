@@ -46,14 +46,11 @@
   , setCursorPositionCode
 
     -- * Saving, restoring and reporting cursor position
-    -- | These code sequences are not part of ECMA-48 standard; they are popular,
-    -- but non-portable extensions. E. g., Terminal.app on MacOS
-    -- <https://stackoverflow.com/questions/25879183 does not support them>.
-    -- A more portable way would be to query @terminfo@ database
-    -- for @rc@ and @sc@ capabilities.
+    -- | These code sequences are not part of the ECMA-48 standard; they are
+    -- popular, but non-portable extensions. On Unix-like operating systems,
+    -- they correspond to @rc@ and @sc@ capabilities in the @terminfo@ database.
     --
-    -- Cursor positions
-    -- <https://unix.stackexchange.com/questions/565597 are relative to the viewport, not to its content>.
+    -- Cursor positions are relative to the viewport, not to its content.
     --
   , saveCursor
   , restoreCursor
@@ -103,11 +100,12 @@
   , scrollPageDownCode
 
     -- * Using screen buffers
-    -- | These code sequences are not part of ECMA-48 standard; they are popular,
-    -- but non-portable extensions, corresponding to @smcup@ and @rmcup@ capabilities
-    -- in @terminfo@ database.
-    -- On Windows, if emulation is required, switching between alternate and
-    -- normal screen buffers is not emulated.
+    -- | These code sequences are not part of the ECMA-48 standard; they are
+    -- popular, but non-portable extensions. On Unix-like operating systems,
+    -- they correspond to the @smcup@ and @rmcup@ capabilities in the @terminfo@
+    -- database. Windows Terminal supports them. On Windows, if emulation is
+    -- required, switching between alternate and normal screen buffers is not
+    -- emulated.
   , useAlternateScreenBuffer
   , useNormalScreenBuffer
     -- ** \'h...\' variants
@@ -128,9 +126,9 @@
   , setSGRCode
 
     -- * Cursor visibilty changes
-    -- | Strictly speaking, these code sequences are not part of ECMA-48 standard;
-    -- they are popular, but non-portable extensions. However, in practice they seem
-    -- to work pretty much everywhere.
+    -- | These code sequences are not part of the ECMA-48 standard; they are
+    -- popular, but non-portable extensions. In practice, many terminals support
+    -- them.
   , hideCursor
   , showCursor
     -- ** \'h...\' variants
@@ -141,11 +139,10 @@
   , showCursorCode
 
     -- * Hyperlinks
-    -- | These code sequences are not part of ECMA-48 standard and not even an
-    -- @xterm@ extension. Nevertheless
-    -- <https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda many terminals>
-    -- support them. On Windows, if emulation is required,
-    -- hyperlinks are not emulated.
+    -- | These code sequences are not part of the ECMA-48 standard or an Xterm
+    -- extension. However, in practice, many terminals support them, including
+    -- Windows Terminal. On Windows, if emulation is required, hyperlinks are
+    -- not emulated.
   , hyperlink
   , hyperlinkWithId
   , hyperlinkWithParams
