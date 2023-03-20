@@ -23,7 +23,7 @@ import Text.Printf(printf)
 import Data.Colour (Colour)
 import Data.Colour.Names (black, blue, cyan, green, grey, lime, magenta, maroon,
   navy, olive, purple, red, silver, teal, white, yellow)
-import Data.Colour.SRGB (RGB (..), toSRGB)
+import Data.Colour.SRGB (toSRGB)
 #ifdef MIN_VERSION_mintty
 import System.Console.MinTTY (isMinTTYHandle)
 #else
