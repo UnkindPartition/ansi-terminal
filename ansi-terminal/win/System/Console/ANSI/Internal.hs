@@ -10,11 +10,7 @@ import Control.Exception ( IOException, catch )
 import Data.Maybe ( mapMaybe )
 import System.Environment ( lookupEnv )
 import System.IO ( Handle, hIsTerminalDevice, hIsWritable, stdin )
-#ifdef MIN_VERSION_mintty
-import System.Console.MinTTY (isMinTTYHandle)
-#else
 import System.Win32.MinTTY (isMinTTYHandle)
-#endif
 
 import System.Console.ANSI.Types ( ConsoleLayer )
 import System.Console.ANSI.Windows.Foreign
