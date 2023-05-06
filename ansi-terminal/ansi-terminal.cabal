@@ -47,11 +47,8 @@ Library
             Hs-Source-Dirs:     win
             Other-Modules:      System.Console.ANSI.Windows.Foreign
                                 System.Win32.Compat
-            if flag(Win32-2-13-1)
-                Build-Depends:   Win32 >= 2.13.1
-            else
-                Build-Depends:   Win32 < 2.13.1
-                               , mintty
+                                System.Win32.MinTTY
+            Build-Depends:      Win32
         else
             Hs-Source-Dirs:     unix
 
