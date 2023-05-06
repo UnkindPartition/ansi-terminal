@@ -15,6 +15,8 @@ Build-Type:          Simple
 
 Extra-Source-Files:     CHANGELOG.md
                         README.md
+                        win/include/errors.h
+                        win/include/winternl_compat.h
 
 Source-repository head
   type:     git
@@ -23,11 +25,6 @@ Source-repository head
 Flag Example
         Description:    Build the example application
         Default:        False
-
-Flag Win32-2-13-1
-        Description:    Use Win32-2-13.1.0 or later. If used, there is
-                        no dependency on the mintty package.
-        Default:        True
 
 Library
         Hs-Source-Dirs:         src
@@ -41,14 +38,17 @@ Library
         Other-Modules:          System.Console.ANSI.Internal
 
         Build-Depends:          base >= 4.8.0.0 && < 5
-                              , ansi-terminal-types ==0.11.5
-                              , colour >=2.1.0
+                              , ansi-terminal-types == 0.11.5
+                              , colour >= 2.1.0
         if os(windows)
             Hs-Source-Dirs:     win
             Other-Modules:      System.Console.ANSI.Windows.Foreign
-                                System.Win32.Compat
-                                System.Win32.MinTTY
-            Build-Depends:      Win32
+                                System.Console.ANSI.Windows.Win32.Types
+                                System.Console.ANSI.Windows.Win32.MinTTY
+            Include-Dirs:       win/include
+            Includes:           errors.h
+                                winternl_compat.h
+            C-Sources:          win/c-source/errors.c
         else
             Hs-Source-Dirs:     unix
 
@@ -65,5 +65,5 @@ Executable ansi-terminal-example
                               , colour
         Ghc-Options:            -Wall
         if !flag(example)
-                Buildable:              False
+            Buildable:          False
         Default-Language:       Haskell2010

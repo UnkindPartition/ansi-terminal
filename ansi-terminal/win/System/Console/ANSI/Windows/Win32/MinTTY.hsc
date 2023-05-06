@@ -1,30 +1,31 @@
+{-# LANGUAGE Safe                #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 {-| This module is based on the corresponding code in the mintty package and the
 Win32 package, in order to avoid a dependency on those packages.
 -}
-module System.Win32.MinTTY
+module System.Console.ANSI.Windows.Win32.MinTTY
   ( isMinTTYHandle
   ) where
 
-import Control.Exception ( catch, throwIO )
-import Data.Char ( isSpace )
+import Control.Exception ( catch )
 import Data.Int ( Int32 )
 import Data.List ( isInfixOf )
-import Data.Word ( Word16, Word32, Word8 )
-import Foreign.C.Error ( Errno (..), errnoToIOError )
+import Data.Word ( Word8 )
 import Foreign.C.String
-         ( peekCWString, peekCWStringLen, withCAString, withCWString
-         , withCWStringLen
-         )
-import Foreign.C.Types ( CChar, CInt (..), CWchar )
+         ( peekCWStringLen, withCAString, withCWString, withCWStringLen )
+import Foreign.C.Types ( CInt (..) )
 import Foreign.Marshal.Alloc ( alloca, allocaBytes )
 import Foreign.Marshal.Array ( advancePtr, copyArray )
 import Foreign.Marshal.Utils ( maybeWith )
-import Foreign.Ptr ( FunPtr, Ptr, castPtr, castPtrToFunPtr, nullPtr, plusPtr )
+import Foreign.Ptr ( FunPtr, Ptr, castPtr, castPtrToFunPtr, plusPtr )
 import Foreign.Storable ( Storable (..) )
-import Numeric ( showHex )
-import System.IO.Error ( ioeSetErrorString )
+
+-- Provided by the ansi-terminal package
+import System.Console.ANSI.Windows.Win32.Types
+         ( Addr, BOOL, DWORD, FileType, HANDLE, HMODULE, LPCSTR, LPCTSTR, LPTSTR
+         , TCHAR, ULONG, USHORT, failIfFalse_, failIfNeg, failIfNull
+         )
 
 -- The headers that are shipped with GHC's copy of MinGW-w64 assume Windows XP.
 -- Since we need some structs that are only available with Vista or later,
@@ -33,25 +34,13 @@ import System.IO.Error ( ioeSetErrorString )
 #define WINVER 0x0600
 #undef _WIN32_WINNT
 #define _WIN32_WINNT 0x0600
-##include "windows_cconv.h"
 #include <windows.h>
 #include "winternl_compat.h"
 
-type Addr = Ptr ()
-type BOOL = Bool
-type DWORD = Word32
-type ErrCode = DWORD
-type FileType = DWORD
-type HANDLE = Ptr ()
-type HMODULE = Ptr ()
-type LPCSTR = LPSTR
-type LPCTSTR = LPTSTR
-type LPSTR = Ptr CChar
-type LPTSTR = Ptr TCHAR
-type LPWSTR = Ptr CWchar
-type TCHAR = CWchar
-type ULONG = Word32
-type USHORT = Word16
+#if __GLASGOW_HASKELL__ < 800
+#let alignment t = "%lu", (unsigned long)offsetof(struct {char x__; t (y__); }, y__)
+#endif
+
 type F_NtQueryObject =
      HANDLE
   -> CInt
@@ -81,8 +70,9 @@ instance Storable FILE_NAME_INFO where
   peek buf = do
     vfniFileNameLength <- (#peek FILE_NAME_INFO, FileNameLength) buf
     let len = fromIntegral vfniFileNameLength `div` sizeOfTCHAR
-    vfniFileName <- peekTStringLen (plusPtr buf (#offset FILE_NAME_INFO, FileName), len)
-    return $ FILE_NAME_INFO
+    vfniFileName <-
+      peekTStringLen (plusPtr buf (#offset FILE_NAME_INFO, FileName), len)
+    pure $ FILE_NAME_INFO
       { fniFileNameLength = vfniFileNameLength
       , fniFileName = vfniFileName
       }
@@ -121,7 +111,7 @@ instance Storable UNICODE_STRING where
     vusBufferPtr <- (#peek UNICODE_STRING, Buffer) buf
     let len = fromIntegral vusLength `div` sizeOfTCHAR
     vusBuffer <- peekTStringLen (vusBufferPtr, len)
-    return $ UNICODE_STRING
+    pure $ UNICODE_STRING
       { usLength = vusLength
       , usMaximumLength = vusMaximumLength
       , usBuffer = vusBuffer
@@ -133,7 +123,7 @@ isMinTTYHandle :: HANDLE -> IO Bool
 isMinTTYHandle h = do
   fileType <- getFileType h
   if fileType /= fILE_TYPE_PIPE
-    then return False
+    then pure False
     else isMinTTYVista h `catch` \(_ :: IOError) -> isMinTTYCompat h
     -- GetFileNameByHandleEx is only available on Vista and later (hence
     -- the name isMinTTYVista). If we're on an older version of Windows,
@@ -144,9 +134,8 @@ isMinTTYHandle h = do
 isMinTTYVista :: HANDLE -> IO Bool
 isMinTTYVista h = do
     fn <- getFileNameByHandle h
-    return $ cygwinMSYSCheck fn
-  `catch` \(_ :: IOError) ->
-    return False
+    pure $ cygwinMSYSCheck fn
+  `catch` \(_ :: IOError) -> pure False
 
 cygwinMSYSCheck :: String -> Bool
 cygwinMSYSCheck fn =
@@ -175,9 +164,8 @@ cygwinMSYSCheck fn =
 isMinTTYCompat :: HANDLE -> IO Bool
 isMinTTYCompat h = do
     fn <- ntQueryObjectNameInformation h
-    return $ cygwinMSYSCheck fn
-  `catch` \(_ :: IOError) ->
-    return False
+    pure $ cygwinMSYSCheck fn
+  `catch` \(_ :: IOError) -> pure False
 
 fILE_TYPE_PIPE :: FileType
 fILE_TYPE_PIPE = 3
@@ -194,7 +182,7 @@ ntQueryObjectNameInformation h = do
       _ <- failIfNeg "NtQueryObject" $ c_NtQueryObject
              h objectNameInformation buf (fromIntegral bufSize) p_len
       oni <- peek buf
-      return $ usBuffer $ oniName oni
+      pure $ usBuffer $ oniName oni
 
 sizeOfTCHAR :: Int
 sizeOfTCHAR = sizeOf (undefined :: TCHAR)
@@ -207,7 +195,7 @@ getFileNameByHandle h = do
   allocaBytes bufSize $ \buf -> do
     getFileInformationByHandleEx h fileNameInfo buf (fromIntegral bufSize)
     fni <- peek buf
-    return $ fniFileName fni
+    pure $ fniFileName fni
 
 getFileInformationByHandleEx ::
      HANDLE
@@ -233,51 +221,6 @@ getProcAddress hmod procname =
   withCAString procname $ \ c_procname ->
   failIfNull "GetProcAddress" $ c_GetProcAddress hmod c_procname
 
-failIfNeg :: (Num a, Ord a) => String -> IO a -> IO a
-failIfNeg = failIf (< 0)
-
-failIfFalse_ :: String -> IO Bool -> IO ()
-failIfFalse_ = failIf_ not
-
-failIf :: (a -> Bool) -> String -> IO a -> IO a
-failIf p wh act = do
-  v <- act
-  if p v then errorWin wh else return v
-
-failIf_ :: (a -> Bool) -> String -> IO a -> IO ()
-failIf_ p wh act = do
-  v <- act
-  if p v then errorWin wh else return ()
-
-failIfNull :: String -> IO (Ptr a) -> IO (Ptr a)
-failIfNull = failIf (== nullPtr)
-
-errorWin :: String -> IO a
-errorWin fn_name = do
-  err_code <- getLastError
-  failWith fn_name err_code
-
-failWith :: String -> ErrCode -> IO a
-failWith fn_name err_code = do
-  c_msg <- getErrorMessage err_code
-  msg <- if c_msg == nullPtr
-    then return $ "Error 0x" ++ Numeric.showHex err_code ""
-    else do
-      msg <- peekTString c_msg
-      -- We ignore failure of freeing c_msg, given we're already failing
-      _ <- localFree c_msg
-      return msg
-  -- turn GetLastError() into errno, which errnoToIOError knows how to convert
-  -- to an IOException we can throw.
-  errno <- c_maperrno_func err_code
-  let msg' = reverse $ dropWhile isSpace $ reverse msg -- drop trailing \n
-      ioerror = errnoToIOError fn_name errno Nothing Nothing
-                  `ioeSetErrorString` msg'
-  throwIO ioerror
-
-peekTString :: LPCTSTR -> IO String
-peekTString = peekCWString
-
 peekTStringLen :: (LPCTSTR, Int) -> IO String
 peekTStringLen = peekCWStringLen
 
@@ -299,18 +242,6 @@ objectNameInformation = #const ObjectNameInformation
 foreign import ccall "dynamic"
   mk_GetFileInformationByHandleEx ::
     FunPtr F_GetFileInformationByHandleEx -> F_GetFileInformationByHandleEx
-
-foreign import ccall unsafe "maperrno_func" -- in base/cbits/Win32Utils.c
-   c_maperrno_func :: ErrCode -> IO Errno
-
-foreign import ccall unsafe "errors.h"
-  getErrorMessage :: DWORD -> IO LPWSTR
-
-foreign import ccall unsafe "windows.h GetLastError"
-  getLastError :: IO ErrCode
-
-foreign import ccall unsafe "windows.h LocalFree"
-  localFree :: Ptr a -> IO (Ptr a)
 
 foreign import ccall unsafe "windows.h GetFileType"
   getFileType :: HANDLE -> IO FileType
