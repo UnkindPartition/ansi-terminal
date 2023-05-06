@@ -10,14 +10,17 @@ import Control.Exception ( IOException, catch )
 import Data.Maybe ( mapMaybe )
 import System.Environment ( lookupEnv )
 import System.IO ( Handle, hIsTerminalDevice, hIsWritable, stdin )
-import System.Win32.MinTTY (isMinTTYHandle)
-
 import System.Console.ANSI.Types ( ConsoleLayer )
+
+-- Provided by the ansi-terminal package
 import System.Console.ANSI.Windows.Foreign
          ( INPUT_RECORD (..), INPUT_RECORD_EVENT (..), KEY_EVENT_RECORD (..)
          , cWcharsToChars, getNumberOfConsoleInputEvents, readConsoleInput
-         , unicodeAsciiChar, withHandleToHANDLE
+         , unicodeAsciiChar
          )
+import System.Console.ANSI.Windows.Win32.MinTTY ( isMinTTYHandle )
+import System.Console.ANSI.Windows.Win32.Types ( withHandleToHANDLE )
+
 
 getReportedCursorPosition :: IO String
 getReportedCursorPosition = getReported

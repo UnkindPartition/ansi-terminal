@@ -1,32 +1,32 @@
-Many other packages depend on `ansi-terminal`. As at March 2023, over 250
-packages on [Hackage](https:https://hackage.haskell.org/) depend on it. Consider
-raising an [issue](https://github.com/UnkindPartition/ansi-terminal/issues) to
+Many other packages depend on `ansi-terminal`. As at May 2023, over 4,400
+packages on [Hackage](https:https://hackage.haskell.org/) depend on it, directly
+or indirectly. Consider raising an
+[issue](https://github.com/UnkindPartition/ansi-terminal/issues) to
 discuss a proposed change before making a pull request.
 
 The `ansi-terminal` and `ansi-terminal-types` packages aim to have:
-* limited dependency on other packages, other than those included with
-  GHC;
+* limited dependency on other packages, even those included with GHC;
 * a high degree of backwards compatibility with earlier versions of GHC; and
 * comprehensive and high-quality Haddock documentation.
 
-As of `ansi-terminal-0.11.5`, the package aims to be compatible with versions
+As of `ansi-terminal-1.0`, the package aims to be compatible with versions
 of GHC from GHC 7.10.1 (released March 2015). GHC 7.10.1 comes with:
 * `base-4.8.0.0`
-* `Win32-2.3.1.0` (only on Windows)
 
 The `ansi-terminal` package also depends on:
 * `ansi-terminal-types`, which exposes module `System.Console.ANSI.Types`. The
-  package is provided to avoid circular dependencies in some circumstances;
+  package is provided to avoid circular dependencies in some circumstances; and
 * `colour-2.1.0` or later, used for 24-bit colour (`Colour`, `RGB`, `toSRGB` and
-  `toSRGB24`); and
-* `mintty` (which depends on `base >= 4.3`), used for its `isMinTTYHandle`
-  function only in the Windows version of the package. The function was later
-  added to `Win32-2.5.0.0` (first included with GHC 8.2.1 with `base-4.10.0.0`).
+  `toSRGB24`).
 
-The packages achieve that backward compatibility by using C Pre-Processor (CPP)
-directives. The `CPP` GHC extension is specified for the libraries in the Cabal
-files. The `Win32` package has developed over time and module
-`System.Win32.Compat` is used to reduce the use of CPP pragmas in other modules.
+The `ansi-terminal` package aims to avoid a dependency on the `Win32` package,
+because of its dependency on the `filepath` package. It does that by reproducing
+the small part of the `Win32` and `mintty` packages on which it would otherwise
+rely.
+
+The `ansi-terminal` and `ansi-terminal-types` packages achieve that backward
+compatibility by using C Pre-Processor (CPP) directives. The `CPP` GHC extension
+is specified for the libraries in the Cabal files.
 
 Separate 'Unix' and Windows versions of the package used to exist because,
 before Windows 10 version 1511, the native terminal software on Windows did not

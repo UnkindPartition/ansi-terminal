@@ -2,19 +2,14 @@
 {-# LANGUAGE RankNTypes         #-}
 {-# LANGUAGE Safe               #-}
 
-{-| "System.Win32.Console" is really very impoverished, so I have had to do all
-the FFI myself.
--}
 module System.Console.ANSI.Windows.Foreign
   (
-    -- 'Re-exports from System.Win32.Console.Extra'
     INPUT_RECORD (..)
   , INPUT_RECORD_EVENT (..)
   , KEY_EVENT_RECORD (..)
   , getNumberOfConsoleInputEvents
   , readConsoleInput
   , cWcharsToChars
-  , withHandleToHANDLE
   , unicodeAsciiChar
   ) where
 
@@ -27,20 +22,10 @@ import Foreign.Marshal.Alloc ( alloca )
 import Foreign.Marshal.Array ( allocaArray, peekArray, pokeArray )
 import Foreign.Ptr ( Ptr, castPtr, plusPtr )
 import Foreign.Storable ( Storable (..) )
-import System.Win32.Compat
-         ( BOOL, DWORD, ErrCode, HANDLE, LPDWORD, SHORT, UINT, ULONG, WORD
-         , failIfFalse_, withHandleToHANDLE
+import System.Console.ANSI.Windows.Win32.Types
+         ( BOOL, DWORD, ErrCode, HANDLE, LPDWORD, SHORT, UINT, ULONG, WCHAR
+         , WORD, failIfFalse_
          )
-
-#if defined(i386_HOST_ARCH)
-#define WINDOWS_CCONV stdcall
-#elif defined(x86_64_HOST_ARCH)
-#define WINDOWS_CCONV ccall
-#else
-#error Unknown mingw32 arch
-#endif
-
-type WCHAR = CWchar
 
 peekAndOffset :: Storable a => Ptr a -> IO (a, Ptr b)
 peekAndOffset ptr = do
@@ -223,9 +208,9 @@ wINDOW_BUFFER_SIZE_EVENT =  4
 mENU_EVENT               =  8
 fOCUS_EVENT              = 16
 
-foreign import WINDOWS_CCONV unsafe "windows.h GetNumberOfConsoleInputEvents"
+foreign import ccall unsafe "windows.h GetNumberOfConsoleInputEvents"
   cGetNumberOfConsoleInputEvents :: HANDLE -> Ptr DWORD -> IO BOOL
-foreign import WINDOWS_CCONV unsafe "windows.h ReadConsoleInputW"
+foreign import ccall unsafe "windows.h ReadConsoleInputW"
   cReadConsoleInput :: HANDLE
                     -> Ptr INPUT_RECORD
                     -> DWORD

@@ -10,7 +10,7 @@ docs/
 
 # Haskell Tool Stack-related
 .stack-work/
-stack.yaml.lock
+*.yaml.lock
 
 # Operating system rubbish
 .DS_Store

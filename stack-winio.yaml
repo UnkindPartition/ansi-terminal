@@ -5,3 +5,5 @@ flags:
 packages:
 - ansi-terminal
 - ansi-terminal-types
+ghc-options:
+  $targets: -with-rtsopts=--io-manager=native

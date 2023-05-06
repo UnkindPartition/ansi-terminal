@@ -1,6 +1,6 @@
+Cabal-Version:       1.22
 Name:                ansi-terminal-types
 Version:             0.11.5
-Cabal-Version:       >= 1.10
 Category:            User Interfaces
 Synopsis:            Types and functions used to represent SGR aspects
 Description:         The \'ANSI\' standards refer to the visual style of
@@ -27,7 +27,7 @@ Library
         Hs-Source-Dirs:         src
         Exposed-Modules:        System.Console.ANSI.Types
         Build-Depends:          base >= 4.8.0.0 && < 5
-                              , colour >=2.1.0
+                              , colour >= 2.1.0
         Default-Extensions:     CPP
         Ghc-Options:            -Wall
         Default-Language:       Haskell2010
