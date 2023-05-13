@@ -4,8 +4,12 @@ Changes
 Version 1.0
 -----------
 
-* Drop support for legacy Windows requiring emulation.
+* On Windows, drop support for legacy Windows requiring emulation.
+* On Windows, the package no longer depends (directly or indirectly) on the
+  `Win32`, `array`,`containers`, `deepseq`, `filepath`, `ghc-boot-th`, `mintty`,
+  `pretty` or `template-haskell` packages.
 * `hSupportsANSI` no longer assumes that the given handle is writeable.
+* `hSupportsANSIWithoutEmulation` is deprecated.
 
 Version 0.11.5
 --------------

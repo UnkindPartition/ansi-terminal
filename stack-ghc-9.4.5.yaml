@@ -1,4 +1,4 @@
-resolver: nightly-2023-05-05 # GHC 9.4.5
+resolver: nightly-2023-05-13 # GHC 9.4.5
 flags:
   ansi-terminal:
     example: false
