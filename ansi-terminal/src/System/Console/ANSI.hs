@@ -39,10 +39,10 @@ Recommendation (previously CCITT Recommendation) T.416 (03/93) \'Information
 Technology – Open Document Architecture (ODA) and Interchange Format: Character
 Content Architectures\` (also published as ISO/IEC International Standard
 8613-6); and (3) further extensions used by \'XTerm\', a terminal emulator for
-the X Window System. The escape codes are described in a Wikipedia article at
-<http://en.wikipedia.org/wiki/ANSI_escape_code> and those codes supported on
-current versions of Windows at
-<https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences>.
+the X Window System. The escape codes are described in a
+  [Wikipedia article](http://en.wikipedia.org/wiki/ANSI_escape_code) and those
+codes supported on current versions of Windows are descibed in
+  [Microsoft's documentation](https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences).
 
 The whole of the \'ANSI\' standards are not supported by this library but most
 (if not all) of the parts that are popular and well-supported by terminal
@@ -74,10 +74,10 @@ time. If they are supported by the terminal software, some control character
 sequences cause data to be emitted into the console input stream. For GHC's
 historical and default IO manager, the function 'hGetBufNonBlocking' in module
 "System.IO" does not work on Windows. This has been attributed to the lack of
-non-blocking primatives in the operating system (see the GHC bug report #806 at
-<https://ghc.haskell.org/trac/ghc/ticket/806>). GHC's native IO manager on
-Windows (\'WinIO\'), introduced as a preview in
-[GHC 9.0.1](https://downloads.haskell.org/ghc/9.0.1/docs/html/users_guide/9.0.1-notes.html#highlights),
+non-blocking primatives in the operating system (see
+  [GHC bug report #806](https://ghc.haskell.org/trac/ghc/ticket/806). GHC's
+native IO manager on Windows (\'WinIO\'), introduced as a preview in
+  [GHC 9.0.1](https://downloads.haskell.org/ghc/9.0.1/docs/html/users_guide/9.0.1-notes.html#highlights),
 has not yet provided a solution. On Windows, this library uses emulation based
 on the Windows Console API to try to read data emitted into the console input
 stream. Functions that use that emulation are not supported on consoles, such
@@ -616,7 +616,7 @@ hSupportsANSIColor h = (||) <$> hSupportsANSI h <*> isEmacsTerm
 -- supports legacy versions of Windows that required emulation.
 --
 -- @since 0.8.1
-{-# DEPRECATED hSupportsANSIWithoutEmulation "" #-}
+{-# DEPRECATED hSupportsANSIWithoutEmulation "See Haddock documentation and hSupportsANSI." #-}
 hSupportsANSIWithoutEmulation :: Handle -> IO (Maybe Bool)
 hSupportsANSIWithoutEmulation h = Just <$> hSupportsANSI h
 
