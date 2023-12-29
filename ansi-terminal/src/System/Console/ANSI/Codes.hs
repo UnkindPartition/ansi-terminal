@@ -1,4 +1,5 @@
-{-# LANGUAGE Safe #-}
+{-# LANGUAGE Safe          #-}
+{-# LANGUAGE TupleSections #-}
 
 {-| This module exports functions that return 'String' values containing codes
 in accordance with the \'ANSI\' standards for control character sequences
@@ -62,7 +63,15 @@ module System.Console.ANSI.Codes
   , setTitleCode
 
     -- * Utilities
-  , colorToCode, csi, osc, sgrToCode
+  , colorToCode
+  , Parameter
+  , SubParam
+  , ParamWithSubs
+  , csi
+  , csi'
+  , osc
+  , sgrToCode
+  , sgrToCode'
   ) where
 
 import Data.Char (isPrint)
@@ -72,16 +81,60 @@ import Data.Colour.SRGB (toSRGB24, RGB (..))
 
 import System.Console.ANSI.Types
 
+-- | Type synonym representing parameter values (without parameter substrings).
+-- To represent a paramater value followed by a parameter substring, see
+-- 'ParamWithSubs'.
+--
+-- @since 1.0.1
+type Parameter = Int
+
+-- | Type synonym representing parameter elements of a parameter
+-- substring. An empty parameter element (which represents a default value for
+-- the parameter element) has value 'Nothing'.
+--
+-- @since 1.0.1
+type SubParam = Maybe Int
+
+-- | Type synonym representing parameter values optionally followed by a
+-- parameter substring. Parameter substrings were introduced by 13.1.8 of T.416
+-- (03/93) for SGR parameter values 38 and 48 and have subsequently been adapted
+-- for other uses.
+--
+-- @since 1.0.1.
+type ParamWithSubs = (Parameter, [SubParam])
+
 -- | 'csi' @parameters controlFunction@, where @parameters@ is a list of 'Int',
 -- returns the control sequence comprising the control function CONTROL
--- SEQUENCE INTRODUCER (CSI) followed by the parameter(s) (separated by \';\')
+-- SEQUENCE INTRODUCER (CSI) followed by the parameter(s) (separated by \'@;@\')
 -- and ending with the @controlFunction@ character(s) that identifies the
--- control function.
+-- control function. See 'csi'' for a function that handles parameter values
+-- that may be followed by a parameter substring.
 csi ::
-     [Int]  -- ^ List of parameters for the control sequence
-  -> String -- ^ Character(s) that identify the control function
+     [Parameter]  -- ^ List of parameters for the control sequence.
+  -> String -- ^ Character(s) that identify the control function.
   -> String
-csi args code = "\ESC[" ++ intercalate ";" (map show args) ++ code
+csi = renderCsi show
+
+-- | Like 'csi' but extended to parameters that may be followed by a parameter
+-- substring. The parameter elements of a parameter substring are separated from
+-- the parameter value and each other by \'@:@\'.
+--
+-- @since 1.0.1
+csi' ::
+     [ParamWithSubs]
+     -- ^ List of parameters (each of which may be followed by a parameter
+     -- substring).
+  -> String -- ^ Characters(s) that identify the control function.
+  -> String
+csi' = renderCsi render
+ where
+  render (p, []) = show p
+  render (p, pes) = intercalate ":" (show p : map (maybe [] show) pes)
+
+-- | Helper function to render different types of parameters.
+renderCsi :: (a -> String) -> [a] -> String -> String
+renderCsi render args code =
+  "\ESC[" ++ intercalate ";" (map render args) ++ code
 
 -- | 'osc' @parameterS parametersT@, where @parameterS@ specifies the type of
 -- operation to perform and @parametersT@ is the other parameter(s) (if any),
@@ -110,40 +163,51 @@ colorToCode color = case color of
   White   -> 7
 
 -- | 'sgrToCode' @sgr@ returns the parameter of the SELECT GRAPHIC RENDITION
--- (SGR) aspect identified by @sgr@.
+-- (SGR) aspect identified by @sgr@. If the parameter is followed by a parameter
+-- substring returns an empty list. See 'sgrToCode'' for a function that handles
+-- also parameter values that are followed by a parameter substring.
 sgrToCode ::
      SGR -- ^ The SGR aspect
-  -> [Int]
-sgrToCode sgr = case sgr of
-  Reset -> [0]
+  -> [Parameter]
+sgrToCode sgr = case sgrToCode' sgr of
+  Right args -> args
+  Left _ -> []
+
+-- | 'sgrToCode'' @sgr@ returns the parameter of the SELECT GRAPHIC RENDITION
+-- (SGR) aspect identified by @sgr@.
+sgrToCode' ::
+     SGR -- ^ The SGR aspect
+  -> Either ParamWithSubs [Parameter]
+sgrToCode' sgr = case sgr of
+  Reset -> Right [0]
   SetConsoleIntensity intensity -> case intensity of
-    BoldIntensity   -> [1]
-    FaintIntensity  -> [2]
-    NormalIntensity -> [22]
-  SetItalicized True  -> [3]
-  SetItalicized False -> [23]
+    BoldIntensity   -> Right [1]
+    FaintIntensity  -> Right [2]
+    NormalIntensity -> Right [22]
+  SetItalicized True  -> Right [3]
+  SetItalicized False -> Right [23]
   SetUnderlining underlining -> case underlining of
-    SingleUnderline -> [4]
-    DoubleUnderline -> [21]
-    NoUnderline     -> [24]
+    SingleUnderline -> Right [4]
+    DoubleUnderline -> Right [21]
+    NoUnderline     -> Right [24]
   SetBlinkSpeed blink_speed -> case blink_speed of
-    SlowBlink   -> [5]
-    RapidBlink  -> [6]
-    NoBlink     -> [25]
-  SetVisible False -> [8]
-  SetVisible True  -> [28]
-  SetSwapForegroundBackground True  -> [7]
-  SetSwapForegroundBackground False -> [27]
-  SetColor Foreground Dull color  -> [30 + colorToCode color]
-  SetColor Foreground Vivid color -> [90 + colorToCode color]
-  SetColor Background Dull color  -> [40 + colorToCode color]
-  SetColor Background Vivid color -> [100 + colorToCode color]
-  SetPaletteColor Foreground index -> [38, 5, fromIntegral index]
-  SetPaletteColor Background index -> [48, 5, fromIntegral index]
-  SetRGBColor Foreground color -> [38, 2] ++ toRGB color
-  SetRGBColor Background color -> [48, 2] ++ toRGB color
-  SetDefaultColor Foreground -> [39]
-  SetDefaultColor Background -> [49]
+    SlowBlink   -> Right [5]
+    RapidBlink  -> Right [6]
+    NoBlink     -> Right [25]
+  SetVisible False -> Right [8]
+  SetVisible True  -> Right [28]
+  SetSwapForegroundBackground True  -> Right [7]
+  SetSwapForegroundBackground False -> Right [27]
+  SetColor Foreground Dull color  -> Right [30 + colorToCode color]
+  SetColor Foreground Vivid color -> Right [90 + colorToCode color]
+  SetColor Background Dull color  -> Right [40 + colorToCode color]
+  SetColor Background Vivid color -> Right [100 + colorToCode color]
+  SetPaletteColor Foreground index -> Right [38, 5, fromIntegral index]
+  SetPaletteColor Background index -> Right [48, 5, fromIntegral index]
+  SetRGBColor Foreground color -> Right $ [38, 2] ++ toRGB color
+  SetRGBColor Background color -> Right $ [48, 2] ++ toRGB color
+  SetDefaultColor Foreground -> Right [39]
+  SetDefaultColor Background -> Right [49]
  where
   toRGB color = let RGB r g b = toSRGB24 color
                 in  map fromIntegral [r, g, b]
@@ -245,7 +309,9 @@ setSGRCode ::
      -- console SGR mode. An empty list of commands is equivalent to the list
      -- @[Reset]@. Commands are applied left to right.
   -> String
-setSGRCode sgrs = csi (concatMap sgrToCode sgrs) "m"
+setSGRCode sgrs = csi' (concatMap sgrToCode'' sgrs) "m"
+ where
+  sgrToCode'' = either (:[]) (map (,[] :: [SubParam])) . sgrToCode'
 
 hideCursorCode, showCursorCode :: String
 hideCursorCode = csi [] "?25l"
