@@ -897,6 +897,7 @@ layerColor layer = do
   void $ string $ case layer of
     Foreground -> "10"
     Background -> "11"
+    Underlining -> fail "reportLayerColor does not support underlining"
   void $ string ";rgb:"
   redHex <- hexadecimal -- A non-negative whole hexadecimal number
   void $ char '/'

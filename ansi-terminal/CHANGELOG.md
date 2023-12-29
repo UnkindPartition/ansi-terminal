@@ -1,9 +1,11 @@
 Changes
 =======
 
-Version 1.0.3
--------------
+Version 1.1
+-----------
 
+* Add support for console layer `Underlining` and underlining styles
+  `CurlyUnderline`, `DottedUnderline` and `DashedUnderline`.
 * Add type synonyms `Parameter`, `SubParam`, and `ParamWithSubs` to represent
   SGR parameter values with and without following parameter substrings comprised
   of one or more parameter elements (including empty elements).
@@ -31,7 +33,6 @@ Version 1.0.1
 * Deprecated `hSupportsANSIWithoutEmulation` is now consistent with
   `hNowSupportsANSI`.
 * Improvements to Haddock documentation.
-
 Version 1.0
 -----------
 

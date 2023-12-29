@@ -58,6 +58,8 @@ data ColorIntensity
 data ConsoleLayer
   = Foreground
   | Background
+  | Underlining
+    -- ^ Not widely supported.
   deriving (Bounded, Eq, Enum, Ix, Ord, Read, Show)
 
 -- | ANSI blink speeds: values other than 'NoBlink' are not widely supported
@@ -70,8 +72,14 @@ data BlinkSpeed
 -- | ANSI text underlining
 data Underlining
   = SingleUnderline
-  -- | Not widely supported. Not supported natively on Windows 10
   | DoubleUnderline
+    -- ^ Not widely supported.
+  | CurlyUnderline
+    -- ^ Not widely supported.
+  | DottedUnderline
+    -- ^ Not widely supported.
+  | DashedUnderline
+    -- ^ Not widely supported.
   | NoUnderline
   deriving (Bounded, Eq, Enum, Ix, Ord, Read, Show)
 

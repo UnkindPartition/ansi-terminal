@@ -1,1 +1,1 @@
-resolver: lts-22.3 # GHC 9.6.3
+resolver: lts-22.9 # GHC 9.6.4
