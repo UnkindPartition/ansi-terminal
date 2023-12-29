@@ -189,6 +189,9 @@ sgrToCode' sgr = case sgr of
   SetUnderlining underlining -> case underlining of
     SingleUnderline -> Right [4]
     DoubleUnderline -> Right [21]
+    CurlyUnderline -> Left (4, [Just 3])
+    DottedUnderline -> Left (4, [Just 4])
+    DashedUnderline -> Left (4, [Just 5])
     NoUnderline     -> Right [24]
   SetBlinkSpeed blink_speed -> case blink_speed of
     SlowBlink   -> Right [5]
@@ -202,15 +205,21 @@ sgrToCode' sgr = case sgr of
   SetColor Foreground Vivid color -> Right [90 + colorToCode color]
   SetColor Background Dull color  -> Right [40 + colorToCode color]
   SetColor Background Vivid color -> Right [100 + colorToCode color]
+  SetColor Underlining Dull color  -> Left (58, [Just 5, Just $ colorToCode color])
+  SetColor Underlining Vivid color -> Left (58, [Just 5, Just $ 8 + colorToCode color])
   SetPaletteColor Foreground index -> Right [38, 5, fromIntegral index]
   SetPaletteColor Background index -> Right [48, 5, fromIntegral index]
+  SetPaletteColor Underlining index -> Left (58, [Just 5, Just $ fromIntegral index])
   SetRGBColor Foreground color -> Right $ [38, 2] ++ toRGB color
   SetRGBColor Background color -> Right $ [48, 2] ++ toRGB color
+  SetRGBColor Underlining color -> Left (58, [Just 2, Nothing] ++ toRGB' color)
   SetDefaultColor Foreground -> Right [39]
   SetDefaultColor Background -> Right [49]
+  SetDefaultColor Underlining -> Right [59]
  where
   toRGB color = let RGB r g b = toSRGB24 color
                 in  map fromIntegral [r, g, b]
+  toRGB' = map Just . toRGB
 
 cursorUpCode, cursorDownCode, cursorForwardCode, cursorBackwardCode ::
      Int -- ^ Number of lines or characters to move
@@ -262,9 +271,11 @@ restoreCursorCode = "\ESC8"
 reportCursorPositionCode :: String
 reportCursorPositionCode = csi [] "6n"
 
--- | Code to emit the layer color into the console input stream, immediately
--- after being recognised on the output stream, as:
+-- | Code to emit the foreground or backgrond layer color into the console input
+-- stream, immediately after being recognised on the output stream, as:
+--
 -- @ESC ] \<Ps> ; rgb: \<red> ; \<green> ; \<blue> \<ST>@
+--
 -- where @\<Ps>@ is @10@ for 'Foreground' and @11@ for 'Background'; @\<red>@,
 -- @\<green>@ and @\<blue>@ are the color channel values in hexadecimal (4, 8,
 -- 12 and 16 bit values are possible, although 16 bit values are most common);
@@ -280,6 +291,7 @@ reportCursorPositionCode = csi [] "6n"
 reportLayerColorCode :: ConsoleLayer -> String
 reportLayerColorCode Foreground = osc "10" "?"
 reportLayerColorCode Background = osc "11" "?"
+reportLayerColorCode Underlining = [] -- Not supported.
 
 clearFromCursorToScreenEndCode, clearFromCursorToScreenBeginningCode,
   clearScreenCode :: String

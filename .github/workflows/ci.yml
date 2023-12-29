@@ -26,20 +26,20 @@ jobs:
           - "9.2.8"
           - "9.4.8"
         include:
-          - ghc: "9.6.3"
+          - ghc: "9.6.4"
             cabal: "3.10"
           - ghc: "9.8.1"
             cabal: "3.10"
     steps:
       - uses: actions/checkout@v4
-      - uses: haskell/actions/setup@v2
+      - uses: haskell-actions/setup@v2
         id: setup-haskell-cabal
         with:
           ghc-version: ${{ matrix.ghc }}
           cabal-version: ${{ matrix.cabal }}
       - run: cabal v2-update
       - run: cabal v2-freeze
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: |
             ${{ steps.setup-haskell-cabal.outputs.cabal-store }}
@@ -74,7 +74,7 @@ jobs:
           - ghc: "9.4.8"
             cabal: "3.8"
             winio: true
-          - ghc: "9.6.3"
+          - ghc: "9.6.4"
             cabal: "3.10"
             winio: true
           - ghc: "9.8.1"
@@ -82,14 +82,14 @@ jobs:
             winio: true
     steps:
       - uses: actions/checkout@v4
-      - uses: haskell/actions/setup@v2
+      - uses: haskell-actions/setup@v2
         id: setup-haskell-cabal
         with:
           ghc-version: ${{ matrix.ghc }}
           cabal-version: ${{ matrix.cabal }}
       - run: cabal v2-update
       - run: cabal v2-freeze
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: |
             ${{ steps.setup-haskell-cabal.outputs.cabal-store }}

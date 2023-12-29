@@ -1,6 +1,6 @@
 Cabal-Version:       1.22
 Name:                ansi-terminal-types
-Version:             0.11.5
+Version:             1.1
 Category:            User Interfaces
 Synopsis:            Types and functions used to represent SGR aspects
 Description:         The \'ANSI\' standards refer to the visual style of

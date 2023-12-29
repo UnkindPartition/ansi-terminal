@@ -243,15 +243,16 @@ screenBuffersExample = do
 sgrColorExample :: IO ()
 sgrColorExample = do
   let colors = enumFromTo minBound maxBound :: [Color]
-  forM_ [Foreground, Background] $ \layer ->  do
+  forM_ [Foreground, Background, Underlining] $ \layer ->  do
     forM_ [Dull, Vivid] $ \intensity -> do
       resetScreen
       forM_ colors $ \color -> do
         setSGR [Reset]
         setSGR [SetColor layer intensity color]
+        setSGR [SetUnderlining SingleUnderline]
         print color
       pause
-  -- The ANSI eight standard colors, 4 times in sequence (two layers and two
+  -- The ANSI eight standard colors, 6 times in sequence (three layers and two
   -- intensities)
 
   resetScreen
@@ -333,6 +334,25 @@ sgrColorExample = do
         putStr " "
   replicateM_ 5 pause
 
+  resetScreen
+  setSGR [Reset]
+  setSGR [SetUnderlining SingleUnderline]
+  forM_
+    (zip "Underlining: True color (24 bit color depth)" (cycle [0, 10 .. 255])) $
+    \(c, i) -> do
+      setSGR [SetRGBColor Underlining $ sRGB24 i 0 0]
+      putChar c
+  putChar '\n'
+  putChar '\n'
+  setSGR [Reset]
+  setSGR [SetUnderlining SingleUnderline]
+  forM_ (zip "Underlining: A 256-color palette" (cycle [0 .. 5])) $
+    \(c, i) -> do
+      setSGR [SetPaletteColor Underlining $ xterm6LevelRGB i 0 0]
+      putChar c
+  putChar '\n'
+  replicateM_ 5 pause
+
 sgrOtherExample :: IO ()
 sgrOtherExample = do
   let named_styles = [ (SetConsoleIntensity BoldIntensity, "Bold")
@@ -342,6 +362,9 @@ sgrOtherExample = do
                      , (SetItalicized False, "No Italics")
                      , (SetUnderlining SingleUnderline, "Single Underline")
                      , (SetUnderlining DoubleUnderline, "Double Underline")
+                     , (SetUnderlining CurlyUnderline, "Curly Underline")
+                     , (SetUnderlining DottedUnderline, "Dotted Underline")
+                     , (SetUnderlining DashedUnderline, "Dashed Underline")
                      , (SetUnderlining NoUnderline, "No Underline")
                      , (SetBlinkSpeed SlowBlink, "Slow Blink")
                      , (SetBlinkSpeed RapidBlink, "Rapid Blink")

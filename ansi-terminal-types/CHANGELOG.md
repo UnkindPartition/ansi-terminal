@@ -1,6 +1,13 @@
 Changes
 =======
 
+Version 1.1
+--------------
+
+* Add `Underlining` constructor to type `ConsoleLayer`.
+* Add `CurlyUnderline`, `DottedUnderline`, and `DashedUnderline` constructors to
+  type `Underlining`.
+
 Version 0.11.5
 --------------
 

@@ -1,4 +1,4 @@
-resolver: lts-21.25 # GHC 9.4.8
+snapshot: lts-21.25 # GHC 9.4.8
 flags:
   ansi-terminal:
     example: false
