@@ -23,13 +23,15 @@ jobs:
           - "8.8.4"
           - "8.10.7"
           - "9.0.2"
-          - "9.2.7"
-          - "9.4.5"
+          - "9.2.8"
+          - "9.4.8"
         include:
-        - ghc: "9.6.1"
-          cabal: "3.10"
+          - ghc: "9.6.3"
+            cabal: "3.10"
+          - ghc: "9.8.1"
+            cabal: "3.10"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: haskell/actions/setup@v2
         id: setup-haskell-cabal
         with:
@@ -66,15 +68,20 @@ jobs:
           - ghc: "9.0.2"
             cabal: "3.8"
             winio: true
-          - ghc: "9.2.7"
+          - ghc: "9.2.8"
             cabal: "3.8"
             winio: true
-          - ghc: "9.4.5"
+          - ghc: "9.4.8"
             cabal: "3.8"
-          - ghc: "9.6.1"
+            winio: true
+          - ghc: "9.6.3"
             cabal: "3.10"
+            winio: true
+          - ghc: "9.8.1"
+            cabal: "3.10"
+            winio: true
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: haskell/actions/setup@v2
         id: setup-haskell-cabal
         with:

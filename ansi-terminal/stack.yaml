@@ -1,8 +1,6 @@
-resolver: lts-20.20 # GHC 9.2.7
+resolver: lts-22.3 # GHC 9.6.3
 flags:
   ansi-terminal:
     example: false
-packages:
-- .
 extra-deps:
 - ansi-terminal-types-0.11.5@sha256:f78440dfd95c4509e88855ac7cc2d9566ddf956a92c1290404cac93ad1a1b00a,1482
