@@ -1,6 +1,6 @@
 Cabal-Version:       1.22
 Name:                ansi-terminal
-Version:             1.0
+Version:             1.0.1
 Category:            User Interfaces
 Synopsis:            Simple ANSI terminal support
 Description:         ANSI terminal support for Haskell: allows cursor movement,
@@ -16,6 +16,7 @@ Build-Type:          Simple
 Extra-Source-Files:     CHANGELOG.md
                         README.md
                         win/include/errors.h
+                        win/include/HsWin32.h
                         win/include/winternl_compat.h
 
 Source-repository head
@@ -47,8 +48,11 @@ Library
                                 System.Console.ANSI.Windows.Win32.MinTTY
             Include-Dirs:       win/include
             Includes:           errors.h
+                                HsWin32.h
                                 winternl_compat.h
+            Install-Includes:   HsWin32.h
             C-Sources:          win/c-source/errors.c
+                                win/c-source/HsWin32.c
         else
             Hs-Source-Dirs:     unix
 

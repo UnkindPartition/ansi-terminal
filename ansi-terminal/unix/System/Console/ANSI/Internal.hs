@@ -4,6 +4,7 @@ module System.Console.ANSI.Internal
   ( getReportedCursorPosition
   , getReportedLayerColor
   , hSupportsANSI
+  , hNowSupportsANSI
   ) where
 
 import Data.List ( uncons )
@@ -73,3 +74,6 @@ hSupportsANSI h = (&&) <$> hIsWritable h <*> hSupportsANSI'
  where
   hSupportsANSI' = (&&) <$> hIsTerminalDevice h <*> isNotDumb
   isNotDumb = (/= Just "dumb") <$> lookupEnv "TERM"
+
+hNowSupportsANSI :: Handle -> IO Bool
+hNowSupportsANSI = hSupportsANSI
