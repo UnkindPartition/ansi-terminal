@@ -31,7 +31,13 @@ examples = [ cursorMovementExample
            ]
 
 main :: IO ()
-main = mapM_ (resetScreen >>) examples
+main = do
+  stdoutSupportsANSI <- hNowSupportsANSI stdout
+  if stdoutSupportsANSI
+    then
+      mapM_ (resetScreen >>) examples
+    else
+      putStrLn "Standard output does not support 'ANSI' escape codes."
 
 -- Annex D to Standard ECMA-48 (5th Ed, 1991) identifies that the representation
 -- of an erased state is implementation-dependent. There may or may not be a

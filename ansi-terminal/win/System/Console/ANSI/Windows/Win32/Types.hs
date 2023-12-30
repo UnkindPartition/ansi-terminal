@@ -19,6 +19,7 @@ module System.Console.ANSI.Windows.Win32.Types
   , SHORT
   , TCHAR
   , UINT
+  , UINT_PTR
   , ULONG
   , USHORT
   , WCHAR
@@ -68,6 +69,7 @@ type LPWSTR = Ptr CWchar
 type SHORT = CShort
 type TCHAR = CWchar
 type UINT = Word32
+type UINT_PTR = Word
 type ULONG = Word32
 type USHORT = Word16
 type WCHAR = CWchar

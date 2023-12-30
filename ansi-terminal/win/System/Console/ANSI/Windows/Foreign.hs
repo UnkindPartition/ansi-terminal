@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE RankNTypes         #-}
-{-# LANGUAGE Safe               #-}
+{-# LANGUAGE Trustworthy        #-}
 
 module System.Console.ANSI.Windows.Foreign
   (
@@ -11,6 +11,11 @@ module System.Console.ANSI.Windows.Foreign
   , readConsoleInput
   , cWcharsToChars
   , unicodeAsciiChar
+  , eNABLE_VIRTUAL_TERMINAL_PROCESSING
+  , iNVALID_HANDLE_VALUE
+  , nullHANDLE
+  , getConsoleMode
+  , setConsoleMode
   ) where
 
 import Control.Exception ( Exception )
@@ -20,11 +25,11 @@ import Data.Word ( Word32 )
 import Foreign.C.Types ( CWchar (..) )
 import Foreign.Marshal.Alloc ( alloca )
 import Foreign.Marshal.Array ( allocaArray, peekArray, pokeArray )
-import Foreign.Ptr ( Ptr, castPtr, plusPtr )
+import Foreign.Ptr ( Ptr, castPtr, plusPtr, nullPtr )
 import Foreign.Storable ( Storable (..) )
 import System.Console.ANSI.Windows.Win32.Types
-         ( BOOL, DWORD, ErrCode, HANDLE, LPDWORD, SHORT, UINT, ULONG, WCHAR
-         , WORD, failIfFalse_
+         ( BOOL, DWORD, ErrCode, HANDLE, LPDWORD, SHORT, UINT, UINT_PTR, ULONG
+         , WCHAR, WORD, failIfFalse_
          )
 
 peekAndOffset :: Storable a => Ptr a -> IO (a, Ptr b)
@@ -461,3 +466,29 @@ cWcharsToChars = map chr . fromUTF16 . map fromIntegral
       ((c1 - 0xd800)*0x400 + (c2 - 0xdc00) + 0x10000) : fromUTF16 wcs
   fromUTF16 (c:wcs) = c : fromUTF16 wcs
   fromUTF16 [] = []
+
+eNABLE_VIRTUAL_TERMINAL_PROCESSING :: DWORD
+eNABLE_VIRTUAL_TERMINAL_PROCESSING = 4
+
+iNVALID_HANDLE_VALUE :: HANDLE
+iNVALID_HANDLE_VALUE = castUINTPtrToPtr maxBound
+
+nullHANDLE :: HANDLE
+nullHANDLE = nullPtr
+
+foreign import ccall unsafe "HsWin32.h"
+  castUINTPtrToPtr :: UINT_PTR -> Ptr a
+
+foreign import ccall unsafe "windows.h GetConsoleMode"
+  c_GetConsoleMode :: HANDLE -> LPDWORD -> IO BOOL
+
+foreign import ccall unsafe "windows.h SetConsoleMode"
+  c_SetConsoleMode :: HANDLE -> DWORD -> IO BOOL
+
+getConsoleMode :: HANDLE -> IO DWORD
+getConsoleMode h = alloca $ \ptr -> do
+  failIfFalse_ "GetConsoleMode" $ c_GetConsoleMode h ptr
+  peek ptr
+
+setConsoleMode :: HANDLE -> DWORD -> IO ()
+setConsoleMode h mode = failIfFalse_ "SetConsoleMode" $ c_SetConsoleMode h mode

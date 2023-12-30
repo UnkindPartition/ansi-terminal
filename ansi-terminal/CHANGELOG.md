@@ -1,10 +1,30 @@
 Changes
 =======
 
+Version 1.0.1
+-------------
+
+* On Windows, the processing of \'ANSI\' control characters in output is enabled
+  by default in Windows Terminal but is not enabled by default in ConHost
+  terminals. Additions have been made to allow support of users of ConHost
+  terminals.
+* Add `hNowSupportsANSI`. On Unix, the function is equivalent to
+  `hSupportsANSI`. On Windows, in Windows Terminal and ConHost terminals, the
+  action can try to enable the processing of \'ANSI\' control characters in
+  output.
+* In Windows Terminal and ConHost terminals, `hSupportsANSI` will yield `False`
+  if the the processing of \'ANSI\' control characters in output is not enabled.
+* Deprecated `hSupportsANSIWithoutEmulation` is now consistent with
+  `hNowSupportsANSI`.
+* Improvements to Haddock documentation.
+
 Version 1.0
 -----------
 
-* On Windows, drop support for legacy Windows requiring emulation.
+* On Windows, drop support for legacy Windows requiring emulation. The package
+  assumes Windows Terminal has replaced ConHost terminals on supported versions
+  of Windows. Functions that yield actions no longer enable (re-enable) the
+  processing of \'ANSI\' control characters in output.
 * On Windows, the package no longer depends (directly or indirectly) on the
   `Win32`, `array`,`containers`, `deepseq`, `filepath`, `ghc-boot-th`, `mintty`,
   `pretty` or `template-haskell` packages.

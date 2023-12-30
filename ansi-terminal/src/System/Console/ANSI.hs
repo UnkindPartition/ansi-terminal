@@ -65,6 +65,17 @@ Windows Terminal, with the objective of replacing most of the Windows Console
 API with the use of control character sequences and retiring the historical
 user-interface role of Windows Console Host (\'ConHost\').
 
+Windows Terminal is supported on Windows 10 version 19041.0 or higher and
+provided with Windows 11. It can be downloaded from the Microsoft Store. Windows
+Terminal can be set as the default terminal application on Windows 10 (from
+the 22H2 update) and is the default application on Windows 11 (from the 22H2
+update).
+
+Despite the above developments, some Windows users may continue to use ConHost.
+ConHost does not enable the processing of \'ANSI\' control characters in output
+by default. See 'hNowSupportsANSI' for a function that can try to enable such
+processing.
+
 Terminal software other than the native software exists for Windows. One example
 is the \'mintty\' terminal emulator for \'Cygwin\', \'MSYS\' or \'MSYS2\', and
 dervied projects, and for \'WSL\' (Windows Subsystem for Linux).
@@ -120,15 +131,21 @@ A simple example is below:
 > module Main where
 >
 > import System.Console.ANSI
+> import System.IO (stdout)
 >
 > -- Set colors and write some text in those colors.
 > main :: IO ()
 > main = do
->   setSGR [SetColor Foreground Vivid Red]
->   setSGR [SetColor Background Vivid Blue]
->   putStrLn "Red-On-Blue"
->   setSGR [Reset]  -- Reset to default colour scheme
->   putStrLn "Default colors."
+>   stdoutSupportsANSI <- hNowSupportsANSI stdout
+>   if stdoutSupportsANSI
+>     then
+>       setSGR [SetColor Foreground Vivid Red]
+>       setSGR [SetColor Background Vivid Blue]
+>       putStrLn "Red-On-Blue"
+>       setSGR [Reset]  -- Reset to default colour scheme
+>       putStrLn "Default colors."
+>     else
+>       putStrLn "Standard output does not support 'ANSI' escape codes."
 
 Another example is below:
 
@@ -139,14 +156,19 @@ Another example is below:
 >
 > main :: IO ()
 > main = do
->   setSGR [SetColor Foreground Dull Blue]
->   putStr "Enter your name: "
->   setSGR [SetColor Foreground Dull Yellow]
->   hFlush stdout  -- flush the output buffer before getLine
->   name <- getLine
->   setSGR [SetColor Foreground Dull Blue]
->   putStrLn $ "Hello, " ++ name ++ "!"
->   setSGR [Reset]  -- reset to default colour scheme
+>   stdoutSupportsANSI <- hNowSupportsANSI stdout
+>   if stdoutSupportsANSI
+>     then
+>       setSGR [SetColor Foreground Dull Blue]
+>       putStr "Enter your name: "
+>       setSGR [SetColor Foreground Dull Yellow]
+>       hFlush stdout  -- flush the output buffer before getLine
+>       name <- getLine
+>       setSGR [SetColor Foreground Dull Blue]
+>       putStrLn $ "Hello, " ++ name ++ "!"
+>       setSGR [Reset]  -- reset to default colour scheme
+>     else
+>       putStrLn "Standard output does not support 'ANSI' escape codes."
 
 For many more examples, see the project's extensive
 <https://github.com/UnkindPartition/ansi-terminal/blob/master/app/Example.hs Example.hs> file.
@@ -317,6 +339,7 @@ module System.Console.ANSI
 
     -- * Checking if handle supports ANSI (not portable: GHC only)
   , hSupportsANSI
+  , hNowSupportsANSI
   , hSupportsANSIColor
 
     -- * Getting the cursor position
@@ -573,28 +596,40 @@ setTitle :: String -- ^ New window title and icon name
          -> IO ()
 setTitle = hSetTitle stdout
 
--- | Use heuristics to determine whether the functions defined in this
--- package will work with a given handle.
+-- | Use heuristics to determine whether the functions defined in this package
+-- will work with a given handle.
 --
 -- If the handle is not writable (that is, it cannot manage output - see
 -- 'hIsWritable'), then @pure False@ is returned.
 --
 -- For Unix-like operating systems, the current implementation checks
--- that: (1) the handle is a terminal; and (2) a @TERM@
--- environment variable is not set to @dumb@ (which is what the GNU Emacs text
--- editor sets for its integrated terminal).
+-- that: (1) the handle is a terminal; and (2) a @TERM@ environment variable is
+-- not set to @dumb@ (which is what the GNU Emacs text editor sets for its
+-- integrated terminal).
 --
--- For Windows, the current implementation performs the same checks as for
--- Unix-like operating systems and, as an alternative, checks whether the
--- handle is connected to a \'mintty\' terminal. (That is because the function
--- 'hIsTerminalDevice' is used to check if the handle is a
--- terminal. However, where a non-native Windows terminal (such as \'mintty\')
--- is implemented using redirection, that function will not identify a
--- handle to the terminal as a terminal.)
+-- For Windows, the current implementation checks: first that (1) the handle is
+-- a terminal, (2) a @TERM@ environment variable is not set to @dumb@, and (3)
+-- the processing of \'ANSI\' control characters in output is enabled; and
+-- second, as an alternative, whether the handle is connected to a \'mintty\'
+-- terminal. (That is because the function 'hIsTerminalDevice' is used to check
+-- if the handle is a terminal. However, where a non-native Windows terminal
+-- (such as \'mintty\') is implemented using redirection, that function will not
+-- identify a handle to the terminal as a terminal.) If it is not already
+-- enabled, this function does *not* enable the processing of \'ANSI\' control
+-- characters in output (see 'hNowSupportsANSI').
 --
 -- @since 0.6.2
 hSupportsANSI :: Handle -> IO Bool
 hSupportsANSI = Internal.hSupportsANSI
+
+-- | With one exception, equivalent to 'hSupportsANSI'. The exception is that,
+-- on Windows only, if a @TERM@ environment variable is not set to @dumb@ and
+-- the processing of \'ANSI\' control characters in output is not enabled, this
+-- function first tries to enable such processing.
+--
+-- @Since 1.0.1
+hNowSupportsANSI :: Handle -> IO Bool
+hNowSupportsANSI = Internal.hNowSupportsANSI
 
 -- | Some terminals (e.g. Emacs) are not fully ANSI compliant but can support
 -- ANSI colors. This can be used in such cases, if colors are all that is
@@ -610,15 +645,15 @@ hSupportsANSIColor h = (||) <$> hSupportsANSI h <*> isEmacsTerm
 
 -- | Use heuristics to determine whether a given handle will support \'ANSI\'
 -- control characters in output. The function is consistent with
--- 'hSupportsANSI'.
+-- 'hNowSupportsANSI'.
 --
 -- This function is deprecated as, from version 1.0, the package no longer
 -- supports legacy versions of Windows that required emulation.
 --
 -- @since 0.8.1
-{-# DEPRECATED hSupportsANSIWithoutEmulation "See Haddock documentation and hSupportsANSI." #-}
+{-# DEPRECATED hSupportsANSIWithoutEmulation "See Haddock documentation and hNowSupportsANSI." #-}
 hSupportsANSIWithoutEmulation :: Handle -> IO (Maybe Bool)
-hSupportsANSIWithoutEmulation h = Just <$> hSupportsANSI h
+hSupportsANSIWithoutEmulation h = Just <$> hNowSupportsANSI h
 
 -- | Parses the characters emitted by 'reportCursorPosition' into the console
 -- input stream. Returns the cursor row and column as a tuple.
