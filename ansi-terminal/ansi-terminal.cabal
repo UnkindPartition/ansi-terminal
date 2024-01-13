@@ -1,6 +1,6 @@
 Cabal-Version:       1.22
 Name:                ansi-terminal
-Version:             1.0.1
+Version:             1.0.2
 Category:            User Interfaces
 Synopsis:            Simple ANSI terminal support
 Description:         ANSI terminal support for Haskell: allows cursor movement,

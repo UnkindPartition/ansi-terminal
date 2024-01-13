@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 1.0.2
+-------------
+
+* On Windows, fix linker error about a duplicate symbol `castUINTPtrToPtr`.
+
 Version 1.0.1
 -------------
 

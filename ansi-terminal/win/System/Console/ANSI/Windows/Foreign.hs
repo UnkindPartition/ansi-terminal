@@ -476,7 +476,7 @@ iNVALID_HANDLE_VALUE = castUINTPtrToPtr maxBound
 nullHANDLE :: HANDLE
 nullHANDLE = nullPtr
 
-foreign import ccall unsafe "HsWin32.h"
+foreign import ccall unsafe "HsWin32.h _ansi_terminal_castUINTPtrToPtr"
   castUINTPtrToPtr :: UINT_PTR -> Ptr a
 
 foreign import ccall unsafe "windows.h GetConsoleMode"
