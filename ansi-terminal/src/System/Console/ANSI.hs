@@ -138,7 +138,7 @@ A simple example is below:
 > main = do
 >   stdoutSupportsANSI <- hNowSupportsANSI stdout
 >   if stdoutSupportsANSI
->     then
+>     then do
 >       setSGR [SetColor Foreground Vivid Red]
 >       setSGR [SetColor Background Vivid Blue]
 >       putStrLn "Red-On-Blue"
@@ -158,7 +158,7 @@ Another example is below:
 > main = do
 >   stdoutSupportsANSI <- hNowSupportsANSI stdout
 >   if stdoutSupportsANSI
->     then
+>     then do
 >       setSGR [SetColor Foreground Dull Blue]
 >       putStr "Enter your name: "
 >       setSGR [SetColor Foreground Dull Yellow]

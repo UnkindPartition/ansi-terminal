@@ -64,10 +64,11 @@ but for a taste of how the library works try the following code:
 import System.Console.ANSI
 import System.IO (stdout)
 
+main :: IO ()
 main = do
   stdoutSupportsANSI <- hNowSupportsANSI stdout
   if stdoutSupportsANSI
-    then
+    then do
       setCursorPosition 5 0
       setTitle "ANSI Terminal Short Example"
 
