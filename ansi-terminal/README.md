@@ -62,21 +62,27 @@ but for a taste of how the library works try the following code:
 
 ``` haskell
 import System.Console.ANSI
+import System.IO (stdout)
 
 main = do
-    setCursorPosition 5 0
-    setTitle "ANSI Terminal Short Example"
+  stdoutSupportsANSI <- hNowSupportsANSI stdout
+  if stdoutSupportsANSI
+    then
+      setCursorPosition 5 0
+      setTitle "ANSI Terminal Short Example"
 
-    setSGR [ SetConsoleIntensity BoldIntensity
-           , SetColor Foreground Vivid Red
-           ]
-    putStr "Hello"
+      setSGR [ SetConsoleIntensity BoldIntensity
+             , SetColor Foreground Vivid Red
+             ]
+      putStr "Hello"
 
-    setSGR [ SetConsoleIntensity NormalIntensity
-           , SetColor Foreground Vivid White
-           , SetColor Background Dull Blue
-           ]
-    putStrLn "World!"
+      setSGR [ SetConsoleIntensity NormalIntensity
+             , SetColor Foreground Vivid White
+             , SetColor Background Dull Blue
+             ]
+      putStrLn "World!"
+    else
+      putStrLn "Standard output does not support 'ANSI' escape codes."
 ```
 
 ![](https://raw.githubusercontent.com/feuerbach/ansi-terminal/master/example.png)

@@ -1,4 +1,4 @@
-Many other packages depend on `ansi-terminal`. As at May 2023, over 4,400
+Many other packages depend on `ansi-terminal`. As at January 2024, over 4,700
 packages on [Hackage](https:https://hackage.haskell.org/) depend on it, directly
 or indirectly. Consider raising an
 [issue](https://github.com/UnkindPartition/ansi-terminal/issues) to
@@ -9,7 +9,7 @@ The `ansi-terminal` and `ansi-terminal-types` packages aim to have:
 * a high degree of backwards compatibility with earlier versions of GHC; and
 * comprehensive and high-quality Haddock documentation.
 
-As of `ansi-terminal-1.0`, the package aims to be compatible with versions
+As of `ansi-terminal-1.0.1`, the package aims to be compatible with versions
 of GHC from GHC 7.10.1 (released March 2015). GHC 7.10.1 comes with:
 * `base-4.8.0.0`
 
