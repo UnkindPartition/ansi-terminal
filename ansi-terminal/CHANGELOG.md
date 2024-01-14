@@ -18,7 +18,7 @@ Version 1.0.1
   action can try to enable the processing of \'ANSI\' control characters in
   output.
 * In Windows Terminal and ConHost terminals, `hSupportsANSI` will yield `False`
-  if the the processing of \'ANSI\' control characters in output is not enabled.
+  if the processing of \'ANSI\' control characters in output is not enabled.
 * Deprecated `hSupportsANSIWithoutEmulation` is now consistent with
   `hNowSupportsANSI`.
 * Improvements to Haddock documentation.
