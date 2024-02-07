@@ -85,14 +85,14 @@ import System.Console.ANSI.Types
 -- To represent a paramater value followed by a parameter substring, see
 -- 'ParamWithSubs'.
 --
--- @since 1.0.1
+-- @since 1.1
 type Parameter = Int
 
 -- | Type synonym representing parameter elements of a parameter
 -- substring. An empty parameter element (which represents a default value for
 -- the parameter element) has value 'Nothing'.
 --
--- @since 1.0.1
+-- @since 1.1
 type SubParam = Maybe Int
 
 -- | Type synonym representing parameter values optionally followed by a
@@ -100,7 +100,7 @@ type SubParam = Maybe Int
 -- (03/93) for SGR parameter values 38 and 48 and have subsequently been adapted
 -- for other uses.
 --
--- @since 1.0.1.
+-- @since 1.1
 type ParamWithSubs = (Parameter, [SubParam])
 
 -- | 'csi' @parameters controlFunction@, where @parameters@ is a list of 'Int',
@@ -119,7 +119,7 @@ csi = renderCsi show
 -- substring. The parameter elements of a parameter substring are separated from
 -- the parameter value and each other by \'@:@\'.
 --
--- @since 1.0.1
+-- @since 1.1
 csi' ::
      [ParamWithSubs]
      -- ^ List of parameters (each of which may be followed by a parameter
@@ -175,6 +175,8 @@ sgrToCode sgr = case sgrToCode' sgr of
 
 -- | 'sgrToCode'' @sgr@ returns the parameter of the SELECT GRAPHIC RENDITION
 -- (SGR) aspect identified by @sgr@.
+--
+-- @since 1.1
 sgrToCode' ::
      SGR -- ^ The SGR aspect
   -> Either ParamWithSubs [Parameter]

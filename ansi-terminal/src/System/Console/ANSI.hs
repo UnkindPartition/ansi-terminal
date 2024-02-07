@@ -10,7 +10,8 @@ The sequences of control characters (also referred to as \'escape\' sequences or
 codes) provide a rich range of functionality for terminal control, which
 includes:
 
- * Colored text output, with control over both foreground and background colors
+ * Colored text output, with control over foreground, background and (where
+   supported) underlining colors
 
  * Clearing parts of a line or the screen
 

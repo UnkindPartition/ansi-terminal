@@ -9,8 +9,8 @@ Description
 
 ['ANSI' terminal escape code](http://en.wikipedia.org/wiki/ANSI_escape_sequences)
 support for Haskell, which allows:
--   Colored text output, with control over both foreground and background
-    colors
+-   Colored text output, with control over foreground, background and (where
+    supported) underlining colors
 -   Clearing parts of a line or the screen
 -   Hiding or showing the cursor
 -   Moving the cursor around

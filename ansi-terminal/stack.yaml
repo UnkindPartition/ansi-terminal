@@ -3,4 +3,4 @@ flags:
   ansi-terminal:
     example: false
 extra-deps:
-- ansi-terminal-types-0.11.5@sha256:f78440dfd95c4509e88855ac7cc2d9566ddf956a92c1290404cac93ad1a1b00a,1482
+- ansi-terminal-types-1.1@sha256:135f6a381afa19d53d0a3fe40b6dd47e6666c538b09e4300fbb1438759df3248,1462
