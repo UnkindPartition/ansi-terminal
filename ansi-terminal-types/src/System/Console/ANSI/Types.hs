@@ -1,11 +1,12 @@
 {-# LANGUAGE Safe #-}
 
 {-| The \'ANSI\' standards refer to the visual style of displaying characters as
-their \'graphic rendition\'. The style includes the color of a character or its
-background, the intensity (bold, normal or faint) of a character, or whether the
-character is italic or underlined (single or double), blinking (slowly or
-rapidly) or visible or not. The \'ANSI\' codes to establish the graphic
-rendition for subsequent text are referred to as SELECT GRAPHIC RENDITION (SGR).
+their \'graphic rendition\'. The style includes the color of a character, its
+background, or (where supported) its underlining; the intensity (bold, normal or
+faint) of a character; or whether the character is italic or underlined (single,
+double, curly, dotted or dashed), blinking (slowly or rapidly) or visible or
+not. The \'ANSI\' codes to establish the graphic rendition for subsequent text
+are referred to as SELECT GRAPHIC RENDITION (SGR).
 
 This module exports types and functions used to represent SGR aspects. See also
 'System.Console.ANSI.setSGR' and related functions provided by the
@@ -54,12 +55,14 @@ data ColorIntensity
   | Vivid
   deriving (Bounded, Eq, Enum, Ix, Ord, Read, Show)
 
--- | ANSI colors can be set on two different layers
+-- | ANSI colors can be set on three different layers
 data ConsoleLayer
   = Foreground
   | Background
   | Underlining
     -- ^ Not widely supported.
+    --
+    -- @since 1.1
   deriving (Bounded, Eq, Enum, Ix, Ord, Read, Show)
 
 -- | ANSI blink speeds: values other than 'NoBlink' are not widely supported
@@ -76,10 +79,16 @@ data Underlining
     -- ^ Not widely supported.
   | CurlyUnderline
     -- ^ Not widely supported.
+    --
+    -- @since 1.1
   | DottedUnderline
     -- ^ Not widely supported.
+    --
+    -- @since 1.1
   | DashedUnderline
     -- ^ Not widely supported.
+    --
+    -- @since 1.1
   | NoUnderline
   deriving (Bounded, Eq, Enum, Ix, Ord, Read, Show)
 
