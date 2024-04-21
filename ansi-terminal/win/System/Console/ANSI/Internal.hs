@@ -5,12 +5,13 @@ module System.Console.ANSI.Internal
   , getReportedLayerColor
   , hNowSupportsANSI
   , hSupportsANSI
+  , hSupportsANSIColor
   ) where
 
 import Control.Exception ( IOException, SomeException, catch, try )
 import Data.Bits ( (.&.), (.|.) )
 import Data.Maybe ( mapMaybe )
-import System.Environment ( lookupEnv )
+import System.Environment ( getEnvironment, lookupEnv )
 import System.IO ( Handle, hIsTerminalDevice, hIsWritable, stdin )
 import System.Console.ANSI.Types ( ConsoleLayer )
 
@@ -103,3 +104,10 @@ withHANDLE invalid action h =
   if h == iNVALID_HANDLE_VALUE || h == nullHANDLE
     then invalid  -- Invalid handle or no handle
     else action h
+
+hSupportsANSIColor :: Handle -> IO Bool
+hSupportsANSIColor h = (||) <$> hSupportsANSI h <*> isEmacsTerm
+  where
+    isEmacsTerm = (\env -> insideEmacs env && isDumb env) <$> getEnvironment
+    insideEmacs = any (\(k, _) -> k == "INSIDE_EMACS")
+    isDumb env = Just "dumb" == lookup "TERM" env
