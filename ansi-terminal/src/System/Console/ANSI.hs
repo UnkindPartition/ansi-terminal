@@ -368,7 +368,6 @@ import Control.Monad ( when, void )
 import Data.Char ( digitToInt, isDigit, isHexDigit )
 import Data.Colour.SRGB ( RGB (..) )
 import Data.Word ( Word16 )
-import System.Environment ( getEnvironment )
 import System.IO
          ( BufferMode (..), Handle, hFlush, hGetBuffering, hGetEcho, hPutStr
          , hReady, hSetBuffering, hSetEcho, stdin, stdout
@@ -638,11 +637,7 @@ hNowSupportsANSI = Internal.hNowSupportsANSI
 --
 -- @since 0.9
 hSupportsANSIColor :: Handle -> IO Bool
-hSupportsANSIColor h = (||) <$> hSupportsANSI h <*> isEmacsTerm
-  where
-    isEmacsTerm = (\env -> insideEmacs env && isDumb env) <$> getEnvironment
-    insideEmacs = any (\(k, _) -> k == "INSIDE_EMACS")
-    isDumb env = Just "dumb" == lookup "TERM" env
+hSupportsANSIColor = Internal.hSupportsANSIColor
 
 -- | Use heuristics to determine whether a given handle will support \'ANSI\'
 -- control characters in output. The function is consistent with

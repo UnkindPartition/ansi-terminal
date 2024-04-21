@@ -1,16 +1,18 @@
-{-# LANGUAGE Safe #-}
+{-# LANGUAGE Trustworthy #-}
 
 module System.Console.ANSI.Internal
   ( getReportedCursorPosition
   , getReportedLayerColor
   , hSupportsANSI
   , hNowSupportsANSI
+  , hSupportsANSIColor
   ) where
 
 import Data.List ( uncons )
-import Data.Maybe ( fromMaybe, mapMaybe )
+import Data.Maybe ( fromMaybe, isJust, mapMaybe )
 import System.Environment ( lookupEnv )
 import System.IO ( Handle, hIsTerminalDevice, hIsWritable )
+import System.IO.Unsafe ( unsafePerformIO )
 import System.Timeout ( timeout )
 
 import System.Console.ANSI.Types ( ConsoleLayer (..) )
@@ -72,8 +74,34 @@ hSupportsANSI :: Handle -> IO Bool
 -- (https://github.com/hspec/hspec/commit/d932f03317e0e2bd08c85b23903fb8616ae642bd)
 hSupportsANSI h = (&&) <$> hIsWritable h <*> hSupportsANSI'
  where
-  hSupportsANSI' = (&&) <$> hIsTerminalDevice h <*> isNotDumb
-  isNotDumb = (/= Just "dumb") <$> lookupEnv "TERM"
+  hSupportsANSI' = (&& isNotDumb) <$> hIsTerminalDevice h
 
 hNowSupportsANSI :: Handle -> IO Bool
 hNowSupportsANSI = hSupportsANSI
+
+hSupportsANSIColor :: Handle -> IO Bool
+hSupportsANSIColor h = (|| isEmacsTerm) <$> hSupportsANSI h
+ where
+  isEmacsTerm = insideEmacs && isDumb
+  isDumb = not isNotDumb
+
+-- | This function assumes that once it is first established whether or not the
+-- TERM environment variable exists with contents dumb, that will not change.
+-- This approach is taken because the use of C function setenv() in one thread
+-- can cause other threads calling C function getenv() to crash. On Unix-like
+-- operating systems, System.Environment.lookupEnv is implemented using C
+-- function getenv(). 
+isNotDumb :: Bool
+isNotDumb = unsafePerformIO (lookupEnv "TERM") /= Just "dumb"
+
+{-# NOINLINE isNotDumb #-}
+
+-- | This function assumes that once it is first established whether or not the
+-- INSIDE_EMACS environment variable exists, that will not change. This approach
+-- is taken because the use of C function setenv() in one thread can cause other
+-- threads calling C function getenv() to crash. On Unix-like operating systems,
+-- System.Environment.lookupEnv is implemented using C function getenv(). 
+insideEmacs :: Bool
+insideEmacs = isJust $ unsafePerformIO (lookupEnv "INSIDE_EMACS")
+
+{-# NOINLINE insideEmacs #-}
