@@ -1,6 +1,17 @@
 Changes
 =======
 
+Version 1.1.1
+-------------
+
+* Use of C function `setenv()` in one thread can cause other threads calling C
+  functions that query environment variables to crash. On Unix-like operating
+  systems, where such functions are used, the implementations of
+  `hSupportsANSI` and `hSupportsANSIColor` now avoid unnecessary calls of
+  `System.Environment.lookupEnv`.
+
+* Improvements to Haddock documentation.
+
 Version 1.1
 -----------
 
