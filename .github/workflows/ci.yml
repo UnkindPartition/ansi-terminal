@@ -26,9 +26,9 @@ jobs:
           - "9.2.8"
           - "9.4.8"
         include:
-          - ghc: "9.6.4"
+          - ghc: "9.6.5"
             cabal: "3.10"
-          - ghc: "9.8.1"
+          - ghc: "9.8.2"
             cabal: "3.10"
     steps:
       - uses: actions/checkout@v4
@@ -74,10 +74,10 @@ jobs:
           - ghc: "9.4.8"
             cabal: "3.8"
             winio: true
-          - ghc: "9.6.4"
+          - ghc: "9.6.5"
             cabal: "3.10"
             winio: true
-          - ghc: "9.8.1"
+          - ghc: "9.8.2"
             cabal: "3.10"
             winio: true
     steps:
