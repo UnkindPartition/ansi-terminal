@@ -783,6 +783,8 @@ hGetCursorPosition h = fmap to0base <$> getCursorPosition'
 -- emulated, but the emulation does not work on Windows Terminal and (2) of
 -- difficulties in obtaining the data emitted into the console input stream.
 --
+-- Underlining is not supported.
+--
 -- @since 0.11.4
 reportLayerColor :: ConsoleLayer -> IO ()
 reportLayerColor = hReportLayerColor stdout
@@ -814,6 +816,8 @@ hReportLayerColor h layer = hPutStr h $ reportLayerColorCode layer
 -- as mintty, that are not based on the Windows' Console API. (Command Prompt
 -- and PowerShell are based on the Console API.)
 --
+-- Underlining is not supported.
+--
 -- @since 0.11.4
 getReportedLayerColor :: ConsoleLayer -> IO String
 getReportedLayerColor = Internal.getReportedLayerColor
@@ -831,6 +835,8 @@ getReportedLayerColor = Internal.getReportedLayerColor
 -- and PowerShell are based on the Console API.) This function also relies on
 -- emulation that does not work on Windows Terminal.
 --
+-- Underlining is not supported.
+--
 -- @since 0.11.4
 getLayerColor :: ConsoleLayer -> IO (Maybe(RGB Word16))
 getLayerColor = hGetLayerColor stdout
@@ -846,6 +852,8 @@ getLayerColor = hGetLayerColor stdout
 -- as mintty, that are not based on the Windows' Console API. (Command Prompt
 -- and PowerShell are based on the Console API.) This function also relies on
 -- emulation that does not work on Windows Terminal.
+--
+-- Underlining is not supported.
 --
 -- @since 0.11.4
 hGetLayerColor :: Handle -> ConsoleLayer -> IO (Maybe (RGB Word16))
@@ -885,6 +893,8 @@ hGetLayerColor h layer = do
 -- >     [] -> putStrLn $ "Error: could not parse " ++ show input
 -- >     [(col, _)] -> putStrLn $ "The color was " ++ show col ++ "."
 -- >     (_:_) -> putStrLn $ "Error: parse not unique"
+--
+-- Underlining is not supported.
 --
 -- @since 0.11.4
 layerColor :: ConsoleLayer -> ReadP (RGB Word16)

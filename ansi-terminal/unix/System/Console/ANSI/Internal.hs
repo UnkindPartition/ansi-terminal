@@ -21,6 +21,8 @@ getReportedCursorPosition :: IO String
 getReportedCursorPosition = getReport "\ESC[" ["R"]
 
 getReportedLayerColor :: ConsoleLayer -> IO String
+getReportedLayerColor Underlining =
+  error "getReportedLayerColor does not support underlining."
 getReportedLayerColor layer =
   getReport ("\ESC]" ++ pS ++ ";rgb:") ["\BEL", "\ESC\\"]
  where

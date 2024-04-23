@@ -289,6 +289,8 @@ reportCursorPositionCode = csi [] "6n"
 -- terminals (2) of difficulties in obtaining the data emitted into the
 -- console input stream. See 'System.Console.ANSI.getReportedLayerColor'.
 --
+-- Underlining is not supported.
+--
 -- @since 0.11.4
 reportLayerColorCode :: ConsoleLayer -> String
 reportLayerColorCode Foreground = osc "10" "?"
