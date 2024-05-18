@@ -84,9 +84,9 @@ dervied projects, and for \'WSL\' (Windows Subsystem for Linux).
 GHC's management of input and output (IO) on Windows has also developed over
 time. If they are supported by the terminal software, some control character
 sequences cause data to be emitted into the console input stream. For GHC's
-historical and default IO manager, the function 'hGetBufNonBlocking' in module
-"System.IO" does not work on Windows. This has been attributed to the lack of
-non-blocking primatives in the operating system (see
+historical and default IO manager, the function 'System.IO.hGetBufNonBlocking'
+in module "System.IO" does not work on Windows. This has been attributed to the
+lack of non-blocking primatives in the operating system (see
   [GHC bug report #806](https://ghc.haskell.org/trac/ghc/ticket/806). GHC's
 native IO manager on Windows (\'WinIO\'), introduced as a preview in
   [GHC 9.0.1](https://downloads.haskell.org/ghc/9.0.1/docs/html/users_guide/9.0.1-notes.html#highlights),
@@ -600,7 +600,7 @@ setTitle = hSetTitle stdout
 -- will work with a given handle.
 --
 -- If the handle is not writable (that is, it cannot manage output - see
--- 'hIsWritable'), then @pure False@ is returned.
+-- 'System.IO.hIsWritable'), then @pure False@ is returned.
 --
 -- For Unix-like operating systems, the current implementation checks
 -- that: (1) the handle is a terminal; and (2) a @TERM@ environment variable is
@@ -611,12 +611,12 @@ setTitle = hSetTitle stdout
 -- a terminal, (2) a @TERM@ environment variable is not set to @dumb@, and (3)
 -- the processing of \'ANSI\' control characters in output is enabled; and
 -- second, as an alternative, whether the handle is connected to a \'mintty\'
--- terminal. (That is because the function 'hIsTerminalDevice' is used to check
--- if the handle is a terminal. However, where a non-native Windows terminal
--- (such as \'mintty\') is implemented using redirection, that function will not
--- identify a handle to the terminal as a terminal.) If it is not already
--- enabled, this function does *not* enable the processing of \'ANSI\' control
--- characters in output (see 'hNowSupportsANSI').
+-- terminal. (That is because the function 'System.IO.hIsTerminalDevice' is used
+-- to check if the handle is a terminal. However, where a non-native Windows
+-- terminal (such as \'mintty\') is implemented using redirection, that function
+-- will not identify a handle to the terminal as a terminal.) If it is not
+-- already enabled, this function does *not* enable the processing of \'ANSI\'
+-- control characters in output (see 'hNowSupportsANSI').
 --
 -- @since 0.6.2
 hSupportsANSI :: Handle -> IO Bool
@@ -955,7 +955,7 @@ getTerminalSize = hGetTerminalSize stdout
 
 -- | Attempts to get the current terminal size (height in rows, width in
 -- columns), by writing control character sequences to the specified handle
--- (which will typically be 'stdout' or 'stderr').
+-- (which will typically be 'stdout' or 'System.IO.stderr').
 --
 -- There is no \'ANSI\' control character sequence that reports the terminal
 -- size. So, it attempts to set the cursor position beyond the bottom right
