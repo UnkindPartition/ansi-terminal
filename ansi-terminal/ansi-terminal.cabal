@@ -47,9 +47,6 @@ Library
                                 System.Console.ANSI.Windows.Win32.Types
                                 System.Console.ANSI.Windows.Win32.MinTTY
             Include-Dirs:       win/include
-            Includes:           errors.h
-                                HsWin32.h
-                                winternl_compat.h
             Install-Includes:   HsWin32.h
             C-Sources:          win/c-source/errors.c
                                 win/c-source/HsWin32.c
