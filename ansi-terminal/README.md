@@ -15,6 +15,7 @@ support for Haskell, which allows:
 -   Hiding or showing the cursor
 -   Moving the cursor around
 -   Reporting the position of the cursor
+-   Enabling and disabling automatic line wrapping
 -   Scrolling the screen up or down
 -   Switching between the Alternate and Normal Screen Buffers
 -   Clickable hyperlinks to URIs
@@ -40,6 +41,7 @@ including:
 -   Directly changing cursor position: `setCursorColumn` and `setCursorPosition`
 -   Saving, restoring and reporting cursor position: `saveCursor`,
     `restoreCursor` and `reportCursorPosition`
+-   Automatic line wrapping: `enableLineWrap` and `disableLineWrap`
 -   Scrolling the screen: `scrollPageUp` and `scrollPageDown`
 -   Changing the title: `setTitle`
 

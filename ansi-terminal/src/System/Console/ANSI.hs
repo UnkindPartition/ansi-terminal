@@ -21,6 +21,8 @@ includes:
 
  * Reporting the position of the cursor
 
+ * Enabling or disabling automatic line wrapping
+
  * Scrolling the screen up or down
 
  * Switching between the Alternate and Normal Screen Buffers
@@ -197,6 +199,7 @@ module System.Console.ANSI
   , cursorBackwardCode
 
     -- * Cursor movement by line
+    --
     -- | The difference between movements \"by character\" and \"by line\" is
     -- that @*Line@ functions additionally move the cursor to the start of the
     -- line, while functions like @cursorUp@ and @cursorDown@ keep the column
@@ -221,6 +224,7 @@ module System.Console.ANSI
   , setCursorPositionCode
 
     -- * Saving, restoring and reporting cursor position
+    --
     -- | These code sequences are not part of ECMA-48 standard; they are popular,
     -- but non-portable extensions. E. g., Terminal.app on MacOS
     -- <https://stackoverflow.com/questions/25879183 does not support them>.
@@ -243,6 +247,7 @@ module System.Console.ANSI
   , reportCursorPositionCode
 
     -- * Clearing parts of the screen
+    --
     -- | Note that these functions only clear parts of the screen. They do not
     -- move the cursor. Some functions are based on the whole screen and others
     -- are based on the line in which the cursor is located.
@@ -267,15 +272,18 @@ module System.Console.ANSI
   , clearFromCursorToLineBeginningCode
   , clearLineCode
 
-    -- * Enabling and disabling line wrap
-  , disableLineWrap
+    -- * Enabling and disabling automatic line wrapping
+    --
+    -- | These functions control whether or not characters automatically wrap to
+    -- the next line when the cursor reaches the right border.
   , enableLineWrap
+  , disableLineWrap
     -- ** \'h...\' variants
-  , hDisableLineWrap
   , hEnableLineWrap
+  , hDisableLineWrap
     -- ** \'...Code\' variants
-  , disableLineWrapCode
   , enableLineWrapCode
+  , disableLineWrapCode
 
     -- * Scrolling the screen
   , scrollPageUp
@@ -288,6 +296,7 @@ module System.Console.ANSI
   , scrollPageDownCode
 
     -- * Using screen buffers
+    --
     -- | These code sequences are not part of ECMA-48 standard; they are popular,
     -- but non-portable extensions, corresponding to @smcup@ and @rmcup@ capabilities
     -- in @terminfo@ database.
@@ -313,6 +322,7 @@ module System.Console.ANSI
   , setSGRCode
 
     -- * Cursor visibilty changes
+    --
     -- | Strictly speaking, these code sequences are not part of ECMA-48 standard;
     -- they are popular, but non-portable extensions. However, in practice they seem
     -- to work pretty much everywhere.
@@ -326,6 +336,7 @@ module System.Console.ANSI
   , showCursorCode
 
     -- * Hyperlinks
+    --
     -- | These code sequences are not part of ECMA-48 standard and not even an
     -- @xterm@ extension. Nevertheless
     -- <https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda many terminals>

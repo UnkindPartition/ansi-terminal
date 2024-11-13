@@ -35,7 +35,10 @@ module System.Console.ANSI.Codes
   , clearScreenCode, clearFromCursorToLineEndCode
   , clearFromCursorToLineBeginningCode, clearLineCode
 
-    -- * Enabling and disabling line wrap
+    -- * Enabling and disabling automatic line wrapping
+    --
+    -- | These functions control whether or not characters automatically wrap to
+    -- the next line when the cursor reaches the right border.
   , enableLineWrapCode, disableLineWrapCode
 
     -- * Scrolling the screen
@@ -58,6 +61,7 @@ module System.Console.ANSI.Codes
   , hideCursorCode, showCursorCode
 
     -- * Hyperlinks
+    --
     -- | Some, but not all, terminals support hyperlinks - that is, clickable
     -- text that points to a URI.
   , hyperlinkCode, hyperlinkWithIdCode, hyperlinkWithParamsCode
