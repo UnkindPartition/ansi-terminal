@@ -267,6 +267,16 @@ module System.Console.ANSI
   , clearFromCursorToLineBeginningCode
   , clearLineCode
 
+    -- * Enabling and disabling line wrap
+  , disableLineWrap
+  , enableLineWrap
+    -- ** \'h...\' variants
+  , hDisableLineWrap
+  , hEnableLineWrap
+    -- ** \'...Code\' variants
+  , disableLineWrapCode
+  , enableLineWrapCode
+
     -- * Scrolling the screen
   , scrollPageUp
   , scrollPageDown
@@ -1027,6 +1037,16 @@ clearFromCursorToLineEnd, clearFromCursorToLineBeginning, clearLine :: IO ()
 clearFromCursorToLineEnd = hClearFromCursorToLineEnd stdout
 clearFromCursorToLineBeginning = hClearFromCursorToLineBeginning stdout
 clearLine = hClearLine stdout
+
+hEnableLineWrap, hDisableLineWrap ::
+     Handle
+  -> IO ()
+hEnableLineWrap h = hPutStr h enableLineWrapCode
+hDisableLineWrap h = hPutStr h disableLineWrapCode
+
+enableLineWrap, disableLineWrap :: IO ()
+enableLineWrap = hEnableLineWrap stdout
+disableLineWrap = hDisableLineWrap stdout
 
 hScrollPageUp, hScrollPageDown ::
      Handle

@@ -35,6 +35,9 @@ module System.Console.ANSI.Codes
   , clearScreenCode, clearFromCursorToLineEndCode
   , clearFromCursorToLineBeginningCode, clearLineCode
 
+    -- * Enabling and disabling line wrap
+  , enableLineWrapCode, disableLineWrapCode
+
     -- * Scrolling the screen
     --
     -- | These functions yield @\"\"@ when the number is @0@ as, on some
@@ -308,6 +311,10 @@ clearScreenCode = csi [2] "J"
 clearFromCursorToLineEndCode = csi [0] "K"
 clearFromCursorToLineBeginningCode = csi [1] "K"
 clearLineCode = csi [2] "K"
+
+enableLineWrapCode, disableLineWrapCode :: String
+enableLineWrapCode = csi [] "?7h"
+disableLineWrapCode = csi [] "?7l"
 
 scrollPageUpCode, scrollPageDownCode ::
      Int -- ^ Number of lines to scroll by
