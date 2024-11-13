@@ -18,6 +18,7 @@ examples = [ cursorMovementExample
            , setCursorPositionExample
            , saveRestoreCursorExample
            , clearExample
+           , lineWrapExample
            , scrollExample
            , screenBuffersExample
            , sgrColorExample
@@ -205,6 +206,24 @@ clearExample = do
   clearScreen
   pause
   --
+
+lineWrapExample :: IO ()
+lineWrapExample = do
+  putStrLn $ take 240 $ cycle "Default-line-wrap|"
+  pause
+  -- Default-line-wrap|Default-line-wrap|Default-line-wrap|Default-line-wrap|Def
+  -- ault-line-wrap|Default-line-wrap|Default-line-wrap|Default-line-wrap|Defaul
+  -- t-line-wrap|Default-line-wrap|Default-line-wrap|Default-line-wrap|Default-l
+  disableLineWrap
+  putStrLn $ take 240 $ cycle "Disable-line-wrap|"
+  pause
+  -- Disable-line-wrap|Disable-line-wrap|Disable-line-wrap|Disable-line-wrap|Dis
+  enableLineWrap
+  putStrLn $ take 240 $ cycle "Enable-line-wrap|"
+  pause
+  -- Enable-line-wrap|Enable-line-wrap|Enable-line-wrap|Enable-line-wrap|Enable-
+  -- line-wrap|Enable-line-wrap|Enable-line-wrap|Enable-line-wrap|Enable-line-wr
+  -- ap|Enable-line-wrap|Enable-line-wrap|Enable-line-wrap|Enable-line-wrap|Enab
 
 scrollExample :: IO ()
 scrollExample = do
