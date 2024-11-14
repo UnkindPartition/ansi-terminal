@@ -1,4 +1,4 @@
-snapshot: lts-22.26 # GHC 9.6.5
+snapshot: lts-22.41 # GHC 9.6.6
 flags:
   ansi-terminal:
     example: false
