@@ -1,6 +1,12 @@
 Changes
 =======
 
+Version 1.1.2
+-------------
+
+* Add `enableLineWrap` and `disableLineWrap`, and support for enabling and
+ disabling automatic line wrapping.
+
 Version 1.1.1
 -------------
 

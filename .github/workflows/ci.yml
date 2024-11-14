@@ -26,7 +26,7 @@ jobs:
           - "9.2.8"
           - "9.4.8"
         include:
-          - ghc: "9.6.5"
+          - ghc: "9.6.6"
             cabal: "3.10"
           - ghc: "9.8.2"
             cabal: "3.10"
@@ -76,7 +76,7 @@ jobs:
           - ghc: "9.4.8"
             cabal: "3.8"
             winio: true
-          - ghc: "9.6.5"
+          - ghc: "9.6.6"
             cabal: "3.10"
             winio: true
           - ghc: "9.8.2"
