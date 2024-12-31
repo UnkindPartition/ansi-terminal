@@ -1,6 +1,4 @@
-snapshot: lts-22.41 # GHC 9.6.6
+snapshot: lts-23.2 # GHC 9.8.4
 flags:
   ansi-terminal:
     example: false
-extra-deps:
-- ansi-terminal-types-1.1@sha256:135f6a381afa19d53d0a3fe40b6dd47e6666c538b09e4300fbb1438759df3248,1462

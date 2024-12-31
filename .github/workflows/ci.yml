@@ -28,10 +28,12 @@ jobs:
         include:
           - ghc: "9.6.6"
             cabal: "3.10"
-          - ghc: "9.8.2"
+          - ghc: "9.8.4"
             cabal: "3.10"
           - ghc: "9.10.1"
             cabal: "3.10"
+          - ghc: "9.12.1"
+            cabal: "3.14"
     steps:
       - uses: actions/checkout@v4
       - uses: haskell-actions/setup@v2
@@ -79,11 +81,14 @@ jobs:
           - ghc: "9.6.6"
             cabal: "3.10"
             winio: true
-          - ghc: "9.8.2"
+          - ghc: "9.8.4"
             cabal: "3.10"
             winio: true
           - ghc: "9.10.1"
             cabal: "3.10"
+            winio: true
+          - ghc: "9.12.1"
+            cabal: "3.14"
             winio: true
     steps:
       - uses: actions/checkout@v4
