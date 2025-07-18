@@ -26,13 +26,13 @@ jobs:
           - "9.2.8"
           - "9.4.8"
         include:
-          - ghc: "9.6.6"
+          - ghc: "9.6.7"
             cabal: "3.10"
           - ghc: "9.8.4"
             cabal: "3.10"
-          - ghc: "9.10.1"
+          - ghc: "9.10.2"
             cabal: "3.10"
-          - ghc: "9.12.1"
+          - ghc: "9.12.2"
             cabal: "3.14"
     steps:
       - uses: actions/checkout@v4
@@ -78,16 +78,16 @@ jobs:
           - ghc: "9.4.8"
             cabal: "3.8"
             winio: true
-          - ghc: "9.6.6"
+          - ghc: "9.6.7"
             cabal: "3.10"
             winio: true
           - ghc: "9.8.4"
             cabal: "3.10"
             winio: true
-          - ghc: "9.10.1"
+          - ghc: "9.10.2"
             cabal: "3.10"
             winio: true
-          - ghc: "9.12.1"
+          - ghc: "9.12.2"
             cabal: "3.14"
             winio: true
     steps:
