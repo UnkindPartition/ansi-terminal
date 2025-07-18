@@ -1,4 +1,4 @@
-Many other packages depend on `ansi-terminal`. As at November 2024, over 4,800
+Many other packages depend on `ansi-terminal`. As at July 2025, almost 5,000
 packages on [Hackage](https:https://hackage.haskell.org/) depend on it, directly
 or indirectly. Consider raising an
 [issue](https://github.com/UnkindPartition/ansi-terminal/issues) to
@@ -9,13 +9,14 @@ The `ansi-terminal` and `ansi-terminal-types` packages aim to have:
 * a high degree of backwards compatibility with earlier versions of GHC; and
 * comprehensive and high-quality Haddock documentation.
 
-As of `ansi-terminal-1.0.1`, the package aims to be compatible with versions
+As of `ansi-terminal-1.1.3`, the package aims to be compatible with versions
 of GHC from GHC 7.10.1 (released March 2015). GHC 7.10.1 comes with:
 * `base-4.8.0.0`
 
 The `ansi-terminal` package also depends on:
-* `ansi-terminal-types`, which exposes module `System.Console.ANSI.Types`. The
-  package is provided to avoid circular dependencies in some circumstances; and
+* `ansi-terminal-types`, which exposes modules `System.Console.ANSI.Codes` and
+  `System.Console.ANSI.Types`. The package is provided to avoid circular
+  dependencies in some circumstances; and
 * `colour-2.1.0` or later, used for 24-bit colour (`Colour`, `RGB`, `toSRGB` and
   `toSRGB24`).
 
