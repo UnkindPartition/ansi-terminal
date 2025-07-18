@@ -1,4 +1,4 @@
-snapshot: lts-24.0 # GHC 9.10.2
+snapshot: nightly-2025-07-18 # GHC 9.12.2
 flags:
   ansi-terminal:
     example: false
