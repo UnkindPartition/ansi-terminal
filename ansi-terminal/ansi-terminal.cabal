@@ -1,6 +1,6 @@
 Cabal-Version:       1.22
 Name:                ansi-terminal
-Version:             1.1.2
+Version:             1.1.3
 Category:            User Interfaces
 Synopsis:            Simple ANSI terminal support
 Description:         ANSI terminal support for Haskell: allows cursor movement,
@@ -30,16 +30,16 @@ Flag Example
 Library
         Hs-Source-Dirs:         src
         Exposed-Modules:        System.Console.ANSI
-                                System.Console.ANSI.Codes
 
         -- We re-export all of ansi-terminal-types to aid compatibility for
         -- downstream users.
-        Reexported-Modules:     System.Console.ANSI.Types
+        Reexported-Modules:     System.Console.ANSI.Codes
+                              , System.Console.ANSI.Types
 
         Other-Modules:          System.Console.ANSI.Internal
 
         Build-Depends:          base >= 4.8.0.0 && < 5
-                              , ansi-terminal-types == 1.1
+                              , ansi-terminal-types == 1.1.3
                               , colour >= 2.1.0
         if os(windows)
             Hs-Source-Dirs:     win

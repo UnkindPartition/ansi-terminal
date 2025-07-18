@@ -1,6 +1,12 @@
 Changes
 =======
 
+Version 1.1.3
+-------------
+
+* Module `System.Console.ANSI.Codes` spun out to dependency package
+  `ansi-terminal-types-1.1.3`.
+
 Version 1.1.2
 -------------
 
