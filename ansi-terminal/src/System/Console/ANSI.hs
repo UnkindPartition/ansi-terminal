@@ -648,7 +648,7 @@ hSupportsANSI = Internal.hSupportsANSI
 -- the processing of \'ANSI\' control characters in output is not enabled, this
 -- function first tries to enable such processing.
 --
--- @Since 1.0.1
+-- @since 1.0.1
 hNowSupportsANSI :: Handle -> IO Bool
 hNowSupportsANSI = Internal.hNowSupportsANSI
 
