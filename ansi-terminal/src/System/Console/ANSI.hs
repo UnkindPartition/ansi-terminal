@@ -391,7 +391,7 @@ import Data.Colour.SRGB ( RGB (..) )
 import Data.Word ( Word16 )
 import System.IO
          ( BufferMode (..), Handle, hFlush, hGetBuffering, hGetEcho, hPutStr
-         , hReady, hSetBuffering, hSetEcho, stdin, stdout
+         , hReady, hSetBuffering, hSetEcho, stdin, stdout, hIsTerminalDevice
          )
 import Text.ParserCombinators.ReadP
          ( ReadP, (<++), char, many1, readP_to_S, satisfy, string )
@@ -761,7 +761,11 @@ getCursorPosition = hGetCursorPosition stdout
 --
 -- @since 0.10.1
 hGetCursorPosition :: Handle -> IO (Maybe (Int, Int))
-hGetCursorPosition h = fmap to0base <$> getCursorPosition'
+hGetCursorPosition h = do
+  isTerminalStdin <- hIsTerminalDevice stdin
+  if isTerminalStdin
+    then fmap to0base <$> getCursorPosition'
+    else pure Nothing
  where
   to0base (row, col) = (row - 1, col - 1)
   getCursorPosition' = do
