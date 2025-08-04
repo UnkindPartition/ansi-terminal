@@ -11,34 +11,56 @@ import Text.Printf(printf)
 import Data.Colour.SRGB (sRGB24)
 
 import System.Console.ANSI
+import System.Environment ( getArgs )
 
-examples :: [IO ()]
-examples = [ cursorMovementExample
-           , lineChangeExample
-           , setCursorPositionExample
-           , saveRestoreCursorExample
-           , clearExample
-           , lineWrapExample
-           , scrollExample
-           , screenBuffersExample
-           , sgrColorExample
-           , sgrOtherExample
-           , cursorVisibilityExample
-           , hyperlinkExample
-           , titleExample
-           , getCursorPositionExample
-           , getTerminalSizeExample
-           , getLayerColorExample
-           ]
+examples :: [(String, IO ())]
+examples =
+  [ ( "Cursor movement", cursorMovementExample )
+  , ( "Line change", lineChangeExample )
+  , ( "Set cursor position", setCursorPositionExample )
+  , ( "Save restore cursor", saveRestoreCursorExample )
+  , ( "Clear", clearExample )
+  , ( "Line wrap", lineWrapExample )
+  , ( "Scroll", scrollExample )
+  , ( "Screen buffers", screenBuffersExample )
+  , ( "SGR color", sgrColorExample )
+  , ( "SGR other", sgrOtherExample )
+  , ( "Cursor visibility", cursorVisibilityExample )
+  , ( "Hyperlink", hyperlinkExample )
+  , ( "Title", titleExample )
+  , ( "Get cursor position", getCursorPositionExample )
+  , ( "Get terminal size", getTerminalSizeExample )
+  , ( "Get layer color", getLayerColorExample )
+  ]
 
 main :: IO ()
 main = do
-  stdoutSupportsANSI <- hNowSupportsANSI stdout
-  if stdoutSupportsANSI
+  args <- getArgs
+  let numExamples = zip [1 ..] examples
+  if wantHelp args
     then
-      mapM_ (resetScreen >>) examples
-    else
-      putStrLn "Standard output does not support 'ANSI' escape codes."
+      listExamples numExamples
+    else do
+      let wantedNumExamples = filter (isExample args) numExamples
+          wantedExamples = map getExample wantedNumExamples
+      stdoutSupportsANSI <- hNowSupportsANSI stdout
+      if stdoutSupportsANSI
+        then
+          mapM_ (resetScreen >>) wantedExamples
+        else
+          putStrLn "Standard output does not support 'ANSI' escape codes."
+ where
+  wantHelp :: [String] -> Bool
+  wantHelp args = "-h" `elem` args || "--help" `elem` args
+
+  listExamples :: [(Int, (String, IO ()))] -> IO ()
+  listExamples = mapM_ (\(n, (d, _)) -> putStrLn $ show n ++ ": " ++ d)
+
+  isExample :: [String] -> (Int, (String, IO ())) -> Bool
+  isExample args (n, _) = show n `elem` args
+
+  getExample :: (Int, (String, IO ())) -> IO ()
+  getExample (_, (_, example)) = example
 
 -- Annex D to Standard ECMA-48 (5th Ed, 1991) identifies that the representation
 -- of an erased state is implementation-dependent. There may or may not be a
