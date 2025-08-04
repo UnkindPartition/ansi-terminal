@@ -384,6 +384,7 @@ module System.Console.ANSI
   , hSupportsANSIWithoutEmulation
   ) where
 
+import Control.Concurrent (threadDelay)
 import Control.Exception.Base ( bracket )
 import Control.Monad ( when, void )
 import Data.Char ( digitToInt, isDigit, isHexDigit )
@@ -775,8 +776,13 @@ hGetCursorPosition h = fmap to0base <$> getCursorPosition'
         hSetEcho stdin False
         clearStdin
         hReportCursorPosition h
-        hFlush h -- ensure the report cursor position code is sent to the
-                 -- operating system
+        -- Ensure the report cursor position code is sent to the operating
+        -- system:
+        hFlush h
+        -- On Windows and in Windows Terminal v1.22.12111.0 (at least), it seems
+        -- that a moment's delay is required in order to allow sufficient time
+        -- for the reported information to reach the standard input channel:
+        threadDelay 1
         getReportedCursorPosition
     case readP_to_S cursorPosition input of
       [] -> pure Nothing
@@ -889,8 +895,12 @@ hGetLayerColor h layer = do
       hSetEcho stdin False
       clearStdin
       hReportLayerColor h layer
-      hFlush h -- ensure the report cursor position code is sent to the
-               -- operating system
+      -- Ensure the report cursor position code is sent to the operating system:
+      hFlush h
+      -- On Windows and in Windows Terminal v1.22.12111.0 (at least), it seems
+      -- that a moment's delay is required in order to allow sufficient time for
+      -- the reported information to reach the standard input channel:
+      threadDelay 1
       getReportedLayerColor layer
   case readP_to_S (layerColor layer) input of
       [] -> pure Nothing
