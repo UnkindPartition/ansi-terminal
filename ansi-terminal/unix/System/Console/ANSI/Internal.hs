@@ -92,7 +92,7 @@ hSupportsANSIColor h = (|| isEmacsTerm) <$> hSupportsANSI h
 -- This approach is taken because the use of C function setenv() in one thread
 -- can cause other threads calling C function getenv() to crash. On Unix-like
 -- operating systems, System.Environment.lookupEnv is implemented using C
--- function getenv(). 
+-- function getenv().
 isNotDumb :: Bool
 isNotDumb = unsafePerformIO (lookupEnv "TERM") /= Just "dumb"
 
@@ -102,7 +102,7 @@ isNotDumb = unsafePerformIO (lookupEnv "TERM") /= Just "dumb"
 -- INSIDE_EMACS environment variable exists, that will not change. This approach
 -- is taken because the use of C function setenv() in one thread can cause other
 -- threads calling C function getenv() to crash. On Unix-like operating systems,
--- System.Environment.lookupEnv is implemented using C function getenv(). 
+-- System.Environment.lookupEnv is implemented using C function getenv().
 insideEmacs :: Bool
 insideEmacs = isJust $ unsafePerformIO (lookupEnv "INSIDE_EMACS")
 

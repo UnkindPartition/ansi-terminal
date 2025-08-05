@@ -742,6 +742,8 @@ getReportedCursorPosition = Internal.getReportedCursorPosition
 -- as mintty, that are not based on the Windows' Console API. (Command Prompt
 -- and PowerShell are based on the Console API.)
 --
+-- This operation may fail with an error if 'stdin' has been redirected.
+--
 -- @since 0.10.3
 getCursorPosition :: IO (Maybe (Int, Int))
 getCursorPosition = hGetCursorPosition stdout
@@ -759,6 +761,8 @@ getCursorPosition = hGetCursorPosition stdout
 -- On Windows operating systems, the function is not supported on consoles, such
 -- as mintty, that are not based on the Windows' Console API. (Command Prompt
 -- and PowerShell are based on the Console API.)
+--
+-- This operation may fail with an error if 'stdin' has been redirected.
 --
 -- @since 0.10.1
 hGetCursorPosition :: Handle -> IO (Maybe (Int, Int))
@@ -864,6 +868,8 @@ getReportedLayerColor = Internal.getReportedLayerColor
 --
 -- Underlining is not supported.
 --
+-- This operation may fail with an error if 'stdin' has been redirected.
+--
 -- @since 0.11.4
 getLayerColor :: ConsoleLayer -> IO (Maybe(RGB Word16))
 getLayerColor = hGetLayerColor stdout
@@ -881,6 +887,8 @@ getLayerColor = hGetLayerColor stdout
 -- emulation that does not work on Windows Terminal.
 --
 -- Underlining is not supported.
+--
+-- This operation may fail with an error if 'stdin' has been redirected.
 --
 -- @since 0.11.4
 hGetLayerColor :: Handle -> ConsoleLayer -> IO (Maybe (RGB Word16))
@@ -976,6 +984,8 @@ layerColor layer = do
 -- as mintty, that are not based on Windows' Console API. (Command Prompt and
 -- PowerShell are based on the Console API.)
 --
+-- This operation may fail with an error if 'stdin' has been redirected.
+--
 -- For a different approach, one that does not use control character sequences
 -- and works when 'stdin' is redirected, see the
 -- <https://hackage.haskell.org/package/terminal-size terminal-size> package.
@@ -998,6 +1008,8 @@ getTerminalSize = hGetTerminalSize stdout
 -- On Windows operating systems, the function is not supported on consoles, such
 -- as mintty, that are not based on the Windows' Console API. (Command Prompt
 -- and PowerShell are based on the Console API.)
+--
+-- This operation may fail with an error if 'stdin' has been redirected.
 --
 -- For a different approach, one that does not use control character sequences
 -- and works when 'stdin' is redirected, see the
