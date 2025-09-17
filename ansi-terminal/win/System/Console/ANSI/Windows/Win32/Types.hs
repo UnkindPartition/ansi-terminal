@@ -30,28 +30,17 @@ module System.Console.ANSI.Windows.Win32.Types
   , withHandleToHANDLE
   ) where
 
-import Control.Concurrent.MVar ( readMVar )
-import Control.Exception ( bracket, throwIO )
+import Control.Exception ( throwIO )
 import Control.Monad ( when )
 import Data.Char ( isSpace )
-import Data.Typeable ( cast )
 import Data.Word ( Word16, Word32 )
 import Foreign.C.Error ( Errno (..), errnoToIOError )
 import Foreign.C.String ( peekCWString )
 import Foreign.C.Types ( CChar, CInt (..), CShort (..), CWchar )
 import Foreign.Ptr ( Ptr, nullPtr )
-import Foreign.StablePtr ( StablePtr, freeStablePtr, newStablePtr )
-import GHC.IO.Handle.Types ( Handle (..), Handle__ (..) )
-import GHC.IO.FD ( FD(..) ) -- A wrapper around an Int32
 import Numeric ( showHex )
 import System.IO.Error ( ioeSetErrorString )
-
-#if defined(__IO_MANAGER_WINIO__)
-import GHC.IO.Exception
-         ( IOErrorType (InappropriateType), IOException (IOError), ioException )
-import GHC.IO.SubSystem ( (<!>) )
-import GHC.IO.Windows.Handle ( ConsoleHandle, Io, NativeHandle, toHANDLE )
-#endif
+import System.Win32.Types (withHandleToHANDLE)
 
 type Addr = Ptr ()
 type BOOL = Bool
@@ -74,68 +63,6 @@ type ULONG = Word32
 type USHORT = Word16
 type WCHAR = CWchar
 type WORD = Word16
-
-withStablePtr :: a -> (StablePtr a -> IO b) -> IO b
-withStablePtr value = bracket (newStablePtr value) freeStablePtr
-
-#if defined(__IO_MANAGER_WINIO__)
-
-withHandleToHANDLE :: Handle -> (HANDLE -> IO a) -> IO a
-withHandleToHANDLE = withHandleToHANDLEPosix <!> withHandleToHANDLENative
-
-withHandleToHANDLENative :: Handle -> (HANDLE -> IO a) -> IO a
-withHandleToHANDLENative haskell_handle action =
-  withStablePtr haskell_handle $ const $ do
-    let write_handle_mvar = case haskell_handle of
-            FileHandle _ handle_mvar     -> handle_mvar
-            DuplexHandle _ _ handle_mvar -> handle_mvar
-    windows_handle <- readMVar write_handle_mvar >>= handle_ToHANDLE
-    action windows_handle
- where
-  handle_ToHANDLE :: Handle__ -> IO HANDLE
-  handle_ToHANDLE (Handle__{haDevice = dev}) =
-    case ( cast dev :: Maybe (Io NativeHandle)
-         , cast dev :: Maybe (Io ConsoleHandle)) of
-      (Just hwnd, Nothing) -> pure $ toHANDLE hwnd
-      (Nothing, Just hwnd) -> pure $ toHANDLE hwnd
-      _                    -> throwErr "not a known HANDLE"
-
-  throwErr msg = ioException $ IOError (Just haskell_handle)
-    InappropriateType "withHandleToHANDLENative" msg Nothing Nothing
-
-#else
-
-withHandleToHANDLE :: Handle -> (HANDLE -> IO a) -> IO a
-withHandleToHANDLE = withHandleToHANDLEPosix
-
-#endif
-
-withHandleToHANDLEPosix :: Handle -> (HANDLE -> IO a) -> IO a
-withHandleToHANDLEPosix haskell_handle action =
-  -- Create a stable pointer to the Handle. This prevents the garbage collector
-  -- getting to it while we are doing horrible manipulations with it, and hence
-  -- stops it being finalized (and closed).
-  withStablePtr haskell_handle $ const $ do
-    -- Grab the write handle variable from the Handle
-    let write_handle_mvar = case haskell_handle of
-          FileHandle _ handle_mvar     -> handle_mvar
-          DuplexHandle _ _ handle_mvar -> handle_mvar
-          -- This is "write" MVar, we could also take the "read" one
-
-    -- Get the FD from the algebraic data type
-    Just fd <- (\(Handle__ { haDevice = dev }) -> fmap fdFD (cast dev))
-             <$> readMVar write_handle_mvar
-
-    -- Finally, turn that (C-land) FD into a HANDLE using msvcrt
-    windows_handle <- c_get_osfhandle fd
-    -- Do what the user originally wanted
-    action windows_handle
-
--- This essential function comes from the C runtime system. It is certainly
--- provided by msvcrt, and also seems to be provided by the mingw C library -
--- hurrah!
-foreign import ccall unsafe "_get_osfhandle"
-  c_get_osfhandle :: CInt -> IO HANDLE
 
 failIfNeg :: (Num a, Ord a) => String -> IO a -> IO a
 failIfNeg = failIf (< 0)
