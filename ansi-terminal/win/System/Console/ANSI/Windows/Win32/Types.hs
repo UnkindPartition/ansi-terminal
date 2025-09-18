@@ -41,28 +41,16 @@ import Foreign.C.String ( peekCWString )
 import Foreign.C.Types ( CChar, CInt (..), CShort (..), CWchar )
 import Foreign.Ptr ( Ptr, nullPtr )
 import Foreign.StablePtr ( StablePtr, freeStablePtr, newStablePtr )
-#if MIN_VERSION_base(4,20,0)
-import GHC.Internal.IO.Handle.Types ( Handle (..), Handle__ (..) )
-import GHC.Internal.IO.FD ( FD(..) ) -- A wrapper around an Int32
-#else
 import GHC.IO.Handle.Types ( Handle (..), Handle__ (..) )
 import GHC.IO.FD ( FD(..) ) -- A wrapper around an Int32
-#endif
 import Numeric ( showHex )
 import System.IO.Error ( ioeSetErrorString )
 
 #if defined(__IO_MANAGER_WINIO__)
-#if MIN_VERSION_base(4,20,0)
-import GHC.Internal.IO.Exception
-         ( IOErrorType (InappropriateType), IOException (IOError), ioException )
-import GHC.Internal.IO.SubSystem ( (<!>) )
-import GHC.Internal.IO.Windows.Handle ( ConsoleHandle, Io, NativeHandle, toHANDLE )
-#else
 import GHC.IO.Exception
          ( IOErrorType (InappropriateType), IOException (IOError), ioException )
 import GHC.IO.SubSystem ( (<!>) )
 import GHC.IO.Windows.Handle ( ConsoleHandle, Io, NativeHandle, toHANDLE )
-#endif
 #endif
 
 type Addr = Ptr ()
