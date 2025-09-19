@@ -23,7 +23,7 @@ Source-repository head
   type:     git
   location: git://github.com/UnkindPartition/ansi-terminal.git
 
-Flag Example
+Flag example
         Description:    Build the example application
         Default:        False
 
