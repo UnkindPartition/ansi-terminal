@@ -30,7 +30,7 @@ jobs:
             cabal: "3.10"
           - ghc: "9.8.4"
             cabal: "3.10"
-          - ghc: "9.10.2"
+          - ghc: "9.10.3"
             cabal: "3.10"
           - ghc: "9.12.2"
             cabal: "3.14"
@@ -84,7 +84,7 @@ jobs:
           - ghc: "9.8.4"
             cabal: "3.10"
             winio: true
-          - ghc: "9.10.2"
+          - ghc: "9.10.3"
             cabal: "3.10"
             winio: true
           - ghc: "9.12.2"
