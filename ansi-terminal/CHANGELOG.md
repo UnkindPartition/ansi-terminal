@@ -1,6 +1,15 @@
 Changes
 =======
 
+Version 1.1.4
+-------------
+
+* Fixes `hGetCursorPosition` and `hGetLayerColor` on Windows, allowing time for
+  reported information to reach the standard input channel.
+* Improvements to Haddock documentation.
+* The executable `ansi-terminal-example` allows individual examples to be
+  selected.
+
 Version 1.1.3
 -------------
 
