@@ -1,6 +1,6 @@
 Cabal-Version:       1.22
 Name:                ansi-terminal
-Version:             1.1.4
+Version:             1.1.5
 Category:            User Interfaces
 Synopsis:            Simple ANSI terminal support
 Description:         ANSI terminal support for Haskell: allows cursor movement,
@@ -50,6 +50,15 @@ Library
             Install-Includes:   HsWin32.h
             C-Sources:          win/c-source/errors.c
                                 win/c-source/HsWin32.c
+            -- The MSYS2 UCRT64 environment is stricter than the MINGW64
+            -- environment about these C compiler diagnostics:
+            -- (1) macro-redefined, (2) missing-declarations, and
+            -- (3) pragma-pack. Windows C headers are not warning-clean under
+            -- -Wmacro-redefined, -Wmissing-declarations and -Wpragma-pack. We
+            -- smother those warnings:
+            Cc-Options:         -Wno-macro-redefined
+                                -Wno-missing-declarations
+                                -Wno-pragma-pack
         else
             Hs-Source-Dirs:     unix
 

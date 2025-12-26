@@ -1,6 +1,13 @@
 Changes
 =======
 
+Version 1.1.5
+-------------
+
+* On Windows, smothers a C compiler's warnings about `macro-undefined`,
+  `missing-definitions` and `pragma-pack`, which can be triggered by Windows
+  C headers.
+
 Version 1.1.4
 -------------
 
