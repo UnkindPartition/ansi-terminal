@@ -57,7 +57,7 @@ module System.Console.ANSI.Codes
     -- * Select Graphic Rendition mode: colors and other whizzy stuff
   , setSGRCode
 
-    -- * Cursor visibilty changes
+    -- * Cursor visibility changes
   , hideCursorCode, showCursorCode
 
     -- * Hyperlinks
@@ -89,7 +89,7 @@ import Data.Colour.SRGB (toSRGB24, RGB (..))
 import System.Console.ANSI.Types
 
 -- | Type synonym representing parameter values (without parameter substrings).
--- To represent a paramater value followed by a parameter substring, see
+-- To represent a parameter value followed by a parameter substring, see
 -- 'ParamWithSubs'.
 --
 -- @since 1.1
@@ -280,7 +280,7 @@ restoreCursorCode = "\ESC8"
 reportCursorPositionCode :: String
 reportCursorPositionCode = csi [] "6n"
 
--- | Code to emit the foreground or backgrond layer color into the console input
+-- | Code to emit the foreground or background layer color into the console input
 -- stream, immediately after being recognised on the output stream, as:
 --
 -- @ESC ] \<Ps> ; rgb: \<red> ; \<green> ; \<blue> \<ST>@

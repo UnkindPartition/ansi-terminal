@@ -121,14 +121,14 @@ Version 0.11.3
 Version 0.11.2
 --------------
 
-* On Windows, fix compatability with the Windows I/O Manager (WinIO) when
+* On Windows, fix compatibility with the Windows I/O Manager (WinIO) when
   GHC >= 9.0.1 but `Win32` < 2.9.0.0.
 * Improvements to Haddock documentation.
 
 Version 0.11.1
 --------------
 
-* On Windows, fix compatability with the Windows I/O Manager (WinIO) introduced
+* On Windows, fix compatibility with the Windows I/O Manager (WinIO) introduced
   in GHC 9.0.1, by incorporating changes made in package `Win32-2.13.2.0` in
   that regard.
 * Improvements to Haddock documentation.
@@ -138,7 +138,7 @@ Version 0.11
 
 * Remove deprecated `getCursorPosition0`. (Use `getCursorPosition` instead.)
 * On Unix-like operating systems, the temporary turning off of echoing is moved
-  from `getReportedCursorPosition` to `hGetCursorPositon`.
+  from `getReportedCursorPosition` to `hGetCursorPosition`.
 * On Unix-like operating systems, fix a bug in `getCursorPosition` and
   `hGetCursorPosition`, where the console input stream was was not always
   clear before the cursor position was emitted into it.
@@ -224,7 +224,7 @@ Version 0.8.0.2
 ---------------
 
 * Improve README and Haddock documentation
-* On Windows, fix compatability with earlier GHC versions
+* On Windows, fix compatibility with earlier GHC versions
 * Drop support for GHC versions before 6.12.1 (released December 2009)
 
 Version 0.8.0.1
