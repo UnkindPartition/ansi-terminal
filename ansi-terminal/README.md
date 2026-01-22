@@ -26,7 +26,7 @@ If you like this, you may be interested in
 provides a pretty-printer that can construct strings containing 'ANSI'
 colorisation.
 
-Not all 'ANSI' escape codes are suported by this library but most (if not
+Not all 'ANSI' escape codes are supported by this library but most (if not
 all) of the popular ones that are well-supported by terminal software are,
 including:
 -   Select Graphic Rendition mode (colors and other attributes): `setSGR`

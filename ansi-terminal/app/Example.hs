@@ -272,10 +272,10 @@ scrollExample = do
 
 screenBuffersExample :: IO ()
 screenBuffersExample = do
-  replicateM_ 5 $ putStrLn "This message is on the Normal Screen Bufffer"
+  replicateM_ 5 $ putStrLn "This message is on the Normal Screen Buffer"
   replicateM_ 5 pause
   useAlternateScreenBuffer
-  replicateM_ 5 $ putStrLn "This message is on the Alternate Screen Bufffer"
+  replicateM_ 5 $ putStrLn "This message is on the Alternate Screen Buffer"
   replicateM_ 5 pause
   useNormalScreenBuffer
   replicateM_ 5 $ putStrLn "This message is continuing where we left off"

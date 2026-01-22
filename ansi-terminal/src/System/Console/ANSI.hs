@@ -44,7 +44,7 @@ Content Architectures\` (also published as ISO/IEC International Standard
 8613-6); and (3) further extensions used by \'XTerm\', a terminal emulator for
 the X Window System. The escape codes are described in a
   [Wikipedia article](http://en.wikipedia.org/wiki/ANSI_escape_code) and those
-codes supported on current versions of Windows are descibed in
+codes supported on current versions of Windows are described in
   [Microsoft's documentation](https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences).
 
 The whole of the \'ANSI\' standards are not supported by this library but most
@@ -81,14 +81,14 @@ processing.
 
 Terminal software other than the native software exists for Windows. One example
 is the \'mintty\' terminal emulator for \'Cygwin\', \'MSYS\' or \'MSYS2\', and
-dervied projects, and for \'WSL\' (Windows Subsystem for Linux).
+derived projects, and for \'WSL\' (Windows Subsystem for Linux).
 
 GHC's management of input and output (IO) on Windows has also developed over
 time. If they are supported by the terminal software, some control character
 sequences cause data to be emitted into the console input stream. For GHC's
 historical and default IO manager, the function 'System.IO.hGetBufNonBlocking'
 in module "System.IO" does not work on Windows. This has been attributed to the
-lack of non-blocking primatives in the operating system (see
+lack of non-blocking primitives in the operating system (see
   [GHC bug report #806](https://ghc.haskell.org/trac/ghc/ticket/806). GHC's
 native IO manager on Windows (\'WinIO\'), introduced as a preview in
   [GHC 9.0.1](https://downloads.haskell.org/ghc/9.0.1/docs/html/users_guide/9.0.1-notes.html#highlights),
@@ -116,7 +116,7 @@ Every function exported by this module comes in three variants, namely:
  * A \'...@Code@\' variant that has a @String@ type (for example,
    @clearScreenCode :: String@). This variant outputs the sequence of control
    characters as a 'String', which can be added to any other bit of text before
-   being output. If a high degree of backwards compatability is rewuired, the
+   being output. If a high degree of backwards compatibility is required, the
    use of these codes is discouraged because they will not work on legacy
    versions of Windows where the terminal in use is not ANSI-enabled (see
    further above). On Windows, where emulation has been necessary, these
@@ -321,7 +321,7 @@ module System.Console.ANSI
   , hSetSGR
   , setSGRCode
 
-    -- * Cursor visibilty changes
+    -- * Cursor visibility changes
     --
     -- | Strictly speaking, these code sequences are not part of ECMA-48 standard;
     -- they are popular, but non-portable extensions. However, in practice they seem
@@ -709,7 +709,7 @@ cursorPosition = do
 --
 -- > -- set no buffering (if 'no buffering' is not already set, the contents of
 -- > -- the buffer will be discarded, so this needs to be done before the cursor
--- > -- positon is emitted)
+-- > -- position is emitted)
 -- > hSetBuffering stdin NoBuffering
 -- > -- ensure that echoing is off
 -- > input <- bracket (hGetEcho stdin) (hSetEcho stdin) $ \_ -> do
@@ -773,7 +773,7 @@ hGetCursorPosition h = fmap to0base <$> getCursorPosition'
     input <- bracket (hGetBuffering stdin) (hSetBuffering stdin) $ \_ -> do
       -- set no buffering (if 'no buffering' is not already set, the contents of
       -- the buffer will be discarded, so this needs to be done before the
-      -- cursor positon is emitted)
+      -- cursor position is emitted)
       hSetBuffering stdin NoBuffering
       -- ensure that echoing is off
       bracket (hGetEcho stdin) (hSetEcho stdin) $ \_ -> do
@@ -833,7 +833,7 @@ hReportLayerColor h layer = hPutStr h $ reportLayerColorCode layer
 --
 -- > -- set no buffering (if 'no buffering' is not already set, the contents of
 -- > -- the buffer will be discarded, so this needs to be done before the cursor
--- > -- positon is emitted)
+-- > -- position is emitted)
 -- > hSetBuffering stdin NoBuffering
 -- > -- ensure that echoing is off
 -- > input <- bracket (hGetEcho stdin) (hSetEcho stdin) $ \_ -> do
@@ -896,7 +896,7 @@ hGetLayerColor h layer = do
   input <- bracket (hGetBuffering stdin) (hSetBuffering stdin) $ \_ -> do
     -- set no buffering (if 'no buffering' is not already set, the contents of
     -- the buffer will be discarded, so this needs to be done before the
-    -- cursor positon is emitted)
+    -- cursor position is emitted)
     hSetBuffering stdin NoBuffering
     -- ensure that echoing is off
     bracket (hGetEcho stdin) (hSetEcho stdin) $ \_ -> do
