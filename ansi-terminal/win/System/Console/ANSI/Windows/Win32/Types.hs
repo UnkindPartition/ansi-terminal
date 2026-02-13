@@ -30,27 +30,47 @@ module System.Console.ANSI.Windows.Win32.Types
   , withHandleToHANDLE
   ) where
 
-import Control.Concurrent.MVar ( readMVar )
-import Control.Exception ( bracket, throwIO )
+import Control.Exception ( throwIO )
 import Control.Monad ( when )
 import Data.Char ( isSpace )
-import Data.Typeable ( cast )
 import Data.Word ( Word16, Word32 )
 import Foreign.C.Error ( Errno (..), errnoToIOError )
 import Foreign.C.String ( peekCWString )
 import Foreign.C.Types ( CChar, CInt (..), CShort (..), CWchar )
 import Foreign.Ptr ( Ptr, nullPtr )
-import Foreign.StablePtr ( StablePtr, freeStablePtr, newStablePtr )
-import GHC.IO.Handle.Types ( Handle (..), Handle__ (..) )
-import GHC.IO.FD ( FD(..) ) -- A wrapper around an Int32
 import Numeric ( showHex )
 import System.IO.Error ( ioeSetErrorString )
 
+#if __GLASGOW_HASKELL__ >= 915
+
+import System.IO ( Handle )
+import System.IO.OS ( withFileDescriptorWritingBiasedRaw )
+
 #if defined(__IO_MANAGER_WINIO__)
+
+import GHC.IO.SubSystem ( (<!>) )
+import System.IO.OS ( withWindowsHandleWritingBiasedRaw )
+
+#endif
+
+#else
+
+import Control.Concurrent.MVar ( readMVar )
+import Control.Exception ( bracket )
+import Data.Typeable ( cast )
+import Foreign.StablePtr ( StablePtr, freeStablePtr, newStablePtr )
+import GHC.IO.FD ( FD (..) ) -- A wrapper around an Int32
+import GHC.IO.Handle.Types ( Handle (..), Handle__ (..) )
+
+#if defined(__IO_MANAGER_WINIO__)
+
 import GHC.IO.Exception
          ( IOErrorType (InappropriateType), IOException (IOError), ioException )
 import GHC.IO.SubSystem ( (<!>) )
 import GHC.IO.Windows.Handle ( ConsoleHandle, Io, NativeHandle, toHANDLE )
+
+#endif
+
 #endif
 
 type Addr = Ptr ()
@@ -74,6 +94,34 @@ type ULONG = Word32
 type USHORT = Word16
 type WCHAR = CWchar
 type WORD = Word16
+
+#if __GLASGOW_HASKELL__ >= 915
+
+#if defined(__IO_MANAGER_WINIO__)
+
+{-
+    Note that this implementation of 'withHandleToHANDLE' differs from the one
+    provided by the @Win32@ package in that it partly or fully blocks operations
+    on the given Haskell handle during the execution of the user-provided
+    action, to an extend that interaction with the Windows handle through the
+    Haskell handle is prevented.
+-}
+withHandleToHANDLE :: Handle -> (HANDLE -> IO a) -> IO a
+withHandleToHANDLE =
+  withHandleToHANDLEPOSIX <!> withWindowsHandleWritingBiasedRaw
+
+#else
+
+withHandleToHANDLE :: Handle -> (HANDLE -> IO a) -> IO a
+withHandleToHANDLE = withHandleToHANDLEPOSIX
+
+#endif
+
+withHandleToHANDLEPOSIX :: Handle -> (HANDLE -> IO a) -> IO a
+withHandleToHANDLEPOSIX h act =
+  withFileDescriptorWritingBiasedRaw h $ act . c_get_osfhandle
+
+#else
 
 withStablePtr :: a -> (StablePtr a -> IO b) -> IO b
 withStablePtr value = bracket (newStablePtr value) freeStablePtr
@@ -130,6 +178,8 @@ withHandleToHANDLEPosix haskell_handle action =
     windows_handle <- c_get_osfhandle fd
     -- Do what the user originally wanted
     action windows_handle
+
+#endif
 
 -- This essential function comes from the C runtime system. It is certainly
 -- provided by msvcrt, and also seems to be provided by the mingw C library -
